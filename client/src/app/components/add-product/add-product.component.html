@@ -1,0 +1,105 @@
+
+<div class="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-white shadow-2xl rounded-2xl">
+  <h2 class="text-center mb-6 text-3xl font-bold text-gray-800">Add New Product</h2>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Product Title -->
+    <div>
+      <label for="title" class="block text-sm font-medium text-gray-700">Product Title</label>
+      <input id="title" type="text" formControlName="title" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter product title">
+      <div class="text-red-500 text-sm mt-1">
+        @if (productForm.controls["title"].errors?.['required'] && productForm.controls["title"].touched) {
+          <span>This is required</span>
+        }
+        @if (productForm.controls["title"].errors?.['minlength']) {
+          <span>Min 3 characters required.</span>
+        }
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+      <textarea id="description" formControlName="description" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" rows="3" placeholder="Enter product description"></textarea>
+      <div class="text-red-500 text-sm mt-1">
+        @if (productForm.controls["description"].errors?.['required'] && productForm.controls["description"].touched) {
+          <span>This is required</span>
+        }
+        @if (productForm.controls["description"].errors?.['minlength']) {
+          <span>Min 10 characters required.</span>
+        }
+      </div>
+    </div>
+
+    <!-- Price and Stock -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
+        <input id="price" type="number" formControlName="price" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter price">
+        <div class="text-red-500 text-sm mt-1">
+          @if (productForm.get('price')?.errors?.['required'] && productForm.get('price')?.touched) {
+            <span>Price is required.</span>
+          }
+          @if (productForm.get('price')?.errors?.['min']) {
+            <span>Price must be 1 or greater.</span>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label for="stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+        <input id="stock" type="number" formControlName="stock" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter stock quantity">
+        <div class="text-red-500 text-sm mt-1">
+          @if (productForm.get('stock')?.errors?.['required'] && productForm.get('stock')?.touched) {
+            <span>Stock is required.</span>
+          }
+          @if (productForm.get('stock')?.errors?.['min']) {
+            <span>Stock must be 0 or greater.</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Discount -->
+    <div>
+      <label for="discount" class="block text-sm font-medium text-gray-700">Discount (%)</label>
+      <input id="discount" type="number" formControlName="discountPercentage" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter discount">
+      <div class="text-red-500 text-sm mt-1">
+        @if (productForm.get('discountPercentage')?.errors?.['required']) {
+          <span>Discount is required.</span>
+        }
+        @if (productForm.get('discountPercentage')?.errors?.['min']) {
+          <span>Discount must be 0 or greater.</span>
+        }
+        @if (productForm.get('discountPercentage')?.errors?.['max']) {
+          <span>Discount must be less than or equal to 100.</span>
+        }
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div>
+      <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+      <select id="category" formControlName="category" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all">
+        <option value="" disabled>Select a category</option>
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+      <div class="text-red-500 text-sm mt-1">
+        @if (productForm.controls["category"].errors?.['required'] && productForm.controls["category"].touched) {
+          <span>This is required</span>
+        }
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div>
+      <label for="tags" class="block text-sm font-medium text-gray-700">Tags (comma separated)</label>
+      <input id="tags" type="text" formControlName="tags" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter tags">
+    </div>
+
+    <!-- Submit Button -->
+    <button [disabled]="productForm.invalid" class="w-full bg-gradient-to-r from-[#6EE7B7] to-[#3B82F6] text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl hover:from-[#3B82F6] hover:to-[#6EE7B7] transition-all duration-300" type="submit">
+      Add Product
+    </button>
+  </form>
+</div>
