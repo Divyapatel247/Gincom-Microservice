@@ -1,0 +1,44 @@
+# .NET Core / ASP.NET Core
+[Bb]in/
+[Oo]bj/
+*.csproj.user
+*.suo
+*.user
+*.sln.docstates
+
+# Build output
+/build/
+*.dll
+*.exe
+*.pdb
+
+# Dependency directories
+/packages/
+/node_modules/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+appsettings.json  # Remove this line if you want to commit appsettings.json
+
+# Visual Studio / Rider
+.idea/
+*.sln.iml
+/.vs/
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+.DS_Store
+
+# Test results
+[Tt]est[Rr]esult*/
