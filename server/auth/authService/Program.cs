@@ -1,9 +1,26 @@
+using authService.Repositories;
+using IdentityServer4.Validation;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
+builder.Services.AddSingleton<IUserRepository>(new UserRepository(connectionString));
+builder.Services.AddScoped<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+// builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddIdentityServer()
+    .AddInMemoryIdentityResources(Config.IdentityResources)
+    .AddInMemoryApiScopes(Config.ApiScopes)
+    .AddInMemoryClients(Config.Clients)
+    .AddResourceOwnerValidator<ResourceOwnerPasswordValidator>()
+    .AddDeveloperSigningCredential();
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -35,6 +52,11 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+app.UseRouting();
+app.UseIdentityServer();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
 

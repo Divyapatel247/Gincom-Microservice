@@ -1,3 +1,6 @@
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,28 +8,40 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var builder = WebApplication.CreateBuilder(args);
-
 
 // Add Ocelot configuration
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 builder.Services.AddOcelot(builder.Configuration);
 
 // Add JWT authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer("Bearer", options =>
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer("IdentityServer", options =>
     {
-        options.Authority = "https://localhost:5001"; // Auth Service URL
-        options.Audience = "product-service"; // Expected audience
-        options.RequireHttpsMetadata = false; // For development
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
-        };
+        options.Authority = "http://localhost:5001";
+        options.RequireHttpsMetadata = false;
+        options.Audience = "api.read";
     });
+
+
+builder.Services.AddAuthorization(options =>
+{
+options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer("Bearer", options =>
+//     {
+//         options.Authority = "https://localhost:5001"; // Auth Service URL
+//         options.Audience = "product-service"; // Expected audience
+//         options.RequireHttpsMetadata = false; // For development
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true
+//         };
+//     });
 
 // Add CORS for Angular
 builder.Services.AddCors(options =>
@@ -53,8 +68,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 app.UseOcelot().Wait();
 
 
