@@ -25,7 +25,7 @@ public class ResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
                 {
                     new Claim("email", user.Email),
                     new Claim("username", user.Username),
-                    new Claim(ClaimTypes.Role, user.Role) // Add role claim
+                    new Claim(ClaimTypes.Role, user.Role) 
                 });
         }
         else
