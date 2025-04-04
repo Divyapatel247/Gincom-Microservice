@@ -1,10 +1,24 @@
+using Dapper;
+using ProductService.Handlers;
+using ProductService.Interfaces;
+using ProductService.Model;
+using ProductService.Repository;
+using ProductService.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+SqlMapper.AddTypeHandler(new JSONTypeHandler<List<string>>());
+SqlMapper.AddTypeHandler(new JSONTypeHandler<Dimensions>()); 
 
+
+builder.Services.AddControllers();
+builder.Services.AddScoped<DatabaseConfig>();
+builder.Services.AddScoped<IProductRepository, ProductsRepository>();
+builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +50,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
+app.MapControllers();
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
