@@ -15,9 +15,13 @@ namespace OrderService.Mappers
         {
             return new OrderService.Models.Order
             {
-                ProductId = request.ProductId,
                 UserId = request.UserId,
-                Status = "Pending"
+                Status = "Pending",
+                Items = request.Items.Select(i => new OrderItem
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity
+                }).ToList()
             };
         }
 
@@ -26,11 +30,14 @@ namespace OrderService.Mappers
             return new OrderResponseDto
             {
                 Id = order.Id,
-                ProductId = order.ProductId,
                 UserId = order.UserId,
-                Status = order.Status
+                Status = order.Status,
+                Items = order.Items.Select(i => new OrderItemResponseDto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity
+                }).ToList()
             };
         }
-        
     }
 }

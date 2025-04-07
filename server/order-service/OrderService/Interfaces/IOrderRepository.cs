@@ -8,7 +8,7 @@ namespace OrderService.Interfaces
 {
 public interface IOrderRepository
     {
-Task<Basket> GetBasketAsync(string userId);
+        Task<Basket> GetBasketAsync(string userId);
         Task<Basket> CreateBasketAsync(Basket basket);
         Task AddBasketItemAsync(BasketItem item, int basketId);
         Task UpdateBasketItemAsync(int itemId, int quantity);
@@ -18,6 +18,7 @@ Task<Basket> GetBasketAsync(string userId);
         Task<Order> GetOrderByIdAsync(int orderId);
         Task<Order> CreateOrderAsync(Order order);
         Task UpdateOrderAsync(Order order);
+        Task AddOrderItemAsync(OrderItem item, int orderId);
         Task<Payment> CreatePaymentAsync(Payment payment);
         Task<Payment> GetPaymentByOrderIdAsync(int orderId);
     }
