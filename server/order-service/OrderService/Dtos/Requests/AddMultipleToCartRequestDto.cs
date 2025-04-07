@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace OrderService.Dtos.Requests
 {
-    public class CreateOrderRequestDto
+    public class AddMultipleToCartRequestDto
     {
-        public string UserId { get; set; }
-        public List<OrderItemDto>? Items { get; set; }
+        public List<CartItemDto> Items { get; set; }
     }
 
-    public class OrderItemDto
+    public class CartItemDto
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
