@@ -24,10 +24,10 @@ builder.Services.AddAuthentication()
     });
 
 
-builder.Services.AddAuthorization(options =>
-{
-options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-});
+// builder.Services.AddAuthorization(options =>
+// {
+// options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+// });
 // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //     .AddJwtBearer("Bearer", options =>
 //     {

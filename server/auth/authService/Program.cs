@@ -1,5 +1,9 @@
+using authService;
 using authService.Repositories;
+using authService.Services;
+using Common.Events;
 using IdentityServer4.Validation;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +15,33 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 builder.Services.AddSingleton<IUserRepository>(new UserRepository(connectionString));
 builder.Services.AddScoped<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+builder.Services.AddLogging(logging => logging.AddConsole());
 // builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Configure MassTransit with RabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        cfg.Publish<IUserLoggedInEvent>(x =>{    x.Exclude = true;});
+        cfg.ConfigureEndpoints(context); // Auto-configures endpoints for consumers
+    });
+});
+
+// Add publisher service
+builder.Services.AddScoped<RabbitMQPublisher>();
 
 builder.Services.AddIdentityServer()
     .AddInMemoryIdentityResources(Config.IdentityResources)
-    .AddInMemoryApiScopes(Config.ApiScopes)
     .AddInMemoryClients(Config.Clients)
+    .AddInMemoryApiScopes(Config.ApiScopes)
     .AddResourceOwnerValidator<ResourceOwnerPasswordValidator>()
+    .AddProfileService<CustomProfileService>()
     .AddDeveloperSigningCredential();
 
 builder.Services.AddControllers();

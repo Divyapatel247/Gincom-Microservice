@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 public static class Config
 {
-   public static IEnumerable<IdentityResource> IdentityResources =>
-        new List<IdentityResource>
-        {
+    public static IEnumerable<IdentityResource> IdentityResources =>
+         new List<IdentityResource>
+         {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
             new IdentityResources.Email(),
-            new IdentityResource("roles", "User roles", new[] { "role" }) 
-        };
+            new("custom", "Custom User Data", ["username", "role"]),
+         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
         new List<ApiScope>
@@ -27,12 +27,12 @@ public static class Config
                 ClientId = "client",
                 AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                 ClientSecrets = { new Secret("secret".Sha256()) },
-                
-                AllowedScopes = { "api.read", "api.write", "openid", "profile", "email", "roles" },
 
-                AllowOfflineAccess = true, 
-                
-                AlwaysIncludeUserClaimsInIdToken = true 
+                AllowedScopes = { "api.read", "api.write", "openid", "profile", "email", "role" },
+
+                AllowOfflineAccess = true,
+
+                AlwaysIncludeUserClaimsInIdToken = true
             }
         };
 }
