@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Dtos.Requests;
@@ -12,8 +10,7 @@ namespace OrderService.Controllers
 {
     [Route("api/orders/payments")]
     [ApiController]
-    [Tags("Payments")] 
-
+    [Tags("Payments")]
     public class PaymentsController : ControllerBase
     {
         private readonly IOrderRepository _repository;
@@ -28,19 +25,30 @@ namespace OrderService.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentRequestDto request)
         {
-            // Create Razorpay order
+            var order = await _repository.GetOrderByIdAsync(request.OrderId);
+            if (order == null || order.Status != "Pending")
+                return BadRequest("Invalid or non-pending order");
+
+            // This is now optional; Razorpay is initiated in CreateOrder
             var razorpayOrderId = await _paymentService.CreateRazorpayOrderAsync(request.OrderId, request.Amount);
 
-            // Save payment record
-            var payment = new Payment
+            var payment = await _repository.GetPaymentByOrderIdAsync(request.OrderId);
+            if (payment == null)
             {
-                // UserId = User.Identity.Name,
-                UserId = "test-user", // Extracted from JWT
-                OrderId = request.OrderId,
-                Status = "Pending",
-                TransactionId = razorpayOrderId
-            };
-            payment = await _repository.CreatePaymentAsync(payment);
+                payment = new Payment
+                {
+                    UserId = "test-user", // Extracted from JWT in production
+                    OrderId = request.OrderId,
+                    Status = "Pending", // Admin will change
+                    TransactionId = razorpayOrderId
+                };
+                await _repository.CreatePaymentAsync(payment);
+            }
+            else
+            {
+                payment.TransactionId = razorpayOrderId;
+                await _repository.UpdatePaymentAsync(payment);
+            }
 
             return Ok(new { RazorpayOrderId = razorpayOrderId });
         }
@@ -52,6 +60,5 @@ namespace OrderService.Controllers
             if (payment == null) return NotFound();
             return Ok(PaymentMapper.ToPaymentResponse(payment));
         }
-        
     }
 }

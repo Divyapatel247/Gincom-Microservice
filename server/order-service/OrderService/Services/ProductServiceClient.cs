@@ -45,18 +45,16 @@ namespace OrderService.Services
         private readonly HttpClient _client;
         private readonly bool _isProductServiceDown = true;
         private readonly ConcurrentDictionary<int, ProductDto> _mockProducts = new();
-        private readonly ConcurrentDictionary<int, int> _reservedStock = new(); // Track reserved stock
 
         public ProductServiceClient(HttpClient client)
         {
             _client = client;
             _client.BaseAddress = new Uri("https://localhost:5000/api/products/");
 
-            // Initialize mock products
             if (_mockProducts.IsEmpty)
             {
-                _mockProducts.TryAdd(1, new ProductDto { Id = 1, ProductDetail = "Dummy Product 1", Price = 1000m, Stock = 4 });
-                _mockProducts.TryAdd(2, new ProductDto { Id = 2, ProductDetail = "Dummy Product 2", Price = 1500m, Stock = 30 });
+                _mockProducts.TryAdd(1, new ProductDto { Id = 1, ProductDetail = "Dummy Product 1", Price = 10m, Stock = 5 });
+                _mockProducts.TryAdd(2, new ProductDto { Id = 2, ProductDetail = "Dummy Product 2", Price = 15m, Stock = 30 });
             }
         }
 
@@ -66,13 +64,12 @@ namespace OrderService.Services
             {
                 if (_mockProducts.TryGetValue(productId, out var product))
                 {
-                    int reserved = _reservedStock.GetValueOrDefault(productId, 0);
                     return new ProductDto
                     {
                         Id = product.Id,
                         ProductDetail = product.ProductDetail,
                         Price = product.Price,
-                        Stock = product.Stock - reserved // Return available (unreserved) stock
+                        Stock = product.Stock
                     };
                 }
                 return null;
@@ -84,45 +81,12 @@ namespace OrderService.Services
             return await JsonHandler.DeserializeAsync<ProductDto>(response);
         }
 
-        private readonly ConcurrentDictionary<int, SemaphoreSlim> _locks = new();
-        private SemaphoreSlim GetLock(int productId)
+        internal bool DeductStock(int productId, int quantity)
         {
-            return _locks.GetOrAdd(productId, _ => new SemaphoreSlim(1, 1));
-        }
-
-        internal bool ReserveStock(int productId, int quantity)
-        {
-            var productLock = GetLock(productId);
-            productLock.Wait(); // lock per product
-            try
+            lock (_mockProducts) // Prevent concurrent deductions
             {
-                if (!_mockProducts.TryGetValue(productId, out var product))
-                    return false;
-
-                int reserved = _reservedStock.GetValueOrDefault(productId, 0);
-                int available = product.Stock - reserved;
-
-                if (available < quantity)
-                    return false;
-
-                _reservedStock.AddOrUpdate(productId, quantity, (key, oldVal) => oldVal + quantity);
-                return true;
-            }
-            finally
-            {
-                productLock.Release();
-            }
-        }
-
-
-        internal void CommitStock(int productId, int quantity)
-        {
-            if (_mockProducts.TryGetValue(productId, out var product))
-            {
-                int reserved = _reservedStock.GetValueOrDefault(productId, 0);
-                if (reserved >= quantity)
+                if (_mockProducts.TryGetValue(productId, out var product) && product.Stock >= quantity)
                 {
-                    // Update the actual stock
                     _mockProducts[productId] = new ProductDto
                     {
                         Id = product.Id,
@@ -130,35 +94,39 @@ namespace OrderService.Services
                         Price = product.Price,
                         Stock = product.Stock - quantity
                     };
-
-                    // Subtract from reserved
-                    int remaining = reserved - quantity;
-
-                    if (remaining <= 0)
-                    {
-                        // Remove reservation if none left
-                        _reservedStock.TryRemove(productId, out _);
-                    }
-                    else
-                    {
-                        _reservedStock[productId] = remaining;
-                    }
+                    return true;
                 }
+                return false;
             }
         }
 
-
-        internal void ReleaseStock(int productId, int quantity)
+        internal bool RestoreStock(int productId, int quantity)
         {
-            _reservedStock.AddOrUpdate(productId, 0, (key, oldValue) => Math.Max(0, oldValue - quantity));
+            lock (_mockProducts) // Ensure atomic restoration
+            {
+                if (_mockProducts.TryGetValue(productId, out var product))
+                {
+                    _mockProducts[productId] = new ProductDto
+                    {
+                        Id = product.Id,
+                        ProductDetail = product.ProductDetail,
+                        Price = product.Price,
+                        Stock = product.Stock + quantity
+                    };
+                    return true;
+                }
+                return false;
+            }
         }
 
         internal void ResetStock()
         {
-            _mockProducts.Clear();
-            _reservedStock.Clear();
-            _mockProducts.TryAdd(1, new ProductDto { Id = 1, ProductDetail = "Dummy Product 1", Price = 1000m, Stock = 4 });
-            _mockProducts.TryAdd(2, new ProductDto { Id = 2, ProductDetail = "Dummy Product 2", Price = 1500m, Stock = 30 });
+            lock (_mockProducts)
+            {
+                _mockProducts.Clear();
+                _mockProducts.TryAdd(1, new ProductDto { Id = 1, ProductDetail = "Dummy Product 1", Price = 1000m, Stock = 5 });
+                _mockProducts.TryAdd(2, new ProductDto { Id = 2, ProductDetail = "Dummy Product 2", Price = 1500m, Stock = 30 });
+            }
         }
 
         internal Dictionary<int, ProductDto> GetMockProducts()
