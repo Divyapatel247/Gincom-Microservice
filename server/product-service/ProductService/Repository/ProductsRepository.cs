@@ -11,6 +11,7 @@ public class ProductsRepository : IProductRepository
 {
     private readonly string _connectionString;
 
+
         public ProductsRepository(DatabaseConfig dbConfig)
         {
             _connectionString = dbConfig.GetConnectionString();
@@ -23,13 +24,13 @@ public class ProductsRepository : IProductRepository
                 INSERT INTO Products (
                     Title, Description, Price, DiscountPercentage, Rating, Stock, Tags,
                     Brand, Sku, Weight, Dimensions, WarrantyInformation, ShippingInformation,
-                    AvailabilityStatus, Reviews, ReturnPolicy, MinimumOrderQuantity, Images,
+                    AvailabilityStatus, ReturnPolicy, MinimumOrderQuantity, 
                     Thumbnail, CategoryId
                 )
                 VALUES (
                     @Title, @Description, @Price, @DiscountPercentage, @Rating, @Stock, @Tags,
                     @Brand, @Sku, @Weight, @Dimensions, @WarrantyInformation, @ShippingInformation,
-                    @AvailabilityStatus, @Reviews, @ReturnPolicy, @MinimumOrderQuantity, @Images,
+                    @AvailabilityStatus,  @ReturnPolicy, @MinimumOrderQuantity,
                     @Thumbnail, @CategoryId
                 );
                 SELECT LAST_INSERT_ID();";
@@ -50,29 +51,30 @@ public class ProductsRepository : IProductRepository
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
-                var sql = @"
-            SELECT 
-                p.*, c.Id, c.Name
-            FROM Products p
-            LEFT JOIN Categories c ON p.CategoryId = c.Id";
-                // var productDict = new Dictionary<int, Product>();
-                var products = await connection.QueryAsync<Product, Category, Product>(
+                var sql = @"SELECT p.*, c.Id, c.Name FROM Products p LEFT JOIN Categories c ON p.CategoryId = c.Id LEFT JOIN Reviews r ON p.Id = r.ProductId";
+            
+
+                var productDict = new Dictionary<int, Product>();
+                 await connection.QueryAsync<Product, Category, Review, Product>(
                     sql,
-                    (product, category) =>
+                    (product, category, Review) =>
                     {
-                        product.Category = category;
-                        return product;
-                        // if (!productDict.TryGetValue(product.Id, out var productEntry))
-                        // {
-                        //     productEntry = product;
-                        //     productEntry.Category = category;
-                        //     productDict.Add(productEntry.Id, productEntry);
-                        // }
-                        // return productEntry;
-                    }
-                    // splitOn: "Id"
-                );
-                return products.DistinctBy(p => p.Id).ToList();
+                        if (!productDict.TryGetValue(product.Id, out var productEntry))
+                {
+                    productEntry = product;
+                    productEntry.Category = category;
+                    productDict.Add(productEntry.Id, productEntry);
+                }
+                if (Review != null)
+                {
+                    productEntry.Reviews.Add(Review);
+                }
+                return productEntry;
+            },
+            splitOn: "CategoryId,Id" // Split on Category.Id and Review.Id
+        );
+
+        return productDict.Values.ToList();
             }
         }
 
@@ -90,26 +92,60 @@ public class ProductsRepository : IProductRepository
         }
 
         public async Task<Product> GetProductByIdAsync(int id)
-        {
-            using var connection = new MySqlConnection(_connectionString);
-            var sql = @"
-        SELECT 
-            p.*, c.Id, c.Name
-        FROM Products p
-        LEFT JOIN Categories c ON p.CategoryId = c.Id
-        WHERE p.Id = @Id";
-            var results = await connection.QueryAsync<Product, Category, Product>(
-                sql,
-                (product, category) =>
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        // CHANGED: Simplified and ensured Reviews are included
+        var sql = @"
+            SELECT p.*, c.Id AS CategoryId, c.Name AS CategoryName, r.*
+            FROM Products p
+            LEFT JOIN Categories c ON p.CategoryId = c.Id
+            LEFT JOIN Reviews r ON p.Id = r.ProductId
+            WHERE p.Id = @Id";
+        var productDict = new Dictionary<int, Product>();
+        await connection.QueryAsync<Product, Category, Review, Product>(
+            sql,
+            (product, category, review) =>
+            {
+                if (!productDict.TryGetValue(product.Id, out var existingProduct))
                 {
-                    product.Category = category;
-                    return product;
-                },
-                new { Id = id },
-                splitOn: "Id"
-            );
-            return results.FirstOrDefault()!;
-        }
+                    existingProduct = product;
+                    existingProduct.Category = category;
+                    productDict[product.Id] = product;
+                }
+                if (review != null)
+                {
+                    existingProduct.Reviews.Add(review);
+                }
+                return existingProduct;
+            },
+            new { Id = id },
+            splitOn: "CategoryId,Id"
+        );
+        return productDict.Values.FirstOrDefault();
+    }
+        
+        
+        //     using var connection = new MySqlConnection(_connectionString);
+        //     var sql = @"
+        // SELECT 
+        //     p.*, c.Id, c.Name
+        // FROM Products p
+        // LEFT JOIN Categories c ON p.CategoryId = c.Id
+        // WHERE p.Id = @Id";
+        //     var results = await connection.QueryAsync<Product, Category, Product>(
+        //         sql,
+        //         (product, category) =>
+        //         {
+        //             product.Category = category;
+        //             return product;
+        //         },
+        //         new { Id = id },
+        //         splitOn: "Id"
+        //     );
+        //     return results.FirstOrDefault()!;
+
+
+        
 
 public async Task<List<Product>> GetProductsByCategoryAsync(string categoryName)
         {
@@ -157,5 +193,7 @@ public async Task<List<Product>> GetProductsByCategoryAsync(string categoryName)
         return product;
 
         }
+
+
     }
 

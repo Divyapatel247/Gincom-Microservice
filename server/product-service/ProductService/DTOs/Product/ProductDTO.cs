@@ -1,4 +1,5 @@
 using System;
+using ProductService.DTOs.Review;
 using ProductService.Model;
 
 namespace ProductService.DTOs;
@@ -20,7 +21,7 @@ public class ProductDTO
         public string WarrantyInformation { get; set; } = string.Empty;
         public string ShippingInformation { get; set; } = string.Empty;
         public string AvailabilityStatus { get; set; } = string.Empty;
-        public List<Review> Reviews { get; set; } = new List<Review>(); 
+        public List<ReviewDto> Reviews { get; set; } = new List<ReviewDto>(); 
         public string ReturnPolicy { get; set; } = string.Empty;
         public int MinimumOrderQuantity { get; set; }
         public List<string> Images { get; set; } = new List<string>(); 

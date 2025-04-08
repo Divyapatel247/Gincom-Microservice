@@ -1,4 +1,5 @@
 using Dapper;
+using MySql.Data.MySqlClient;
 using ProductService.Handlers;
 using ProductService.Interfaces;
 using ProductService.Model;
@@ -13,12 +14,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 SqlMapper.AddTypeHandler(new JSONTypeHandler<List<string>>());
 SqlMapper.AddTypeHandler(new JSONTypeHandler<Dimensions>()); 
-
+builder.Services.AddScoped(sp => 
+    new MySqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<DatabaseConfig>();
 builder.Services.AddScoped<IProductRepository, ProductsRepository>();
 builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
+builder.Services.AddScoped<IReviewRepository,ReviewRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

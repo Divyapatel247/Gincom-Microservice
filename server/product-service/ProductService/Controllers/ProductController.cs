@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using ProductService.DTOs;
+using ProductService.DTOs.Review;
 using ProductService.Interfaces;
 using ProductService.Mapper;
 
@@ -12,9 +13,11 @@ namespace ProductService.Controllers;
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _repository;
-        public ProductController(IProductRepository repository)
+        private readonly IReviewRepository _reviewRepo;
+        public ProductController(IProductRepository repository, IReviewRepository reviewRepo)
         {
             _repository = repository;
+            _reviewRepo = reviewRepo;
         }
 
         [HttpGet]
@@ -115,6 +118,51 @@ namespace ProductService.Controllers;
             var productDtos = products.Select(p => p.ToProductDto()).ToList();
             return Ok(productDtos);
         }
+
+
+        // New Review Endpoints
+    [HttpPost("{productId}/reviews")]
+    public async Task<IActionResult> AddReview(int productId, [FromBody] CreateReviewDto dto)
+    {
+        if (dto.ProductId != productId) return BadRequest("Product ID mismatch");
+        if (dto.Rating < 1 || dto.Rating > 5) return BadRequest("Rating must be between 1 and 5");
+
+        var product = await _repository.GetProductByIdAsync(productId);
+        if (product == null) return NotFound("Product not found");
+
+        int userId = 1; // Hardcoded; replace with auth later
+        var review = dto.ToReviewFromCreate(userId);
+        var id = await _reviewRepo.AddAsync(review);
+        review.Id = id;
+        return CreatedAtAction(nameof(GetReview), new { reviewId = id }, review.ToReviewDto());
+    }
+
+    [HttpGet("{productId}/reviews")]
+    public async Task<IActionResult> GetReviews(int productId)
+    {
+        var product = await _repository.GetProductByIdAsync(productId);
+        if (product == null) return NotFound("Product not found");
+
+        var reviews = await _reviewRepo.GetByProductIdAsync(productId);
+        return Ok(reviews.Select(r => r.ToReviewDto()));
+    }
+
+    [HttpGet("reviews/{reviewId}")]
+    public async Task<IActionResult> GetReview(int reviewId)
+    {
+        var review = await _reviewRepo.GetByIdAsync(reviewId);
+        if (review == null) return NotFound("Review not found");
+        return Ok(review.ToReviewDto());
+    }
+
+    [HttpDelete("reviews/{reviewId}")]
+    public async Task<IActionResult> DeleteReview(int reviewId)
+    {
+        int userId = 1; // Hardcoded; replace with auth later
+        var success = await _reviewRepo.DeleteAsync(reviewId, userId);
+        if (!success) return NotFound("Review not found or not owned by user");
+        return NoContent();
+    }
         
     }
 

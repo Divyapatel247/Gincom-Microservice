@@ -25,7 +25,7 @@ public static ProductDTO ToProductDto(this Product productModel)
                 WarrantyInformation = productModel.WarrantyInformation,
                 ShippingInformation = productModel.ShippingInformation,
                 AvailabilityStatus = productModel.AvailabilityStatus,
-                Reviews = productModel.Reviews ?? new List<Review>(), 
+                Reviews = productModel.Reviews.Select(r => r.ToReviewDto()).ToList(), 
                 ReturnPolicy = productModel.ReturnPolicy,
                 MinimumOrderQuantity = productModel.MinimumOrderQuantity,
                 Images = productModel.Images ?? new List<string>(), 
