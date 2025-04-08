@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Dtos.Requests;
 using OrderService.Interfaces;
@@ -13,6 +14,7 @@ namespace OrderService.Controllers
 {
     [Route("api/orders/{userId}/cart")]
     [ApiController]
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly IOrderRepository _repository;
