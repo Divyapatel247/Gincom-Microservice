@@ -30,9 +30,9 @@ namespace OrderService.Repositories
             if (basket == null) return null;
 
             basket.Items = (await conn.QueryAsync<BasketItem>(
-    "SELECT Id, BasketId, ProductId AS ProductId, Quantity FROM BasketItems WHERE BasketId = @BasketId",
-    new { BasketId = basket.Id }))
-    .ToList();
+                "SELECT Id, BasketId, ProductId AS ProductId, Quantity FROM BasketItems WHERE BasketId = @BasketId",
+                new { BasketId = basket.Id }))
+                .ToList();
 
             return basket;
         }
@@ -124,14 +124,13 @@ namespace OrderService.Repositories
                 Console.WriteLine($"[Repository] Inserting OrderItem -> ProductId: {item.ProductId}, Quantity: {item.Quantity}");
 
                 if (item.ProductId <= 0)
-                    throw new Exception("❌ ProductId is missing or invalid while inserting OrderItem");
+                    throw new Exception("ProductId is missing or invalid while inserting OrderItem");
 
                 await AddOrderItemAsync(item, order.Id);
             }
 
             return order;
         }
-
 
         public async Task UpdateOrderAsync(Order order)
         {
@@ -140,14 +139,6 @@ namespace OrderService.Repositories
                 "UPDATE `Order` SET Status = @Status WHERE Id = @Id",
                 new { order.Status, order.Id });
         }
-
-        // public async Task AddOrderItemAsync(OrderItem item)
-        // {
-        //     using var conn = Connection;
-        //     await conn.ExecuteAsync(
-        //         "INSERT INTO OrderItems (OrderId, ProductId, Quantity) VALUES (@OrderId, @ProductId, @Quantity)",
-        //         new { item.OrderId, item.ProductId, item.Quantity });
-        // }
 
         public async Task AddOrderItemAsync(OrderItem item, int orderId)
         {
@@ -161,9 +152,6 @@ namespace OrderService.Repositories
                     Quantity = item.Quantity
                 });
         }
-
-
-
 
         public async Task<Payment> CreatePaymentAsync(Payment payment)
         {
@@ -179,6 +167,14 @@ namespace OrderService.Repositories
             using var conn = Connection;
             return await conn.QueryFirstOrDefaultAsync<Payment>(
                 "SELECT * FROM Payment WHERE OrderId = @OrderId", new { OrderId = orderId });
+        }
+
+        public async Task UpdatePaymentAsync(Payment payment)
+        {
+            using var conn = Connection;
+            await conn.ExecuteAsync(
+                "UPDATE Payment SET UserId = @UserId, Status = @Status, TransactionId = @TransactionId WHERE Id = @Id",
+                new { payment.UserId, payment.Status, payment.TransactionId, payment.Id });
         }
     }
 }

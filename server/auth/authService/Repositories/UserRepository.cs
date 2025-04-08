@@ -32,4 +32,11 @@ public class UserRepository(string connectionString) : IUserRepository
             "INSERT INTO Users (Email, Username, PasswordHash, Role) VALUES (@Email, @Username, @PasswordHash, @Role)",
             user);
     }
+
+    public async Task<User> GetByIdAsync(int id)
+{
+    using var connection = new MySqlConnection(_connectionString);
+    return await connection.QueryFirstOrDefaultAsync<User>(
+        "SELECT * FROM Users WHERE Id = @Id", new { Id = id });
+}
 }

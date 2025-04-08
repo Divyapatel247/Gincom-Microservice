@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Dtos.Requests;
 using OrderService.Interfaces;
@@ -12,37 +13,33 @@ using OrderService.Services;
 namespace OrderService.Controllers
 {
     [Route("api/orders")]
-    [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _repository;
         private readonly ProductServiceClient _productService;
+        private readonly IPaymentService _paymentService;
 
-        public OrdersController(IOrderRepository repository, ProductServiceClient productService)
+        public OrdersController(IOrderRepository repository, ProductServiceClient productService, IPaymentService paymentService)
         {
             _repository = repository;
             _productService = productService;
+            _paymentService = paymentService;
         }
+
         [HttpGet("{userId}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetOrders(string userId)
         {
-            // Ensure the requesting user matches the userId (or is admin)
-            // if (User.Identity.Name != userId && !User.IsInRole("Admin"))
-            //     return Forbid();
-
             var orders = await _repository.GetOrdersAsync(userId);
             var response = orders.Select(OrderMapper.ToOrderResponse).ToList();
             return Ok(response);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequestDto request)
+        [HttpPost("{userId}")]
+        public async Task<IActionResult> CreateOrder(string userId)
         {
-            if (string.IsNullOrEmpty(request.UserId))
-                return BadRequest("UserId is required");
-
-            var basket = await _repository.GetBasketAsync(request.UserId);
-
+            var basket = await _repository.GetBasketAsync(userId);
             if (basket == null || basket.Items == null || !basket.Items.Any())
                 return BadRequest("Cart is empty");
 
@@ -50,22 +47,6 @@ namespace OrderService.Controllers
             foreach (var i in basket.Items)
             {
                 Console.WriteLine($"BasketItem -> Id: {i.Id}, ProductId: {i.ProductId}, Quantity: {i.Quantity}");
-            }
-
-            var productQuantities = basket.Items
-                .GroupBy(i => i.ProductId)
-                .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
-
-            foreach (var productId in productQuantities.Keys)
-            {
-                var product = await _productService.GetProductAsync(productId, null);
-                if (product == null)
-                    return BadRequest($"Product with ID {productId} not found");
-
-                // if (!_productService.ReserveStock(productId, productQuantities[productId]))
-                //     return BadRequest($"Insufficient stock for Product ID {productId}. Available: {product.Stock}, Required: {productQuantities[productId]}");
-                if (product.Stock < productQuantities[productId])
-                    return BadRequest($"Insufficient stock...");
             }
 
             var orderItems = basket.Items.Select(i => new OrderItem
@@ -80,71 +61,52 @@ namespace OrderService.Controllers
                 Console.WriteLine($"OrderItem -> ProductId: {item.ProductId}, Quantity: {item.Quantity}");
             }
 
+            // Calculate total amount (for Razorpay)
+            decimal totalAmount = 0;
+            foreach (var item in orderItems)
+            {
+                var product = await _productService.GetProductAsync(item.ProductId, null);
+                if (product != null)
+                {
+                    totalAmount += product.Price * item.Quantity;
+                }
+            }
+
+            // Deduct stock at order creation
+            var productQuantities = orderItems
+                .GroupBy(i => i.ProductId)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+            foreach (var productId in productQuantities.Keys)
+            {
+                var product = await _productService.GetProductAsync(productId, null);
+                if (product == null)
+                    return BadRequest($"Product with ID {productId} not found");
+                if (!_productService.DeductStock(productId, productQuantities[productId]))
+                    return BadRequest($"Insufficient stock for Product ID {productId}. Available: {product.Stock}, Required: {productQuantities[productId]}");
+            }
+
             var order = new Order
             {
-                UserId = request.UserId,
-                Status = "Pending",
+                UserId = userId,
+                Status = "Pending", // Admin will change
                 Items = orderItems
             };
 
             order = await _repository.CreateOrderAsync(order);
 
-            foreach (var item in order.Items)
+            // Initiate Razorpay order
+            var razorpayOrderId = await _paymentService.CreateRazorpayOrderAsync(order.Id, totalAmount * 100); // Amount in paise
+            var payment = new Payment
             {
-                _productService.CommitStock(item.ProductId, item.Quantity);
-            }
+                UserId = userId,
+                OrderId = order.Id,
+                Status = "Pending", // Admin will change
+                TransactionId = razorpayOrderId
+            };
+            await _repository.CreatePaymentAsync(payment);
 
-            await _repository.ClearBasketAsync(request.UserId);
-
-            return Ok(OrderMapper.ToOrderResponse(order));
+            return Ok(new { Order = OrderMapper.ToOrderResponse(order), RazorpayOrderId = razorpayOrderId });
         }
-
-
-        // [HttpPost]
-        // public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequestDto request)
-        // {
-        //     if (string.IsNullOrEmpty(request.UserId))
-        //         return BadRequest("UserId is required");
-
-        //     if (request.Items == null || !request.Items.Any())
-        //         return BadRequest("Order must contain at least one item");
-
-        //     var productQuantities = request.Items
-        //         .GroupBy(i => i.ProductId)
-        //         .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
-
-        //     foreach (var productId in productQuantities.Keys)
-        //     {
-        //         var product = await _productService.GetProductAsync(productId, null);
-        //         if (product == null)
-        //             return BadRequest($"Product with ID {productId} not found");
-
-        //         if (!_productService.ReserveStock(productId, productQuantities[productId]))
-        //             return BadRequest($"Insufficient stock for Product ID {productId}. Available: {product.Stock}, Required: {productQuantities[productId]}");
-        //     }
-
-        //     var order = new Order
-        //     {
-        //         UserId = request.UserId,
-        //         Status = "Pending",
-        //         Items = request.Items.Select(i => new OrderItem
-        //         {
-        //             ProductId = i.ProductId,
-        //             Quantity = i.Quantity
-        //         }).ToList()
-        //     };
-
-        //     order = await _repository.CreateOrderAsync(order);
-
-        //     foreach (var item in order.Items)
-        //     {
-        //         _productService.CommitStock(item.ProductId, item.Quantity);
-        //     }
-
-        //     return Ok(OrderMapper.ToOrderResponse(order));
-        // }
-
-
 
         [HttpPut("{orderId}/status")]
         public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequestDto request)
@@ -152,10 +114,29 @@ namespace OrderService.Controllers
             var order = await _repository.GetOrderByIdAsync(orderId);
             if (order == null) return NotFound();
 
-            order.Status = request.Status;
+            if (request.Status == "Cancelled")
+            {
+                // Restore stock if order is cancelled
+                var productQuantities = order.Items
+                    .GroupBy(i => i.ProductId)
+                    .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+                foreach (var productId in productQuantities.Keys)
+                {
+                    _productService.RestoreStock(productId, productQuantities[productId]);
+                }
+            }
+
+            order.Status = request.Status; // Admin changes status
             await _repository.UpdateOrderAsync(order);
+
+            var payment = await _repository.GetPaymentByOrderIdAsync(orderId);
+            if (payment != null)
+            {
+                payment.Status = request.Status; // Sync payment status with order
+                await _repository.UpdatePaymentAsync(payment);
+            }
+
             return Ok(OrderMapper.ToOrderResponse(order));
         }
-
     }
 }

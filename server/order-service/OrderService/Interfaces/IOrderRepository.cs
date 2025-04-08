@@ -21,5 +21,6 @@ public interface IOrderRepository
         Task AddOrderItemAsync(OrderItem item, int orderId);
         Task<Payment> CreatePaymentAsync(Payment payment);
         Task<Payment> GetPaymentByOrderIdAsync(int orderId);
+        Task UpdatePaymentAsync(Payment payment);
     }
 }

@@ -16,13 +16,19 @@ builder.Services.AddScoped<IPaymentService, RazorpayPaymentService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.Authority = "https://localhost:5001";
-//         options.Audience = "product-service";
-//         options.RequireHttpsMetadata = false;
-//     });
+
+builder.Services.AddAuthorization(options =>
+{
+options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://localhost:5001";
+        options.Audience = "api";
+        options.RequireHttpsMetadata = false;
+    });
 
 
 
@@ -36,8 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 
