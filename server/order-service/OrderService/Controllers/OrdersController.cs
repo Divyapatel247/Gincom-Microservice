@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Dtos.Requests;
 using OrderService.Interfaces;
@@ -12,7 +13,7 @@ using OrderService.Services;
 namespace OrderService.Controllers
 {
     [Route("api/orders")]
-    [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _repository;
@@ -27,6 +28,7 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetOrders(string userId)
         {
             var orders = await _repository.GetOrdersAsync(userId);
