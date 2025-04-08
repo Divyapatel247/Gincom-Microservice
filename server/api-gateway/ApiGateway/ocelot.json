@@ -54,10 +54,26 @@
         { "Host": "localhost", "Port": 5004 }
       ],
       "UpstreamPathTemplate": "/api/orders/{everything}",
-      "UpstreamHttpMethod": ["GET","POST", "PUT", "DELETE"],
+      "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "IdentityServer",
-        "AllowedScopes": ["api.read","api.write"]
+        "AllowedScopes": ["api.read"]
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/orders/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5004 }
+      ],
+      "UpstreamPathTemplate": "/api/orders/{everything}",
+      "UpstreamHttpMethod": ["POST", "PUT", "DELETE"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServer",
+        "AllowedScopes": ["api.write"]
+      },
+      "AuthorizationOptions": {
+        "RequireRole": "Admin" 
       }
     },
     {

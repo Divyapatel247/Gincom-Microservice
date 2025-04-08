@@ -37,10 +37,9 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddScoped<RabbitMQPublisher>();
 
 builder.Services.AddIdentityServer()
-    .AddInMemoryApiScopes(Config.ApiScopes)
-     .AddInMemoryApiResources(Config.ApiResources)
-    .AddInMemoryClients(Config.Clients)
     .AddInMemoryIdentityResources(Config.IdentityResources)
+    .AddInMemoryClients(Config.Clients)
+    .AddInMemoryApiScopes(Config.ApiScopes)
     .AddResourceOwnerValidator<ResourceOwnerPasswordValidator>()
     .AddProfileService<CustomProfileService>()
     .AddDeveloperSigningCredential();
