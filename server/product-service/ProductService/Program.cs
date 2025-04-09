@@ -1,4 +1,7 @@
 using Dapper;
+using MassTransit;
+using MySql.Data.MySqlClient;
+using ProductService.Consumers;
 using ProductService.Handlers;
 using ProductService.Interfaces;
 using ProductService.Model;
@@ -13,12 +16,39 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 SqlMapper.AddTypeHandler(new JSONTypeHandler<List<string>>());
 SqlMapper.AddTypeHandler(new JSONTypeHandler<Dimensions>()); 
-
+builder.Services.AddScoped(sp => 
+    new MySqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<DatabaseConfig>();
 builder.Services.AddScoped<IProductRepository, ProductsRepository>();
 builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
+builder.Services.AddScoped<IReviewRepository,ReviewRepository>();
+
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<OrderCreatedConsumer>();
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        cfg.ReceiveEndpoint("order-created-queue", e =>
+        {
+            e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        });
+    });
+});
+
+
+
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

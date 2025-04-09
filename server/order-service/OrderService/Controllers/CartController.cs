@@ -143,18 +143,18 @@ namespace OrderService.Controllers
             return NoContent();
         }
 
-        [HttpGet("debug/stock")]
-        public IActionResult DebugStock()
-        {
-            var stocks = _productService.GetMockProducts();
-            return Ok(stocks);
-        }
+        // [HttpGet("debug/stock")]
+        // public IActionResult DebugStock()
+        // {
+        //     var stocks = _productService.GetMockProducts();
+        //     return Ok(stocks);
+        // }
 
-        [HttpGet("reset/stock")]
-        public IActionResult ResetStock()
-        {
-            _productService.ResetStock();
-            return Ok("Stock reset successfully");
-        }
+        // [HttpGet("reset/stock")]
+        // public IActionResult ResetStock()
+        // {
+        //     _productService.ResetStock();
+        //     return Ok("Stock reset successfully");
+        // }
     }
 }

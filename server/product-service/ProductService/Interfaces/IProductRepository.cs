@@ -12,4 +12,5 @@ Task<List<Product>> GetAllProductsAsync();
         Task<Product> UpdateProductAsync(Product product);
         Task<bool> DeleteProductAsync(int id);
         Task<List<Product>> GetProductsByCategoryAsync(string categoryName);
+        Task<bool> DeductStockAsync(int productId, int quantity);
 }
