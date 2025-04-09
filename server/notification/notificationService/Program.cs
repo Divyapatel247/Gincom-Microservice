@@ -8,11 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddLogging();
 
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserLoggedInConsumer>();
-    // x.AddConsumer<OrderCreatedConsumer>();
+    x.AddConsumer<OrderCreatedConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -28,8 +29,15 @@ builder.Services.AddMassTransit(x =>
             e.ConfigureConsumer<UserLoggedInConsumer>(context);
             // e.ConfigureConsumer<OrderCreatedConsumer>(context);
         });
+        cfg.ReceiveEndpoint("order-created-notification-queue", e =>
+        {
+            e.Bind("Common.Events:OrderCreatedEvent");
+             e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        });
     });
 });
+
 
 
 var app = builder.Build();

@@ -2,6 +2,7 @@ using OrderService.Interfaces;
 using OrderService.Repositories;
 using OrderService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Audience = "api";
         options.RequireHttpsMetadata = false;
     });
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+    });
+});
 
 
 
