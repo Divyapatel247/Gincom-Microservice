@@ -28,7 +28,10 @@ public class Product
 
         public int CategoryId { get; set; }
         public  Category Category { get; set; }
+        public List<Product> RelatedProducts { get; set; } = new List<Product>();
 }
+
+
 public class Dimensions
     {
         public decimal Width { get; set; }

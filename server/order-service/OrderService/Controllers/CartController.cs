@@ -41,6 +41,10 @@ namespace OrderService.Controllers
             if (product == null)
                 return BadRequest("Product not found");
 
+            // Check stock before adding to cart
+            if (product.Stock <= 0 || product.Stock < request.Quantity)
+                return BadRequest($"Insufficient stock for Product ID {request.ProductId}. Available: {product.Stock}, Requested: {request.Quantity}");
+
             var basket = await _repository.GetBasketAsync(userId);
             if (basket == null)
             {
@@ -81,6 +85,14 @@ namespace OrderService.Controllers
 
             foreach (var itemDto in request.Items)
             {
+                var product = await _productService.GetProductAsync(itemDto.ProductId, null);
+                if (product == null)
+                    return BadRequest($"Product with ID {itemDto.ProductId} not found");
+
+                // Check stock before adding to cart
+                if (product.Stock <= 0 || product.Stock < itemDto.Quantity)
+                    return BadRequest($"Insufficient stock for Product ID {itemDto.ProductId}. Available: {product.Stock}, Requested: {itemDto.Quantity}");
+
                 var existingItem = basket.Items.FirstOrDefault(i => i.ProductId == itemDto.ProductId);
                 if (existingItem != null)
                 {
@@ -102,7 +114,6 @@ namespace OrderService.Controllers
 
             return Ok(BasketMapper.ToBasketResponse(basket));
         }
-
         [HttpPut("items/{itemId}")]
         public async Task<IActionResult> UpdateCartItem(string userId, int itemId, [FromBody] UpdateBasketItemRequestDto request)
         {

@@ -1,0 +1,1 @@
+CREATE TRIGGER LimitRelatedProducts BEFORE INSERT ON RelatedProducts FOR EACH ROW BEGIN DECLARE related_count INT; SELECT COUNT(*) INTO related_count FROM RelatedProducts WHERE ProductId = NEW.ProductId; IF related_count >= 4 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot add more than 4 related products'; END IF; END;
