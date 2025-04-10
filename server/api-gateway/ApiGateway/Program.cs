@@ -65,20 +65,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //     });
 
 // Add CORS for Angular
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngular", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // For SignalR
-    });
+builder.Services.AddCors(options =>{
+    options.AddPolicy("AllowSpecificOrigins",
+    builder => builder.WithOrigins("http://localhost:4200")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials());
 });
 
 
 var app = builder.Build();
-
+app.UseCors("AllowSpecificOrigins");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -88,7 +85,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOcelot().Wait();

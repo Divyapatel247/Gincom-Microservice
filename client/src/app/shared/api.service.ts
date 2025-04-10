@@ -1,19 +1,25 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { IProduct } from '../components/product/productModel';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
+  private apiUrl = 'http://localhost:5100/api';
 
-  private apiUrl = 'http://10.13.106.23:5145/api';
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getProducts(): Observable<IProduct[]> {
-    return this.http.get<IProduct[]>(`${this.apiUrl}/products`);
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    console.log(token);
+    return this.http.get<IProduct[]>(`${this.apiUrl}/products`, {
+      headers
+    });
   }
 
   getProductById(productId: string): Observable<IProduct> {
@@ -34,26 +40,26 @@ export class ApiService {
       description: product.description,
       price: product.price,
       stock: product.stock,
-      categoryName: product.categoryName
+      categoryName: product.categoryName,
     });
   }
-
 
   login(loginObj: any) {
     return this.http.post<any>(`${this.apiUrl}/login`, loginObj);
   }
 
   refreshToken(refreshToken: string) {
-    return this.http.post<any>("https://dummyjson.com/auth/refresh", { refreshToken });
+    return this.http.post<any>('https://dummyjson.com/auth/refresh', {
+      refreshToken,
+    });
   }
 
   getProductCategory(categoryName: string): Observable<IProduct[]> {
-    return this.http.get<IProduct[]>(`${this.apiUrl}/products/category/${categoryName}`);
+    return this.http.get<IProduct[]>(
+      `${this.apiUrl}/products/category/${categoryName}`
+    );
   }
-  getCategoryList() : Observable<string[]> {
+  getCategoryList(): Observable<string[]> {
     return this.http.get<string[]>(`${this.apiUrl}/categoryList`);
   }
-
-
-
 }

@@ -7,6 +7,7 @@ using ProductService.Interfaces;
 using ProductService.Model;
 using ProductService.Repository;
 using ProductService.Service;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +46,18 @@ builder.Services.AddMassTransit(x =>
 
 
 
+builder.Services.AddAuthorization(options =>
+{
+options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://localhost:5001";
+        options.Audience = "api";
+        options.RequireHttpsMetadata = false;
+    });
 
 
 
@@ -80,6 +92,8 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
 

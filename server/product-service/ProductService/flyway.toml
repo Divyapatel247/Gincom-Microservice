@@ -4,8 +4,8 @@ name = "gincom_products"
 
 [environments.default]
 url = "jdbc:mysql://localhost:3306/gincom_products?useSSL=false&allowPublicKeyRetrieval=true"
-user = "flyway"
-password = "Flyway123"
+user = "root"
+password = "@041203Divya"
 schemas = [ "gincom_products" ]
 
 [flyway]

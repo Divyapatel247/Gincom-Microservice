@@ -19,32 +19,16 @@
       "UpstreamHttpMethod": ["POST", "GET"]
     },
     {
-      "DownstreamPathTemplate": "/products/{everything}",
+      "DownstreamPathTemplate": "/api/products/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         { "Host": "localhost", "Port": 5002 }
       ],
-      "UpstreamPathTemplate": "/products/{everything}",
+      "UpstreamPathTemplate": "/api/products/{everything}",
       "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "IdentityServer",
         "AllowedScopes": ["api.read"]
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/products/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
-      ],
-      "UpstreamPathTemplate": "/products/{everything}",
-      "UpstreamHttpMethod": ["POST", "PUT", "DELETE"],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "IdentityServer",
-        "AllowedScopes": ["api.write"]
-      },
-      "AuthorizationOptions": {
-        "RequireRole": "Admin" 
       }
     },
     {
