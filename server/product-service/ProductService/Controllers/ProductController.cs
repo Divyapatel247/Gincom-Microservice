@@ -52,15 +52,16 @@ namespace ProductService.Controllers;
             var product = createProductDto.ToProductFromCreate();
             product.CategoryId = category.Id;
 
-            var createdProduct = await _repository.CreateProductAsync(product);
+            var createdProduct = await _repository.CreateProductAsync(product, createProductDto.RelatedProductIds);
             var productWithCategory = await _repository.GetProductByIdAsync(createdProduct.Id);
             var productDto = productWithCategory.ToProductDto();
+            //  return Ok();
             return CreatedAtAction(nameof(GetProductById), new { id = productDto.Id }, productDto);
         }
 
         [HttpPut("{id}")]
         
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto,[FromQuery] List<int> relatedProductIds)
         {
             var existingProduct = await _repository.GetProductByIdAsync(id);
             if (existingProduct == null)
@@ -76,7 +77,7 @@ namespace ProductService.Controllers;
             existingProduct.UpdateFromDto(updateProductDto);
             existingProduct.CategoryId = category.Id;
 
-            await _repository.UpdateProductAsync(existingProduct);
+            await _repository.UpdateProductAsync(existingProduct, relatedProductIds);
             var updatedProduct = await _repository.GetProductByIdAsync(id);
             var productDto = updatedProduct.ToProductDto();
             return Ok(productDto);

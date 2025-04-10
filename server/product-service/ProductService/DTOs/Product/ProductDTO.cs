@@ -28,4 +28,6 @@ public class ProductDTO
         public string Thumbnail { get; set; } = string.Empty;
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+
+        public List<ProductDTO> RelatedProducts { get; set; } = new List<ProductDTO>();
 }

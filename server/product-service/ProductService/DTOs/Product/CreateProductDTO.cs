@@ -1,4 +1,5 @@
 using System;
+using ProductService.DTOs.Review;
 
 namespace ProductService.DTOs;
 
@@ -12,4 +13,7 @@ public class CreateProductDTO
         public List<string> Tags { get; set; } = new List<string>();
         public string CategoryName { get; set; } = string.Empty;
         public string Thumbnail { get; set; } = string.Empty;
+        public List<int> RelatedProductIds { get; set; } = new List<int>();
+
+         
 }
