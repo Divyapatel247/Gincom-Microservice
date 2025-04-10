@@ -67,6 +67,16 @@ namespace OrderService.Controllers
                 Console.WriteLine($"OrderItem -> ProductId: {item.ProductId}, Quantity: {item.Quantity}");
             }
 
+            // Check stock for all items
+            foreach (var item in orderItems)
+            {
+                var product = await _productService.GetProductAsync(item.ProductId, string.Empty);
+                if (product == null)
+                    return BadRequest($"Product with ID {item.ProductId} not found");
+                if (product.Stock <= 0 || product.Stock < item.Quantity)
+                    return BadRequest($"Insufficient stock for Product ID {item.ProductId}. Available: {product.Stock}, Requested: {item.Quantity}");
+            }
+
             // Calculate total amount (for Razorpay)
             decimal totalAmount = 0;
             foreach (var item in orderItems)

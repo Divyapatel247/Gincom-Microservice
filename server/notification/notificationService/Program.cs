@@ -1,6 +1,8 @@
 using MassTransit;
 using MassTransit.Transports.Fabric;
 using notificationService.Consumers;
+using notificationService.Hubs;
+using notificationService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
+builder.Services.AddControllers();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<NotificationServiceForOrderCreated>(); 
 
 builder.Services.AddMassTransit(x =>
 {
@@ -49,5 +54,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/notificationHub"); 
+    endpoints.MapControllers();
+});
 app.Run();
