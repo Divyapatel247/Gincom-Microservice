@@ -1,0 +1,7 @@
+CREATE TABLE OrderItems (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    OrderId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Quantity INT NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES `Order`(Id) ON DELETE CASCADE
+);

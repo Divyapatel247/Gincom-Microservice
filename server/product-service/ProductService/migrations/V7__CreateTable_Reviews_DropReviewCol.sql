@@ -1,0 +1,11 @@
+ALTER TABLE Products DROP COLUMN Review;
+
+CREATE TABLE Reviews (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    ProductId INT NOT NULL,
+    UserId INT NOT NULL,
+    Description TEXT NOT NULL,
+    Rating INT NOT NULL CHECK (Rating >= 1 AND Rating <= 5), 
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE CASCADE
+);

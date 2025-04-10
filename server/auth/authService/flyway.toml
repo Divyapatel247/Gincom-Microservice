@@ -1,0 +1,29 @@
+databaseType = "MySql"
+id = "c18095dd-be06-4635-a426-a22eae19c20a"
+name = "gincom_auth"
+
+[environments.default]
+url = "jdbc:mysql://localhost:3306/gincom_auth?useSSL=false&allowPublicKeyRetrieval=true"
+user = "root"
+password = "@041203Divya"
+schemas = [ "gincom_auth" ]
+
+[flyway]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+schemaModelLocation = "schema-model"
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[flywayDesktop]
+developmentEnvironment = "development"
+shadowEnvironment = "shadow"
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.mysql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
