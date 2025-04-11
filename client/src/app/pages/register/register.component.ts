@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule],
+  imports: [FormsModule,RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
@@ -24,13 +24,12 @@ export class RegisterComponent {
      onRegister() {
        this.api.register(this.registerObj).subscribe({
          next: (res) => {
-          console.log(res)
-          //  alert(`Welcome, You have successfully registered`);
+           alert(`Welcome, You have successfully registered`);
            this.router.navigateByUrl("admin");
          },
          error: (err) => {
-           console.error("Login error:", err);
-           alert(err.error || 'Login failed. Please try again.');
+           console.error("Register error:", err);
+           alert(err.error || 'Register failed. Please try again.');
          }
        });
      }

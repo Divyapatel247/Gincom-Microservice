@@ -7,7 +7,7 @@ import { IProduct } from '../components/product/productModel';
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:5100/api';
+  private apiUrl = 'http://localhost:5100';
 
   constructor(private http: HttpClient) {}
 
@@ -16,26 +16,25 @@ export class ApiService {
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    console.log(token);
-    return this.http.get<IProduct[]>(`${this.apiUrl}/products`, {
+    return this.http.get<IProduct[]>(`${this.apiUrl}/api/products`, {
       headers
     });
   }
 
   getProductById(productId: string): Observable<IProduct> {
-    return this.http.get<IProduct>(`${this.apiUrl}/products/${productId}`);
+    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}`);
   }
 
   deleteProduct(productId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/products/${productId}`);
+    return this.http.delete<void>(`${this.apiUrl}/api/products/${productId}`);
   }
 
   addProduct(product: IProduct): Observable<IProduct> {
-    return this.http.post<IProduct>(`${this.apiUrl}/products/add`, product);
+    return this.http.post<IProduct>(`${this.apiUrl}/api/products/add`, product);
   }
 
   updateProduct(productId: number, product: IProduct): Observable<IProduct> {
-    return this.http.put<IProduct>(`${this.apiUrl}/products/${productId}`, {
+    return this.http.put<IProduct>(`${this.apiUrl}/api/products/${productId}`, {
       title: product.title,
       description: product.description,
       price: product.price,
@@ -45,7 +44,16 @@ export class ApiService {
   }
 
   login(loginObj: any) {
-    return this.http.post<any>(`${this.apiUrl}/login`, loginObj);
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+
+    return this.http.post<any>(`${this.apiUrl}/connect/token`, loginObj,{headers});
+  }
+
+  register(registerObj: any) {
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, registerObj);
   }
 
   refreshToken(refreshToken: string) {
