@@ -1,0 +1,59 @@
+<div class="container mx-auto p-4 max-w-[800px]">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-semibold text-gray-700">My Cart</h2>
+    <span class="text-gray-500">{{ totalQuantity }} items</span>
+  </div>
+
+  @if (basket?.items?.length) {
+    <div class="space-y-6">
+      @for (item of basket?.items; track item.id) {
+        <div class="flex justify-between items-center py-4 border-b border-gray-200 cart-item">
+          <div class="flex items-center space-x-4">
+            <img src="https://via.placeholder.com/80" alt="Product" class="w-20 h-20 object-cover cart-item-image" />
+            <div class="space-y-1 cart-item-details">
+              <h3 class="text-lg font-medium">Product {{ item.productId }}</h3>
+              <p class="text-gray-500 text-sm">Qty: {{ item.quantity }}</p>
+              @if (item.createdAt) {
+                <p class="text-gray-400 text-xs">Added: {{ item.createdAt | date:'medium' }}</p>
+              }
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <p class="text-lg font-semibold cart-item-price">₹{{ (9.99 * item.quantity) | number:'1.2-2' }}</p>
+            <div class="flex items-center space-x-2 cart-item-quantity">
+              <button (click)="updateQuantity({ id: item.id, quantity: item.quantity - 1 })" class="px-2 py-1 bg-gray-200 rounded cart-item-button">-</button>
+              <input type="number" [(ngModel)]="item.quantity" (change)="updateQuantity({ id: item.id, quantity: item.quantity })" min="1" class="w-16 text-center border rounded" />
+              <button (click)="updateQuantity({ id: item.id, quantity: item.quantity + 1 })" class="px-2 py-1 bg-gray-200 rounded cart-item-button">+</button>
+            </div>
+            <button (click)="removeItem(item.id)" class="text-red-500 hover:text-red-700">🗑️</button>
+          </div>
+        </div>
+      }
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-medium mb-4">Order Summary</h3>
+        <div class="space-y-2 text-gray-700">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span>₹{{ totalAmount | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Tax</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="flex justify-between font-bold mt-4 border-t pt-2">
+            <span>Total</span>
+            <span>₹{{ totalAmount | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <button
+          (click)="makeOrder()"
+          class="w-full mt-6 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800"
+        >
+          Checkout
+        </button>
+      </div>
+    </div>
+  } @else {
+    <p class="text-center text-gray-500">Your cart is empty.</p>
+  }
+</div>

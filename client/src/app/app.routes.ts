@@ -9,6 +9,7 @@ import { authGuard } from './guard/auth.guard';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { CustomerLayoutComponent } from './layouts/customer-layout/customer-layout.component';
 import { LoginComponent } from './components/login/login.component';
+import { AddToCartComponent } from './pages/add-to-cart/add-to-cart/add-to-cart.component';
 
 // export const routes: Routes = [
 //   {
@@ -69,7 +70,9 @@ export const routes: Routes = [
     children: [
       // { path: '', component: CustomerDashboardComponent },
       // { path: 'orders', component: CustomerOrdersComponent },
+      { path: 'addToCart', component: AddToCartComponent },
       // other customer routes
+
     ]
   },
   { path: 'login', component: LoginComponent },

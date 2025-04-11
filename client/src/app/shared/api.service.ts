@@ -1,7 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { async, firstValueFrom, Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { IProduct } from '../components/product/productModel';
+import { Basket, BasketResponse } from '../models/cart.interface';
+import { Order, OrderResponse } from '../models/order.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -9,13 +11,13 @@ import { IProduct } from '../components/product/productModel';
 export class ApiService {
   private apiUrl = 'http://localhost:5100/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProducts(): Observable<IProduct[]> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
-       Authorization: `Bearer ${token}`
-     });
+      Authorization: `Bearer ${token}`
+    });
     console.log(token);
     return this.http.get<IProduct[]>(`${this.apiUrl}/products`, {
       headers
@@ -61,5 +63,80 @@ export class ApiService {
   }
   getCategoryList(): Observable<string[]> {
     return this.http.get<string[]>(`${this.apiUrl}/categoryList`);
+  }
+
+
+
+  //------------------------Cart--------------------------------------------
+
+  // Get cart for user
+  getCart(userId: string): Observable<BasketResponse> {
+    // return this.http.get<BasketResponse>(`${this.baseUrl}/orders/${userId}/cart`);
+    return new Observable<BasketResponse>(observer => {
+      const dummyResponse: BasketResponse = {
+        id: 1,
+        userId: 'user123',
+        items: [
+          { id: 1, productId: 1, quantity: 2 },
+          { id: 2, productId: 2, quantity: 1 },
+        ],
+        createdAt: new Date(),
+        totalAmount: 29.97, // Matches backend totalAmount
+      };
+      observer.next(dummyResponse);
+      observer.complete();
+    });
+  }
+
+  updateCartItem(userId: string, itemId: number, quantity: number): Observable<BasketResponse> {
+    // return this.http.put<BasketResponse>(`${this.baseUrl}/orders/${userId}/cart/items/${itemId}`, { quantity });
+    return new Observable<BasketResponse>(observer => {
+      const dummyResponse: BasketResponse = {
+        id: 1,
+        userId: 'user123',
+        items: [
+          { id: itemId, productId: 1, quantity: quantity },
+          { id: 2, productId: 2, quantity: 1 },
+        ],
+        createdAt: new Date(),
+        totalAmount: quantity * 9.99 + 9.99, // Matches backend price logic
+      };
+      observer.next(dummyResponse);
+      observer.complete();
+    });
+  }
+
+  removeCartItem(userId: string, itemId: number): Observable<BasketResponse> {
+    // return this.http.delete<BasketResponse>(`${this.baseUrl}/orders/${userId}/cart/items/${itemId}`);
+    return new Observable<BasketResponse>(observer => {
+      const dummyResponse: BasketResponse = {
+        id: 1,
+        userId: 'user123',
+        items: [{ id: 2, productId: 2, quantity: 1 }],
+        createdAt: new Date(),
+        totalAmount: 9.99,
+      };
+      observer.next(dummyResponse);
+      observer.complete();
+    });
+  }
+
+  createOrder(userId: string): Observable<OrderResponse> {
+    // return this.http.post<OrderResponse>(`${this.baseUrl}/orders/${userId}`, {});
+    return new Observable<OrderResponse>(observer => {
+      const dummyResponse: OrderResponse = {
+        id: 1,
+        userId: 'user123',
+        status: 'Pending',
+        items: [
+          { productId: 1, quantity: 2 },
+          { productId: 2, quantity: 1 },
+        ],
+        createdAt: new Date(),
+        razorpayOrderId: 'rzp_order_123',
+      };
+      observer.next(dummyResponse);
+      observer.complete();
+    });
   }
 }

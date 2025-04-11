@@ -1,0 +1,21 @@
+<div class="flex items-center justify-between py-4 border-b border-gray-200">
+  <div class="flex items-center space-x-4">
+    <img src="https://via.placeholder.com/80" alt="Product" class="w-20 h-20 object-cover" />
+    <div>
+      <h3 class="text-lg font-medium">Product {{ item.productId }}</h3>
+      <p class="text-gray-500 text-sm">Qty: {{ item.quantity }}</p>
+      @if (item.createdAt) {
+        <p class="text-gray-400 text-xs">Added: {{ item.createdAt | date:'medium' }}</p>
+      }
+    </div>
+  </div>
+  <div class="flex items-center space-x-4">
+    <p class="text-lg font-semibold">₹{{ productPrice * item.quantity | number:'1.2-2' }}</p>
+    <div class="flex items-center space-x-2">
+      <button (click)="updateQuantity.emit({ id: item.id, quantity: item.quantity - 1 })" class="px-2 py-1 bg-gray-200 rounded">-</button>
+      <input type="number" [(ngModel)]="item.quantity" (change)="onQuantityChange($event)" min="1" class="w-16 text-center border rounded" />
+      <button (click)="updateQuantity.emit({ id: item.id, quantity: item.quantity + 1 })" class="px-2 py-1 bg-gray-200 rounded">+</button>
+    </div>
+    <button (click)="onRemove()" class="text-red-500 hover:text-red-700">🗑️</button>
+  </div>
+</div>
