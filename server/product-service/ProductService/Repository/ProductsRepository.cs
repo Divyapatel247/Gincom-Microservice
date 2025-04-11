@@ -382,6 +382,31 @@ public class ProductsRepository : IProductRepository
         }
     }
 
+    public async Task RegisterNotificationRequestAsync(int userId, int productId)
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        var sql = "INSERT IGNORE INTO StockNotificationRequests (UserId, ProductId) VALUES (@UserId, @ProductId)";
+        await connection.ExecuteAsync(sql, new {UserId = userId, ProductId= productId});
+    }
 
+    public async Task UpdateProductStockAsync(int productId, int newStock)
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        var sql = "UPDATE Products SET Stock = @NewStock WHERE Id = @ProductId";
+        await connection.ExecuteAsync(sql, new{ProductId = productId, NewStock= newStock});
+    }
+
+    public async Task<List<int>> WhomToNotify(int productId)
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        var sql = @"
+            SELECT UserId 
+            FROM StockNotificationRequests 
+            WHERE ProductId = @ProductId 
+            AND IsNotified = FALSE";
+        
+        var userIds = await connection.QueryAsync<int>(sql, new { ProductId = productId });
+        return userIds.AsList();
+    }
 }
 
