@@ -5,10 +5,11 @@ import { ProductDetailComponent } from './components/product-detail/product-deta
 import { ProductTableComponent } from './components/product-table/product-table.component';
 import { AddProductComponent } from './components/add-product/add-product.component';
 import { AdminLoginComponent } from './components/admin-login/admin-login.component';
-import { authGuard } from './guard/auth.guard';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { CustomerLayoutComponent } from './layouts/customer-layout/customer-layout.component';
-import { LoginComponent } from './components/login/login.component';
+import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { AuthGuard } from './guard/auth.guard';
 
 // export const routes: Routes = [
 //   {
@@ -53,10 +54,13 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
-    // canActivate: [AuthGuard],
-    data: { role: 'admin' },
+    canActivate: [AuthGuard],
+    data: { role: 'Admin' },
     children: [
       { path: '', component: ProductTableComponent },
+      { path: 'dashboard', component: ProductTableComponent },
+      { path: 'products', component: ProductTableComponent },
+      { path: 'orders', component: ProductTableComponent },
       // { path: 'users', component: UserManagementComponent },
       // other admin routes
     ]
@@ -64,15 +68,16 @@ export const routes: Routes = [
   {
     path: 'customer',
     component: CustomerLayoutComponent,
-    // canActivate: [AuthGuard],
-    data: { role: 'customer' },
+    canActivate: [AuthGuard],
+    data: { role: 'User' },
     children: [
       // { path: '', component: CustomerDashboardComponent },
       // { path: 'orders', component: CustomerOrdersComponent },
       // other customer routes
     ]
   },
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent  },
+  { path: 'register', component: RegisterComponent  },
   { path: '**', redirectTo: '/login' }
 ];
 
