@@ -33,7 +33,7 @@
               [(ngModel)]="registerObj.email"
               name="user"
               type="text"
-              id="user"
+              id="email"
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-slate-600 focus:border-slate-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="xyz@email.com"
               required=""
@@ -99,6 +99,12 @@
           >
             Sign in
           </button>
+
+          <p class="text-center mt-3 text-gray-900 dark:text-white">
+            Already registered?
+            <a routerLink="/login"><span class="text-primary cursor-pointer text-[#007bff] hover:underline">Login</span></a>
+          </p>
+
         </form>
       </div>
     </div>

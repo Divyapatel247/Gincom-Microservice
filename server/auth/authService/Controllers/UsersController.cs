@@ -34,7 +34,8 @@ public class UsersController : ControllerBase
             return BadRequest("Invalid role. Must be 'User' or 'Admin'.");
 
         await _userRepository.AddAsync(user);
-        return Ok("User registered successfully");
+       return Ok(new { message = "User registered successfully" });
+
     }
 
     private string HashPassword(string password)
