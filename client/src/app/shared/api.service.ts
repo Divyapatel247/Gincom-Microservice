@@ -1,5 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+
 import { async, firstValueFrom, Observable, of } from 'rxjs';
+
 import { Injectable } from '@angular/core';
 import { IProduct } from '../components/product/productModel';
 import { Basket, BasketResponse } from '../models/cart.interface';
@@ -15,6 +19,11 @@ export class ApiService {
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
+  private products: IProduct[] = [];
+  private productsSubject = new BehaviorSubject<IProduct[]>([]);
+
+  products$ = this.productsSubject.asObservable();
+
   getProducts(): Observable<IProduct[]> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
@@ -22,11 +31,20 @@ export class ApiService {
      });
     return this.http.get<IProduct[]>(`${this.apiUrl}/api/products`, {
       headers
-    });
+    }).pipe(
+      tap((products) => {
+        this.products = products;
+        this.productsSubject.next(products);
+      })
+    );
   }
 
   getProductById(productId: string): Observable<IProduct> {
-    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}`);
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}`,{headers});
   }
 
   deleteProduct(productId: number): Observable<void> {
@@ -38,6 +56,11 @@ export class ApiService {
   }
 
   updateProduct(productId: number, product: IProduct): Observable<IProduct> {
+    const index = this.products.findIndex(p => p.id === productId);
+    if (index !== -1) {
+      this.products[index] = product;
+      this.productsSubject.next([...this.products]);
+    }
     return this.http.put<IProduct>(`${this.apiUrl}/api/products/${productId}`, {
       title: product.title,
       description: product.description,

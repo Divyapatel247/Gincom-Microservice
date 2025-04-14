@@ -10,6 +10,9 @@ import { CustomerLayoutComponent } from './layouts/customer-layout/customer-layo
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { AuthGuard } from './guard/auth.guard';
+import { OrdersComponent } from './pages/orders/orders.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ShowProductDetailComponent } from './pages/show-product-detail/show-product-detail.component';
 import { AddToCartComponent } from './pages/add-to-cart/add-to-cart/add-to-cart.component';
 
 // export const routes: Routes = [
@@ -59,9 +62,10 @@ export const routes: Routes = [
     data: { role: 'Admin' },
     children: [
       { path: '', component: ProductTableComponent },
-      { path: 'dashboard', component: ProductTableComponent },
+      { path: 'dashboard', component: DashboardComponent },
       { path: 'products', component: ProductTableComponent },
-      { path: 'orders', component: ProductTableComponent },
+      { path: 'product/:id', component: ShowProductDetailComponent },
+      { path: 'orders', component: OrdersComponent },
       // { path: 'users', component: UserManagementComponent },
       // other admin routes
     ]
