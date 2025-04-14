@@ -3,9 +3,9 @@ id = "1384f2a8-4e01-40db-b2bf-76b2c0e161b8"
 name = "Order"
 
 [environments.default]
-password = "root"
+password = "Flyway123"
 url = "jdbc:mysql://localhost:3306/OrderDB?useSSL=false&allowPublicKeyRetrieval=true"
-user = "root"
+user = "flyway"
 
 [flyway]
 locations = [ "filesystem:migration" ]

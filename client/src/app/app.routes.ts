@@ -13,6 +13,7 @@ import { AuthGuard } from './guard/auth.guard';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ShowProductDetailComponent } from './pages/show-product-detail/show-product-detail.component';
+import { AddToCartComponent } from './pages/add-to-cart/add-to-cart/add-to-cart.component';
 
 // export const routes: Routes = [
 //   {
@@ -77,7 +78,9 @@ export const routes: Routes = [
     children: [
       // { path: '', component: CustomerDashboardComponent },
       // { path: 'orders', component: CustomerOrdersComponent },
+      { path: 'addToCart', component: AddToCartComponent },
       // other customer routes
+
     ]
   },
   { path: 'login', component: LoginComponent  },

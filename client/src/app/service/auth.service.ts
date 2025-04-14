@@ -26,4 +26,9 @@ export class AuthService {
     const decoded = this.getDecodedToken();
     return decoded?.role ?? null;
   }
+
+  getUserId(): string | null {
+    const decoded = this.getDecodedToken();
+    return decoded?.sub ?? null;
+  }
 }
