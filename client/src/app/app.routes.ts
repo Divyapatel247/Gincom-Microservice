@@ -67,6 +67,7 @@ export const routes: Routes = [
       { path: 'products', component: ProductTableComponent },
       { path: 'product/:id', component: ShowProductDetailComponent },
       { path: 'orders', component: OrdersComponent },
+      {path: 'add-product', component: AddProductComponent}
       // { path: 'users', component: UserManagementComponent },
       // other admin routes
     ]

@@ -1,5 +1,5 @@
 
-<div class="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-white shadow-2xl rounded-2xl">
+<div class="container mx-auto p-8 bg-gray-50 rounded">
   <h2 class="text-center mb-6 text-3xl font-bold text-gray-800">Add New Product</h2>
 
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
@@ -19,7 +19,7 @@
 
     <!-- Description -->
     <div>
-      <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+      <label for="description" class="block  text-sm font-medium text-gray-700">Description</label>
       <textarea id="description" formControlName="description" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" rows="3" placeholder="Enter product description"></textarea>
       <div class="text-red-500 text-sm mt-1">
         @if (productForm.controls["description"].errors?.['required'] && productForm.controls["description"].touched) {
@@ -32,7 +32,21 @@
     </div>
 
     <!-- Price and Stock -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-visible">
+       <!-- Category -->
+    <div>
+      <label for="category" class="block overflow-visible text-sm font-medium text-gray-700">Category</label>
+      <select id="category" formControlName="category" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all">
+        <option value="" disabled>Select a category</option>
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+      <div class="text-red-500 text-sm mt-1">
+        @if (productForm.controls["category"].errors?.['required'] && productForm.controls["category"].touched) {
+          <span>This is required</span>
+        }
+      </div>
+    </div>
+
       <div>
         <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
         <input id="price" type="number" formControlName="price" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter price">
@@ -77,19 +91,6 @@
       </div>
     </div>
 
-    <!-- Category -->
-    <div>
-      <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
-      <select id="category" formControlName="category" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all">
-        <option value="" disabled>Select a category</option>
-        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
-      </select>
-      <div class="text-red-500 text-sm mt-1">
-        @if (productForm.controls["category"].errors?.['required'] && productForm.controls["category"].touched) {
-          <span>This is required</span>
-        }
-      </div>
-    </div>
 
     <!-- Tags -->
     <div>
@@ -97,8 +98,13 @@
       <input id="tags" type="text" formControlName="tags" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all" placeholder="Enter tags">
     </div>
 
+    <div>
+      <app-add-cross-products></app-add-cross-products>
+    </div>
+
+
     <!-- Submit Button -->
-    <button [disabled]="productForm.invalid" class="w-full bg-gradient-to-r from-[#6EE7B7] to-[#3B82F6] text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl hover:from-[#3B82F6] hover:to-[#6EE7B7] transition-all duration-300" type="submit">
+    <button [disabled]="productForm.invalid" class="w-full bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl hover:from-[#3B82F6] hover:to-[#6EE7B7] transition-all duration-300" type="submit">
       Add Product
     </button>
   </form>
