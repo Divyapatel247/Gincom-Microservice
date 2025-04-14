@@ -10,6 +10,7 @@ namespace OrderService.Models
         public int Id { get; set; }
         public string UserId { get; set; }
         public List<BasketItem> Items { get; set; } = new();
+        public DateTime? CreatedAt { get; set; }
     }
 
     public class BasketItem
@@ -18,5 +19,6 @@ namespace OrderService.Models
         public int BasketId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

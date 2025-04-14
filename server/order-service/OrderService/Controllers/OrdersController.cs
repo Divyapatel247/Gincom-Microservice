@@ -144,5 +144,19 @@ namespace OrderService.Controllers
 
             return Ok(OrderMapper.ToOrderResponse(order));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var orders = await _repository.GetAllOrdersAsync();
+            return Ok(orders);
+        }
+
+        [HttpGet("product/{productId}")]
+        public async Task<IActionResult> GetOrdersByProductId(int productId)
+        {
+            var orders = await _repository.GetOrdersByProductIdAsync(productId);
+            return Ok(orders);
+        }
     }
 }

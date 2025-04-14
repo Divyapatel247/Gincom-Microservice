@@ -15,6 +15,8 @@ public interface IOrderRepository
         Task RemoveBasketItemAsync(int itemId);
         Task ClearBasketAsync(string userId);
         Task<List<Order>> GetOrdersAsync(string userId);
+        Task<List<Order>> GetAllOrdersAsync(); 
+        Task<List<Order>> GetOrdersByProductIdAsync(int productId); 
         Task<Order> GetOrderByIdAsync(int orderId);
         Task<Order> CreateOrderAsync(Order order);
         Task UpdateOrderAsync(Order order);

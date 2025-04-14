@@ -11,6 +11,7 @@ public class Order
         public string UserId { get; set; }
         public string Status { get; set; }
         public List<OrderItem> Items { get; set; } = new();
+        public DateTime? CreatedAt { get; set; }
     }
 
     public class OrderItem
@@ -19,5 +20,6 @@ public class Order
         public int OrderId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

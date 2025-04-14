@@ -33,6 +33,8 @@ namespace OrderService.Repositories
                 "SELECT Id, BasketId, ProductId AS ProductId, Quantity FROM BasketItems WHERE BasketId = @BasketId",
                 new { BasketId = basket.Id }))
                 .ToList();
+            basket.CreatedAt = await conn.QueryFirstOrDefaultAsync<DateTime?>(
+                "SELECT CreatedAt FROM Basket WHERE Id = @Id", new { Id = basket.Id });
 
             return basket;
         }
@@ -43,6 +45,7 @@ namespace OrderService.Repositories
             basket.Id = await conn.ExecuteScalarAsync<int>(
                 "INSERT INTO Basket (UserId) VALUES (@UserId); SELECT LAST_INSERT_ID();",
                 new { basket.UserId });
+            basket.CreatedAt = DateTime.Now;
             return basket;
         }
 
@@ -53,6 +56,7 @@ namespace OrderService.Repositories
             item.Id = await conn.ExecuteScalarAsync<int>(
                 "INSERT INTO BasketItems (BasketId, ProductId, Quantity) VALUES (@BasketId, @ProductId, @Quantity); SELECT LAST_INSERT_ID();",
                 item);
+            item.CreatedAt = DateTime.Now;
         }
 
         public async Task UpdateBasketItemAsync(int itemId, int quantity)
@@ -93,6 +97,8 @@ namespace OrderService.Repositories
                 order.Items = (await conn.QueryAsync<OrderItem>(
                     "SELECT * FROM OrderItems WHERE OrderId = @OrderId", new { OrderId = order.Id }))
                     .ToList();
+                order.CreatedAt = await conn.QueryFirstOrDefaultAsync<DateTime?>(
+                    "SELECT CreatedAt FROM `Order` WHERE Id = @Id", new { Id = order.Id });
             }
             return orders.ToList();
         }
@@ -107,6 +113,8 @@ namespace OrderService.Repositories
                 order.Items = (await conn.QueryAsync<OrderItem>(
                     "SELECT * FROM OrderItems WHERE OrderId = @OrderId", new { OrderId = orderId }))
                     .ToList();
+                order.CreatedAt = await conn.QueryFirstOrDefaultAsync<DateTime?>(
+                    "SELECT CreatedAt FROM `Order` WHERE Id = @Id", new { Id = orderId });
             }
             return order;
         }
@@ -118,6 +126,7 @@ namespace OrderService.Repositories
             order.Id = await conn.ExecuteScalarAsync<int>(
                 "INSERT INTO `Order` (UserId, Status) VALUES (@UserId, @Status); SELECT LAST_INSERT_ID();",
                 new { order.UserId, order.Status });
+            order.CreatedAt = DateTime.Now;
 
             foreach (var item in order.Items)
             {
@@ -151,6 +160,7 @@ namespace OrderService.Repositories
                     ProductId = item.ProductId,
                     Quantity = item.Quantity
                 });
+            item.CreatedAt = DateTime.Now;
         }
 
         public async Task<Payment> CreatePaymentAsync(Payment payment)
@@ -159,6 +169,7 @@ namespace OrderService.Repositories
             payment.Id = await conn.ExecuteScalarAsync<int>(
                 "INSERT INTO Payment (UserId, OrderId, Status, TransactionId) VALUES (@UserId, @OrderId, @Status, @TransactionId); SELECT LAST_INSERT_ID();",
                 payment);
+            payment.CreatedAt = DateTime.Now;
             return payment;
         }
 
@@ -175,6 +186,39 @@ namespace OrderService.Repositories
             await conn.ExecuteAsync(
                 "UPDATE Payment SET UserId = @UserId, Status = @Status, TransactionId = @TransactionId WHERE Id = @Id",
                 new { payment.UserId, payment.Status, payment.TransactionId, payment.Id });
+        }
+
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+            using var conn = Connection;
+            var orders = await conn.QueryAsync<Order>(
+                "SELECT * FROM `Order`");
+            foreach (var order in orders)
+            {
+                order.Items = (await conn.QueryAsync<OrderItem>(
+                    "SELECT * FROM OrderItems WHERE OrderId = @OrderId", new { OrderId = order.Id }))
+                    .ToList();
+                order.CreatedAt = await conn.QueryFirstOrDefaultAsync<DateTime?>(
+                    "SELECT CreatedAt FROM `Order` WHERE Id = @Id", new { Id = order.Id });
+            }
+            return orders.ToList();
+        }
+
+        public async Task<List<Order>> GetOrdersByProductIdAsync(int productId)
+        {
+            using var conn = Connection;
+            var orders = await conn.QueryAsync<Order>(
+                "SELECT o.* FROM `Order` o JOIN OrderItems oi ON o.Id = oi.OrderId WHERE oi.ProductId = @ProductId",
+                new { ProductId = productId });
+            foreach (var order in orders)
+            {
+                order.Items = (await conn.QueryAsync<OrderItem>(
+                    "SELECT * FROM OrderItems WHERE OrderId = @OrderId", new { OrderId = order.Id }))
+                    .ToList();
+                order.CreatedAt = await conn.QueryFirstOrDefaultAsync<DateTime?>(
+                    "SELECT CreatedAt FROM `Order` WHERE Id = @Id", new { Id = order.Id });
+            }
+            return orders.ToList();
         }
     }
 }
