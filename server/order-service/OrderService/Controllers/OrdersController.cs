@@ -16,7 +16,7 @@ namespace OrderService.Controllers
 {
     [Route("api/orders")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _repository;
@@ -33,7 +33,7 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Authorize(Policy = "AdminOnly")]
+        // [Authorize(Policy = "AdminOnly")]
 
         public async Task<IActionResult> GetOrders(string userId)
         {

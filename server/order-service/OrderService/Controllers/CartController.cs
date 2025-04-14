@@ -14,7 +14,6 @@ namespace OrderService.Controllers
 {
     [Route("api/orders/{userId}/cart")]
     [ApiController]
-    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly IOrderRepository _repository;
