@@ -11,5 +11,5 @@ public class UpdateProductDTO
         public int Stock { get; set; }
         public string CategoryName { get; set; } = string.Empty;
 
-        public List<Product> RelatedProducts { get; set; } = new List<Product>();
+        
 }

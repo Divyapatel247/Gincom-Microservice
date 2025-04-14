@@ -5,8 +5,8 @@ using ProductService.Interfaces;
 
 namespace ProductService.Controllers;
 
-[ApiController]
-    [Route("api/categoryList")]
+[Route("api/category")]
+[ApiController]    
 public class CategoryController : ControllerBase
 {
 private readonly ICategoryRepository _categoryRepository;
@@ -15,7 +15,7 @@ private readonly ICategoryRepository _categoryRepository;
             _categoryRepository = categoryRepository;
         }
 
-        [HttpGet]
+        [HttpGet("categoryList")]
         public async Task<IActionResult> GetCategoryList()
         {
             var categories = await _categoryRepository.GetAllCategoriesAsync();

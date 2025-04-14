@@ -61,7 +61,7 @@ namespace ProductService.Controllers;
 
         [HttpPut("{id}")]
         
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto,[FromQuery] List<int> relatedProductIds)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto)
         {
             var existingProduct = await _repository.GetProductByIdAsync(id);
             if (existingProduct == null)
@@ -77,7 +77,7 @@ namespace ProductService.Controllers;
             existingProduct.UpdateFromDto(updateProductDto);
             existingProduct.CategoryId = category.Id;
 
-            await _repository.UpdateProductAsync(existingProduct, relatedProductIds);
+            await _repository.UpdateProductAsync(existingProduct);
             var updatedProduct = await _repository.GetProductByIdAsync(id);
             var productDto = updatedProduct.ToProductDto();
             return Ok(productDto);
@@ -157,9 +157,10 @@ namespace ProductService.Controllers;
     }
 
     [HttpDelete("reviews/{reviewId}")]
-    public async Task<IActionResult> DeleteReview(int reviewId)
+    public async Task<IActionResult> DeleteReview(int reviewId, [FromQuery] int userId)
     {
-        int userId = 1; // Hardcoded; replace with auth later
+        // int userId = 1; // Hardcoded; replace with auth later
+        Console.WriteLine($"Attempting to delete reviewId: {reviewId}, userId: {userId}");
         var success = await _reviewRepo.DeleteAsync(reviewId, userId);
         if (!success) return NotFound("Review not found or not owned by user");
         return NoContent();

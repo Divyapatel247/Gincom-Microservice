@@ -5,7 +5,7 @@ import { BehaviorSubject, tap } from 'rxjs';
 import { async, firstValueFrom, Observable, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
-import { IProduct } from '../components/product/productModel';
+import { IProduct, IReview } from '../components/product/productModel';
 import { Basket, BasketResponse } from '../models/cart.interface';
 import { Order, OrderResponse } from '../models/order.interface';
 import { AuthService } from '../service/auth.service';
@@ -44,7 +44,8 @@ export class ApiService {
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}`,{headers});
+    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}` , {headers});
+
   }
 
   deleteProduct(productId: number): Observable<void> {
@@ -95,8 +96,36 @@ export class ApiService {
     );
   }
   getCategoryList(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/categoryList`);
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<string[]>(`${this.apiUrl}/api/category/categoryList` , {headers});
   }
+
+  getReviewsofProduct(productId: any): Observable<IReview[]> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<IReview[]>(`${this.apiUrl}/api/products/${productId}/reviews`, {headers});
+  }
+
+  addReview(productId: number, review: { rating: number; description: string }): Observable<IReview> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http.post<IReview>(`${this.apiUrl}/api/products/${productId}/reviews`, review, { headers });
+  }
+  deleteReview( reviewId: number, userId: number){
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http.delete(`${this.apiUrl}/api/products/reviews/${reviewId}`,{ headers })
+  }
+  
 
 
 

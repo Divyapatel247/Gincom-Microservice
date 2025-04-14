@@ -82,8 +82,10 @@ export const routes: Routes = [
       { path: 'addToCart', component: AddToCartComponent },
       { path: 'myOrders', component: MyOrdersComponent },
       // other customer routes
-
-    ]
+      { path: '', redirectTo: 'product', pathMatch: 'full' }, // Default to products
+      { path: 'product', component: ProductComponent },
+      { path: 'product-detail/:productid', component: ProductDetailComponent }
+    ] 
   },
   { path: 'login', component: LoginComponent  },
   { path: 'register', component: RegisterComponent  },

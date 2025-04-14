@@ -25,6 +25,19 @@
         { "Host": "localhost", "Port": 5002 }
       ],
       "UpstreamPathTemplate": "/api/products/{everything}",
+      "UpstreamHttpMethod": ["GET","POST","DELETE"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServer",
+        "AllowedScopes": ["api.read"]
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/category/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "localhost", "Port": 5002 }
+      ],
+      "UpstreamPathTemplate": "/api/category/{everything}",
       "UpstreamHttpMethod": ["GET"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "IdentityServer",

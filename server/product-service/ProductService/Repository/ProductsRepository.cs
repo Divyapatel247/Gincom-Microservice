@@ -291,7 +291,7 @@ public class ProductsRepository : IProductRepository
         )).AsList();
     }
 
-    public async Task<Product> UpdateProductAsync(Product product, List<int> relatedProductIds)
+    public async Task<Product> UpdateProductAsync(Product product)
     {
 
         using var connection = new MySqlConnection(_connectionString);
@@ -311,15 +311,7 @@ public class ProductsRepository : IProductRepository
         var deleteSql = "DELETE FROM RelatedProducts WHERE ProductId = @ProductId";
         await connection.ExecuteAsync(deleteSql, new { ProductId = product.Id }, transaction);
 
-        if (relatedProductIds != null && relatedProductIds.Any())
-        {
-            var validRelatedIds = relatedProductIds.Take(4).Where(rid => rid != product.Id).ToList();
-            foreach (var relatedId in validRelatedIds)
-            {
-                var relatedSql = "INSERT INTO RelatedProducts (ProductId, RelatedProductId) VALUES (@ProductId, @RelatedProductId)";
-                await connection.ExecuteAsync(relatedSql, new { ProductId = product.Id, RelatedProductId = relatedId }, transaction);
-            }
-        }
+        
 
         await transaction.CommitAsync();
         return product;
