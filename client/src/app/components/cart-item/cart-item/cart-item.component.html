@@ -31,6 +31,9 @@
             class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">+</button>
       </div>
     </div>
+    @if (error) {
+      <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+    }
   </div>
 
   <!-- Total price and remove button - 4 cols on mobile, 1 col on larger screens -->

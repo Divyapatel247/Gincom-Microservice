@@ -1,6 +1,9 @@
+import { Product } from "./product.interface";
+
 export interface OrderItem {
   productId: number;
   quantity: number;
+  product? : Product
 }
 
 export interface Order {
@@ -8,6 +11,7 @@ export interface Order {
   userId: string;
   status: string;
   items: OrderItem[];
+  razorpayOrderId?: string;
   createdAt?: Date;
 }
 

@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 
 import { async, firstValueFrom, Observable, of } from 'rxjs';
 
@@ -148,6 +148,14 @@ export class ApiService {
        Authorization: `Bearer ${token}`
      });
     return this.http.get<Product>(`${this.apiUrl}/api/products/${productId}`, {headers});
+  }
+
+  getOrdersByUserId(userId: string): Observable<OrderResponse[]> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<OrderResponse[]>(`${this.apiUrl}/api/orders/${userId}`, {headers});
   }
 
 }

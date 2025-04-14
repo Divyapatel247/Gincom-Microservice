@@ -14,6 +14,7 @@ import { OrdersComponent } from './pages/orders/orders.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ShowProductDetailComponent } from './pages/show-product-detail/show-product-detail.component';
 import { AddToCartComponent } from './pages/add-to-cart/add-to-cart/add-to-cart.component';
+import { MyOrdersComponent } from './pages/my-orders/my-orders.component';
 
 // export const routes: Routes = [
 //   {
@@ -79,6 +80,7 @@ export const routes: Routes = [
       // { path: '', component: CustomerDashboardComponent },
       // { path: 'orders', component: CustomerOrdersComponent },
       { path: 'addToCart', component: AddToCartComponent },
+      { path: 'myOrders', component: MyOrdersComponent },
       // other customer routes
 
     ]

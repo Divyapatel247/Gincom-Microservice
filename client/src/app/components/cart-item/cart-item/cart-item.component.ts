@@ -16,6 +16,9 @@ export class CartItemComponent implements OnInit {
   @Output() updateQuantity = new EventEmitter<{ id: number; quantity: number }>();
   @Output() removeItem = new EventEmitter<number>();
   product: Product | null = null;
+  stock: number = 0;
+  error: string | null = null;
+
 
   constructor(private apiService: ApiService) {}
 
@@ -23,6 +26,7 @@ export class CartItemComponent implements OnInit {
     if (this.item) {
       console.log('Fetching product for productId:', this.item.productId);
       this.loadProduct();
+      this.checkStock();
     } else {
       console.warn('Item input is undefined in CartItemComponent');
     }
@@ -38,9 +42,30 @@ export class CartItemComponent implements OnInit {
     });
   }
 
+  checkStock() {
+    this.apiService.getProduct(this.item.productId).subscribe({
+      next: (product) => {
+        this.stock = product.stock || 0;
+        if (this.item.quantity <= this.stock) {
+          this.error = null;
+        }
+      },
+      error: (err) => console.error('Error checking stock:', err),
+    });
+  }
+
   onUpdateQuantity(quantity: number) {
     if (this.item) {
-      this.updateQuantity.emit({ id: this.item.id, quantity: quantity > 0 ? quantity : 1 });
+      if (quantity > this.stock) {
+        this.error = `Quantity exceeds available stock (${this.stock}). Please reduce it.`;
+        quantity = this.stock;
+      } else if (quantity < 1) {
+        quantity = 1;
+      } else {
+        this.error = null;
+      }
+      this.updateQuantity.emit({ id: this.item.id, quantity });
+
     }
   }
 
