@@ -50,6 +50,7 @@ export class ProductComponent implements OnInit {
   getCategoryList() {
     this.api.getCategoryList().subscribe((res: string[]) => {
       this.categories = res;
+      console.log('Categories in Layout:', res);
     });
   }
 

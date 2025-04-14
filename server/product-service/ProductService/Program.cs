@@ -20,6 +20,9 @@ SqlMapper.AddTypeHandler(new JSONTypeHandler<Dimensions>());
 builder.Services.AddScoped(sp => 
     new MySqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<DatabaseConfig>();
 builder.Services.AddScoped<IProductRepository, ProductsRepository>();
@@ -91,6 +94,7 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
 
 app.UseAuthentication();
 app.UseAuthorization();

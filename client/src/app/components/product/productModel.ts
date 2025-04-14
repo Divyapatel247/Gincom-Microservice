@@ -23,11 +23,12 @@ export interface IProduct {
   categoryName?: string | null;
 }
 export interface IReview {
+  id:number
+  productId:number;
+  userId:number;
   rating: number;
-  comment: string;
-  date: string;
-  reviewerName: string;
-  reviewerEmail: string;
+  description: string;
+createdAt: string;
 }
 
 export interface IUser {
