@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BasketItem } from '../../../models/cart.interface';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Product } from '../../../models/product.interface';
+import { ApiService } from '../../../shared/api.service';
 
 @Component({
   selector: 'app-cart-item',
@@ -9,18 +11,42 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './cart-item.component.html',
   styleUrl: './cart-item.component.css'
 })
-export class CartItemComponent {
+export class CartItemComponent implements OnInit {
   @Input() item!: BasketItem;
-  @Input() productPrice: number = 9.99; // Dummy price
   @Output() updateQuantity = new EventEmitter<{ id: number; quantity: number }>();
   @Output() removeItem = new EventEmitter<number>();
+  product: Product | null = null;
 
-  onQuantityChange(event: Event) {
-    const quantity = +(event.target as HTMLInputElement).value;
-    this.updateQuantity.emit({ id: this.item.id, quantity: quantity > 0 ? quantity : 1 });
+  constructor(private apiService: ApiService) {}
+
+  ngOnInit() {
+    if (this.item) {
+      console.log('Fetching product for productId:', this.item.productId);
+      this.loadProduct();
+    } else {
+      console.warn('Item input is undefined in CartItemComponent');
+    }
+  }
+
+  loadProduct() {
+    this.apiService.getProduct(this.item.productId).subscribe({
+      next: (data) => {
+        console.log('Product fetched:', data);
+        this.product = data;
+      },
+      error: (err) => console.error('Error fetching product:', err),
+    });
+  }
+
+  onUpdateQuantity(quantity: number) {
+    if (this.item) {
+      this.updateQuantity.emit({ id: this.item.id, quantity: quantity > 0 ? quantity : 1 });
+    }
   }
 
   onRemove() {
-    this.removeItem.emit(this.item.id);
+    if (this.item) {
+      this.removeItem.emit(this.item.id);
+    }
   }
 }

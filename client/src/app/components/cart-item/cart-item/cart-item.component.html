@@ -1,21 +1,47 @@
-<div class="flex items-center justify-between py-4 border-b border-gray-200">
-  <div class="flex items-center space-x-4">
-    <img src="https://via.placeholder.com/80" alt="Product" class="w-20 h-20 object-cover" />
-    <div>
-      <h3 class="text-lg font-medium">Product {{ item.productId }}</h3>
-      <p class="text-gray-500 text-sm">Qty: {{ item.quantity }}</p>
-      @if (item.createdAt) {
-        <p class="text-gray-400 text-xs">Added: {{ item.createdAt | date:'medium' }}</p>
-      }
+<!-- cart-item.html - fully responsive -->
+<div class="grid grid-cols-12 gap-2 sm:gap-4 items-center">
+  <!-- Product info - Full width on mobile, 6 cols on larger screens -->
+  <div class="col-span-12 sm:col-span-6 mb-3 sm:mb-0">
+    <div class="flex items-center gap-3 sm:gap-4">
+      <img [src]="product?.thumbnail || 'https://via.placeholder.com/80'" alt="Product"
+          class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg bg-gray-50 border border-gray-100" />
+      <div>
+        <h3 class="font-medium text-gray-900 text-sm sm:text-base">{{ product?.title || 'Loading...' }}</h3>
+        @if (item.createdAt) {
+          <p class="text-gray-400 text-xs mt-1">Added: {{ item.createdAt | date:'short' }}</p>
+        }
+      </div>
     </div>
   </div>
-  <div class="flex items-center space-x-4">
-    <p class="text-lg font-semibold">₹{{ productPrice * item.quantity | number:'1.2-2' }}</p>
-    <div class="flex items-center space-x-2">
-      <button (click)="updateQuantity.emit({ id: item.id, quantity: item.quantity - 1 })" class="px-2 py-1 bg-gray-200 rounded">-</button>
-      <input type="number" [(ngModel)]="item.quantity" (change)="onQuantityChange($event)" min="1" class="w-16 text-center border rounded" />
-      <button (click)="updateQuantity.emit({ id: item.id, quantity: item.quantity + 1 })" class="px-2 py-1 bg-gray-200 rounded">+</button>
+
+  <!-- Price - Hidden on xs, visible from sm up -->
+  <div class="hidden sm:block sm:col-span-2 text-center text-gray-900">
+    ₹{{ product?.price || 0 | number:'1.2-2' }}
+  </div>
+
+  <!-- Quantity controls - 8 cols on mobile, 3 cols on larger screens -->
+  <div class="col-span-8 sm:col-span-3">
+    <div class="flex items-center justify-start sm:justify-center">
+      <div class="flex items-center border border-gray-200 rounded-md">
+        <button (click)="onUpdateQuantity(item.quantity - 1)"
+            class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">−</button>
+        <input type="number" [(ngModel)]="item.quantity" (change)="onUpdateQuantity(item.quantity)" min="1"
+            class="w-12 sm:w-16 text-center border-x border-gray-200 h-8 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        <button (click)="onUpdateQuantity(item.quantity + 1)"
+            class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">+</button>
+      </div>
     </div>
-    <button (click)="onRemove()" class="text-red-500 hover:text-red-700">🗑️</button>
+  </div>
+
+  <!-- Total price and remove button - 4 cols on mobile, 1 col on larger screens -->
+  <div class="col-span-4 sm:col-span-1 text-right">
+    <div class="flex items-center justify-end gap-2 sm:gap-3">
+      <span class="font-medium text-sm sm:text-base">₹{{ (product?.price || 0) * item.quantity | number:'1.2-2' }}</span>
+      <button (click)="onRemove()" class="text-gray-400 hover:text-black transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </div>
   </div>
 </div>

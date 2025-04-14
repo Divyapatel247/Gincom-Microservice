@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
 import { IProduct } from '../components/product/productModel';
 import { Basket, BasketResponse } from '../models/cart.interface';
 import { Order, OrderResponse } from '../models/order.interface';
+import { AuthService } from '../service/auth.service';
+import { Product } from '../models/product.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +13,7 @@ import { Order, OrderResponse } from '../models/order.interface';
 export class ApiService {
   private apiUrl = 'http://localhost:5100';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   getProducts(): Observable<IProduct[]> {
     const token = localStorage.getItem('access_token');
@@ -77,74 +79,52 @@ export class ApiService {
 
   //------------------------Cart--------------------------------------------
 
-  // Get cart for user
   getCart(userId: string): Observable<BasketResponse> {
-    // return this.http.get<BasketResponse>(`${this.baseUrl}/orders/${userId}/cart`);
-    return new Observable<BasketResponse>(observer => {
-      const dummyResponse: BasketResponse = {
-        id: 1,
-        userId: 'user123',
-        items: [
-          { id: 1, productId: 1, quantity: 2 },
-          { id: 2, productId: 2, quantity: 1 },
-        ],
-        createdAt: new Date(),
-        totalAmount: 29.97, // Matches backend totalAmount
-      };
-      observer.next(dummyResponse);
-      observer.complete();
-    });
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart`, {headers} );
   }
 
   updateCartItem(userId: string, itemId: number, quantity: number): Observable<BasketResponse> {
-    // return this.http.put<BasketResponse>(`${this.baseUrl}/orders/${userId}/cart/items/${itemId}`, { quantity });
-    return new Observable<BasketResponse>(observer => {
-      const dummyResponse: BasketResponse = {
-        id: 1,
-        userId: 'user123',
-        items: [
-          { id: itemId, productId: 1, quantity: quantity },
-          { id: 2, productId: 2, quantity: 1 },
-        ],
-        createdAt: new Date(),
-        totalAmount: quantity * 9.99 + 9.99, // Matches backend price logic
-      };
-      observer.next(dummyResponse);
-      observer.complete();
-    });
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.put<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart/items/${itemId}`, { quantity},{ headers });
   }
 
   removeCartItem(userId: string, itemId: number): Observable<BasketResponse> {
-    // return this.http.delete<BasketResponse>(`${this.baseUrl}/orders/${userId}/cart/items/${itemId}`);
-    return new Observable<BasketResponse>(observer => {
-      const dummyResponse: BasketResponse = {
-        id: 1,
-        userId: 'user123',
-        items: [{ id: 2, productId: 2, quantity: 1 }],
-        createdAt: new Date(),
-        totalAmount: 9.99,
-      };
-      observer.next(dummyResponse);
-      observer.complete();
-    });
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.delete<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart/items/${itemId}`, {headers});
+  }
+
+  deleteCart(userId: string): Observable<any> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.delete<any>(`${this.apiUrl}/api/orders/${userId}/cart`, {headers});
   }
 
   createOrder(userId: string): Observable<OrderResponse> {
-    // return this.http.post<OrderResponse>(`${this.baseUrl}/orders/${userId}`, {});
-    return new Observable<OrderResponse>(observer => {
-      const dummyResponse: OrderResponse = {
-        id: 1,
-        userId: 'user123',
-        status: 'Pending',
-        items: [
-          { productId: 1, quantity: 2 },
-          { productId: 2, quantity: 1 },
-        ],
-        createdAt: new Date(),
-        razorpayOrderId: 'rzp_order_123',
-      };
-      observer.next(dummyResponse);
-      observer.complete();
-    });
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.post<OrderResponse>(`${this.apiUrl}/api/orders/${userId}`, {}, {headers});
   }
+
+  getProduct(productId: number): Observable<Product> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<Product>(`${this.apiUrl}/api/products/${productId}`, {headers});
+  }
+
 }
