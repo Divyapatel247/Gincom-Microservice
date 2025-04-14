@@ -1,0 +1,20 @@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
+
+  <div>
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="font-bold">Cross Products</h3>
+      <button class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+    </div>
+    <div class="max-h-60 overflow-y-auto space-y-3 border p-4 rounded">
+      <div *ngFor="let item of crossProducts" class="flex items-center gap-4 border-b pb-2">
+        <div class="w-16 h-16 bg-gray-100 rounded"></div>
+        <div class="flex-grow">
+          <p class="text-sm font-semibold">Product name</p>
+          <p class="text-sm">$4.00</p>
+          <div class="text-yellow-500 text-xs">★★★★★ 4.00</div>
+        </div>
+        <i class="fa fa-trash text-red-500 cursor-pointer"></i>
+      </div>
+    </div>
+  </div>
+</div>

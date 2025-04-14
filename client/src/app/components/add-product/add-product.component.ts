@@ -3,10 +3,11 @@ import { IProduct } from '../product/productModel';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormControlName } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { NgClass, NgFor, NgIf } from '@angular/common';
+import { AddCrossProductsComponent } from "../add-cross-products/add-cross-products.component";
 
 @Component({
   selector: 'app-add-product',
-  imports: [ReactiveFormsModule,NgClass,NgIf,NgFor],
+  imports: [ReactiveFormsModule, NgClass, NgIf, NgFor, AddCrossProductsComponent],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.css'
 })
@@ -24,6 +25,7 @@ export class AddProductComponent implements OnInit{
     tags: new FormControl(""),
   });
   errorMessage: string = '';
+
 
   ngOnInit() {
     this.loadCategories();
@@ -76,7 +78,7 @@ export class AddProductComponent implements OnInit{
       },
       error: (err) => {
         this.errorMessage = `Failed to add product: ${err.status} - ${err.statusText}`;
-        console.error('Error:', err.message); 
+        console.error('Error:', err.message);
       }
     });
   }
