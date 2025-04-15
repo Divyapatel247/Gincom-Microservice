@@ -5,7 +5,7 @@ import { BehaviorSubject, tap } from 'rxjs';
 import { async, firstValueFrom, Observable, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
-import { IProduct, IReview } from '../components/product/productModel';
+import { IProduct, IProductWithRelatedProducts, IReview } from '../components/product/productModel';
 import { Basket, BasketResponse } from '../models/cart.interface';
 import { Order, OrderResponse } from '../models/order.interface';
 import { AuthService } from '../service/auth.service';
@@ -39,12 +39,12 @@ export class ApiService {
     );
   }
 
-  getProductById(productId: string): Observable<IProduct> {
+  getProductById(productId: string): Observable<IProductWithRelatedProducts> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}` , {headers});
+    return this.http.get<IProductWithRelatedProducts>(`${this.apiUrl}/api/products/${productId}` , {headers});
 
   }
 
@@ -103,8 +103,12 @@ export class ApiService {
   }
 
   getProductCategory(categoryName: string): Observable<IProduct[]> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
     return this.http.get<IProduct[]>(
-      `${this.apiUrl}/products/category/${categoryName}`
+      `${this.apiUrl}/api/products/category/${categoryName}`,{headers}
     );
   }
   getCategoryList(): Observable<string[]> {

@@ -43,6 +43,7 @@ export class ProductDetailComponent implements OnInit {
     warrantyInformation: '',
     returnPolicy: '',
     reviews: [],
+    relatedProductIds: []
   };
 
   constructor(
