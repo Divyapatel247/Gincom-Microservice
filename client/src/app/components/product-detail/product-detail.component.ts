@@ -58,7 +58,8 @@ export class ProductDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUserId = this.authservice.getUserId() ? parseInt(this.authservice.getUserId()!, 10) : null;
-    console.log('currentUserId:', this.currentUserId);
+    console.log('currentUserId:', this.currentUserId,'type:', typeof this.currentUserId);
+    console.log('isLoggedIn:', this.authservice.isLoggedIn());
     if (!this.currentUserId || !this.authservice.isLoggedIn()) {
       console.warn('No user ID or not logged in. Redirecting to login.');
       this.router.navigate(['/login']);
@@ -76,6 +77,7 @@ export class ProductDetailComponent implements OnInit {
         .getReviewsofProduct(productid)
         .subscribe((reviews: IReview[]) => {
           this.productDetail.reviews = reviews;
+          reviews.forEach(r => console.log('review.userId:', r.userId, 'type:', typeof r.userId));
           console.log('Reviews:', reviews);
         });
     }
@@ -88,6 +90,7 @@ export class ProductDetailComponent implements OnInit {
     return this.showAllReviews
       ? this.productDetail.reviews
       : this.productDetail.reviews.slice(0, 2);
+      
   }
 
   newReview = {

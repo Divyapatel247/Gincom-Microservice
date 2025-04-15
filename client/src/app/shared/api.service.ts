@@ -125,6 +125,13 @@ export class ApiService {
     });
     return this.http.delete(`${this.apiUrl}/api/products/reviews/${reviewId}`,{ headers })
   }
+  // deleteReview(reviewId: number): Observable<any> {
+  //   const token = localStorage.getItem('access_token');
+  //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  //   const url = `${this.apiUrl}/reviews/${reviewId}`;
+  //   console.log('DELETE Request:', { url, token });
+  //   return this.http.delete(url, { headers });
+  // }
   
 
 
