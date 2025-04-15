@@ -42,6 +42,7 @@ export class ProductDetailComponent implements OnInit {
     warrantyInformation: '',
     returnPolicy: '',
     reviews: [],
+    relatedProductIds: []
   };
   quantity: number = 1;
   remainingStock: number = 0;

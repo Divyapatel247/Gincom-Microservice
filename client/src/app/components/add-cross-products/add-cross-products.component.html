@@ -1,20 +1,63 @@
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
-
-  <div>
-    <div class="flex justify-between items-center mb-2">
-      <h3 class="font-bold">Cross Products</h3>
-      <button class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+<!-- Cross Products Component -->
+<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 h-full">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-bold text-gray-900">Cross Products</h3>
+    <div class="w-1/4">
+      <select
+        id="category"
+        [(ngModel)]="selectedCategory"
+        (ngModelChange)="onCategoryChange()"
+        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm appearance-none"
+      >
+        <option value="" disabled>Select a category</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
     </div>
-    <div class="max-h-60 overflow-y-auto space-y-3 border p-4 rounded">
-      <div *ngFor="let item of crossProducts" class="flex items-center gap-4 border-b pb-2">
-        <div class="w-16 h-16 bg-gray-100 rounded"></div>
-        <div class="flex-grow">
-          <p class="text-sm font-semibold">Product name</p>
-          <p class="text-sm">$4.00</p>
-          <div class="text-yellow-500 text-xs">★★★★★ 4.00</div>
+  </div>
+
+  <!-- Empty states -->
+  <div *ngIf="!selectedCategory" class="py-8 text-center text-gray-500 text-sm">
+    Please select a category to view products
+  </div>
+
+  <div *ngIf="selectedCategory && products.length === 0" class="py-8 text-center text-gray-500 text-sm">
+    No products found for this category
+  </div>
+
+  <!-- Products list -->
+  <div class="max-h-96 overflow-y-auto mt-2 border border-gray-100 rounded-md">
+    <div *ngFor="let product of products" class="flex items-center gap-4 p-3 border-b border-gray-100 hover:bg-gray-50">
+      <input
+        type="checkbox"
+        [checked]="selectedProductIds.includes(product.id)"
+        [disabled]="isCheckboxDisabled(product.id)"
+        (change)="onCheckboxChange($event, product.id)"
+        class="h-4 w-4 border-gray-300 rounded text-black focus:ring-black"
+      />
+      <div class="w-14 h-14 bg-gray-50 rounded-md flex items-center justify-center border border-gray-100"></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-gray-900 truncate">{{ product.title }}</p>
+        <p class="text-sm text-gray-700">${{ product.price.toFixed(2) }}</p>
+        <div class="flex items-center mt-1">
+          <div class="text-sm text-gray-600">{{ product.rating?.toFixed(1) }}</div>
+          <div class="ml-1 flex text-gray-300">
+            <span class="text-xs">★★★★★</span>
+          </div>
         </div>
-        <i class="fa fa-trash text-red-500 cursor-pointer"></i>
       </div>
+    </div>
+  </div>
+
+  <!-- Counter -->
+  <div class="text-xs text-gray-600 mt-3 flex justify-between items-center">
+    <div>{{ selectedProductIds.length }} of 4 products selected</div>
+    <div class="bg-gray-100 h-1 w-24 rounded-full">
+      <div
+        class="bg-black h-1 rounded-full"
+        [style.width.%]="(selectedProductIds.length / 4) * 100"
+      ></div>
     </div>
   </div>
 </div>

@@ -1,18 +1,18 @@
 import { Component, NgModule, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { IProduct } from '../../components/product/productModel';
-import { ActivatedRoute, Router } from '@angular/router';
+import { IProduct, IProductWithRelatedProducts } from '../../components/product/productModel';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../shared/api.service';
 import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-show-product-detail',
-  imports: [FormsModule,NgFor],
+  imports: [FormsModule,NgFor,RouterLink,NgIf],
   templateUrl: './show-product-detail.component.html',
   styleUrl: './show-product-detail.component.css'
 })
 export class ShowProductDetailComponent implements OnInit {
-  product : IProduct = {
+  product : IProductWithRelatedProducts = {
     title: '',
     price: 0,
     discountPercentage: 0,
@@ -26,8 +26,11 @@ export class ShowProductDetailComponent implements OnInit {
     id: 0,
     description: '',
     categoryId: 0,
-    stock: 0
+    stock: 0,
+    relatedProductIds: [],
+    relatedProducts: [{title:'',price:0}]
   };
+  // relatedProducts: object[] = []
 
 
   productId!: string;
@@ -38,13 +41,15 @@ export class ShowProductDetailComponent implements OnInit {
   ngOnInit() {
     this.productId = this.route.snapshot.paramMap.get('id')!;
     // console.log("productId :", this.productId)
-    this.api.getProductById(this.productId).subscribe(p => this.product = p);
+    this.api.getProductById(this.productId).subscribe(p =>{
+      this.product = p
+    });
     console.log("product :", this.product)
   }
 
 
   relatedProducts = [1, 2, 3]; // Replace with real data
-  crossProducts = [1, 2, 3]; // Replace with real data
+  // crossProducts = [1, 2, 3]; // Replace with real data
 
   newTag = '';
 
