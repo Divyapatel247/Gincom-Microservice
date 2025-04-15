@@ -137,7 +137,6 @@ export class ApiService {
     });
     return this.http.delete(`${this.apiUrl}/api/products/reviews/${reviewId}`,{ headers })
   }
-<<<<<<< HEAD
   // deleteReview(reviewId: number): Observable<any> {
   //   const token = localStorage.getItem('access_token');
   //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -145,10 +144,7 @@ export class ApiService {
   //   console.log('DELETE Request:', { url, token });
   //   return this.http.delete(url, { headers });
   // }
-  
-=======
 
->>>>>>> d71a9a630eadfff3cb4c47bebb765b2016054d7b
 
 
 
