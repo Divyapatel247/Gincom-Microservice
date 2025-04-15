@@ -5,10 +5,11 @@ import { CartItemComponent } from "../../../components/cart-item/cart-item/cart-
 import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../service/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-add-to-cart',
-  imports: [CartItemComponent,NgIf,NgForOf,CommonModule,FormsModule],
+  imports: [CartItemComponent,NgIf,NgForOf,CommonModule,FormsModule,RouterLink],
   templateUrl: './add-to-cart.component.html',
   styleUrl: './add-to-cart.component.css'
 })
