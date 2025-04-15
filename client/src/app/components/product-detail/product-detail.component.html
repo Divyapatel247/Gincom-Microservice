@@ -122,23 +122,31 @@
           </p>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-8 flex gap-4">
+        <div class="mt-8 flex gap-4 items-center">
+          <input
+            type="number"
+            [(ngModel)]="quantity"
+            min="1"
+            [max]="productDetail.stock"
+            class="w-20 border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+            (change)="quantity = clampQuantity(quantity, 1, productDetail.stock)"
+          />
           <button
-            class="flex-1 bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-600 invalid"
+            (click)="addToCart()"
+            class="flex-1 bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-400"
+            [disabled]="!productDetail.id || productDetail.stock === 0 || quantity <= 0"
           >
             Add To Cart
           </button>
           <button
-            class="p-3 border border-gray-300 rounded-md hover:bg-gray-50"
+            class="p-3 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
           >
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-              />
+            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           </button>
         </div>
+        <div *ngIf="errorMessage" class="text-red-500 text-sm mt-2">{{ errorMessage }}</div>
 
         <!-- Shipping and Warranty Information -->
         <div class="mt-8">
@@ -224,7 +232,7 @@
                   <p class="text-sm text-gray-600 flex-1">
                     {{ review.description || "No description available" }}
                   </p>
-                  @if(review.userId === currentUserId){
+                  @if(review.userId == currentUserId){
                     <button
                       (click)="deleteReview(review.id, currentUserId)"
                       class="ml-4 text-red-600 hover:text-red-800"
