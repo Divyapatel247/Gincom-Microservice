@@ -1,18 +1,53 @@
-import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { WebsocketService } from '../../service/websocket.service';
+import { Notification } from '../../models/notification.interface';
+import { AuthService } from '../../service/auth.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-customer-navbar',
-  imports: [],
+  imports: [NgIf,NgFor,CommonModule],
   templateUrl: './customer-navbar.component.html',
-  styleUrl: './customer-navbar.component.css'
+  styleUrl: './customer-navbar.component.css',
 })
-export class CustomerNavbarComponent {
-  constructor(private router: Router) {}
+export class CustomerNavbarComponent implements OnInit, OnDestroy{
+  notifications: Notification[] = [];
+  showNotifications = false;
+  private subscription: Subscription | undefined;
 
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
+
+  constructor(private websocketService: WebsocketService, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    this.subscription = this.websocketService.getNotifications().subscribe(notifs => {
+      this.notifications = notifs;
+      // Force change detection to update the UI
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  deleteNotification(index: number): void {
+    event?.stopPropagation();
+    const updatedNotifications = [...this.notifications];
+    updatedNotifications.splice(index, 1);
+    this.websocketService.updateNotifications(updatedNotifications);
+  }
+
+  clearAllNotifications(): void {
+    event?.stopPropagation();
+    this.websocketService.clearNotifications();
   }
 }

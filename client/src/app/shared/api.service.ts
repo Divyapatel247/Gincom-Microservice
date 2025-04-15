@@ -6,7 +6,8 @@ import { async, firstValueFrom, Observable, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { IProduct, IProductWithRelatedProducts, IReview } from '../components/product/productModel';
-import { Basket, BasketResponse } from '../models/cart.interface';
+import { Basket, BasketItem, BasketResponse } from '../models/cart.interface';
+
 import { Order, OrderResponse } from '../models/order.interface';
 import { AuthService } from '../service/auth.service';
 import { Product } from '../models/product.interface';
@@ -141,6 +142,13 @@ export class ApiService {
     });
     return this.http.delete(`${this.apiUrl}/api/products/reviews/${reviewId}`,{ headers })
   }
+  // deleteReview(reviewId: number): Observable<any> {
+  //   const token = localStorage.getItem('access_token');
+  //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  //   const url = `${this.apiUrl}/reviews/${reviewId}`;
+  //   console.log('DELETE Request:', { url, token });
+  //   return this.http.delete(url, { headers });
+  // }
 
 
 
@@ -201,6 +209,15 @@ export class ApiService {
        Authorization: `Bearer ${token}`
      });
     return this.http.get<OrderResponse[]>(`${this.apiUrl}/api/orders/${userId}`, {headers});
+  }
+
+  addToCartBulk(userId: string, items: BasketItem[]): Observable<BasketResponse> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    const request = { Items: items };
+    return this.http.post<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart/items/bulk`, request, {headers});
   }
 
 }

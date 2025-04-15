@@ -58,16 +58,19 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/notifications/{everything}",
+      "DownstreamPathTemplate": "/notificationHub/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         { "Host": "localhost", "Port": 5003 }
       ],
-      "UpstreamPathTemplate": "/notifications/{everything}",
-      "UpstreamHttpMethod": ["POST"],
+      "UpstreamPathTemplate": "/notificationHub/{everything}",
+      "UpstreamHttpMethod": ["GET","POST", "PUT", "DELETE"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "IdentityServer",
-        "AllowedScopes": ["api.read"]
+        "AllowedScopes": ["api.read","api.write"]
+      },
+      "WebSockets": {
+        "Enabled": true 
       }
     }
   ],
