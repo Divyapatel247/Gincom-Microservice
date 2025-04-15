@@ -41,7 +41,7 @@ export class ProductTableComponent implements OnInit {
       const confirmDelete = window.confirm(`Are you sure you want to delete "${productToDelete.title}"?`);
       if (confirmDelete) {
         console.log('Deleting product:', productToDelete);
-        this.api.deleteProduct(productId).subscribe({
+        this.api.deleteProduct(String(productId)).subscribe({
           next: (response) => {
             console.log('Delete response:', response);
             this.getProducts();

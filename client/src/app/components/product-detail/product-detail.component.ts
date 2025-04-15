@@ -11,7 +11,6 @@ import {
   CommonModule,
 } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { jwtDecode } from 'jwt-decode';
 import { AuthService } from '../../service/auth.service';
 
 
@@ -54,7 +53,7 @@ export class ProductDetailComponent implements OnInit {
     private authservice: AuthService
   ) {}
 
-  
+
 
   ngOnInit(): void {
     this.currentUserId = this.authservice.getUserId() ? parseInt(this.authservice.getUserId()!, 10) : null;

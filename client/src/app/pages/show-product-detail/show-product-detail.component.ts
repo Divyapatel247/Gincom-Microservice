@@ -37,7 +37,7 @@ export class ShowProductDetailComponent implements OnInit {
 
   ngOnInit() {
     this.productId = this.route.snapshot.paramMap.get('id')!;
-    console.log("productId :", this.productId)
+    // console.log("productId :", this.productId)
     this.api.getProductById(this.productId).subscribe(p => this.product = p);
     console.log("product :", this.product)
   }
@@ -63,5 +63,14 @@ export class ShowProductDetailComponent implements OnInit {
 
   removeTag(tag: string) {
     this.product.tags = this.product.tags.filter(t => t !== tag);
+  }
+
+  onDelete(){
+  this.api.deleteProduct(this.productId).subscribe()
+  this.router.navigate(['admin/products']);
+  }
+
+  onSave(){
+    this.api.updateProduct(Number(this.productId),this.product).subscribe()
   }
 }

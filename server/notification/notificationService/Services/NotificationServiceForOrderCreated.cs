@@ -28,6 +28,7 @@ namespace notificationService.Services
                 Details = $"New order placed by User {order.UserId} for ${order.TotalAmount}. Items: {string.Join(", ", order.Items.Select(i => $"{i.Quantity}x Product {i.ProductId}"))}"
             };
             await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
+            Console.WriteLine($"Admin notification sent for OrderId: {order.OrderId}");
 
             // Notification for User
             var userMessage = new
@@ -39,6 +40,7 @@ namespace notificationService.Services
                 Details = $"Your order (ID: {order.OrderId}) worth ${order.TotalAmount} has been successfully placed!"
             };
             await _hubContext.Clients.Group($"User_{order.UserId}").SendAsync("ReceiveNotification", userMessage);
+            Console.WriteLine($"User notification sent to User_{order.UserId} for OrderId: {order.OrderId}");
         }
     }
 }

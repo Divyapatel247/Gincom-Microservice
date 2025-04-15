@@ -9,7 +9,7 @@
 
       <div class="mt-4">
         <label class="block text-sm font-semibold text-gray-700">Product name:</label>
-        <input [(ngModel)]="product.title" class="mt-1 w-full p-2 border rounded" />
+        <input [(ngModel)]="product.title" class="mt-1 w-full p-2 border rounded" disabled=""/>
       </div>
 
       <div class="grid grid-cols-2 gap-4 mt-4">
@@ -34,11 +34,11 @@
         </div>
         <div>
           <label>Height:</label>
-          <input [(ngModel)]="product.dimensions" class="w-full p-2 border rounded" />
+          <input [ngModel]="product.dimensions?.height" class="w-full p-2 border rounded" />
         </div>
         <div>
           <label>Depth:</label>
-          <input [(ngModel)]="product.dimensions" class="w-full p-2 border rounded" />
+          <input [ngModel]="product.dimensions?.depth" class="w-full p-2 border rounded" />
         </div>
         <div>
           <label>Weight:</label>
@@ -80,7 +80,7 @@
     <div>
       <div class="flex justify-between items-center mb-2">
         <h3 class="font-bold">Related Products</h3>
-        <button class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+        <!-- <button class="bg-green-500 text-white px-2 py-1 rounded">+</button> -->
       </div>
       <div class="max-h-60 overflow-y-auto space-y-3 border p-4 rounded">
         <div *ngFor="let item of relatedProducts" class="flex items-center gap-4 border-b pb-2">
@@ -98,7 +98,7 @@
     <div>
       <div class="flex justify-between items-center mb-2">
         <h3 class="font-bold">Cross Products</h3>
-        <button class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+        <!-- <button class="bg-green-500 text-white px-2 py-1 rounded">+</button> -->
       </div>
       <div class="max-h-60 overflow-y-auto space-y-3 border p-4 rounded">
         <div *ngFor="let item of crossProducts" class="flex items-center gap-4 border-b pb-2">
@@ -117,17 +117,17 @@
   <div class="flex flex-row items-end justify-end pt-4 gap-4">
     <div>
       <button
-      routerLink="/add-product"
-      class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl hover:from-[#5c6166] hover:to-[#abd373] transition-all duration-300"
+      (click)="onSave()"
+      class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl transition-all duration-300"
     > Save
     </button>
     </div>
     <div>
       <button
-        routerLink="/add-product"
-        class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl hover:from-[#5c6166] hover:to-[#abd373] transition-all duration-300"
+        (click)="onDelete()"
+        class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl transition-all duration-300"
       >
-         delete
+         Delete
       </button>
     </div>
   </div>

@@ -48,15 +48,27 @@ export class ApiService {
 
   }
 
-  deleteProduct(productId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/api/products/${productId}`);
+  deleteProduct(productId: string): Observable<void> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.delete<void>(`${this.apiUrl}/api/products/${productId}`,{headers});
   }
 
   addProduct(product: IProduct): Observable<IProduct> {
-    return this.http.post<IProduct>(`${this.apiUrl}/api/products/add`, product);
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.post<IProduct>(`${this.apiUrl}/api/products/add`, product,{headers});
   }
 
   updateProduct(productId: number, product: IProduct): Observable<IProduct> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
     const index = this.products.findIndex(p => p.id === productId);
     if (index !== -1) {
       this.products[index] = product;
@@ -68,7 +80,7 @@ export class ApiService {
       price: product.price,
       stock: product.stock,
       categoryName: product.categoryName,
-    });
+    },{headers});
   }
 
   login(loginObj: any) {
@@ -100,7 +112,7 @@ export class ApiService {
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.get<string[]>(`${this.apiUrl}/api/category/categoryList` , {headers});
+    return this.http.get<string[]>(`${this.apiUrl}/api/category/categoryList`,{headers});
   }
 
   getReviewsofProduct(productId: any): Observable<IReview[]> {
@@ -125,6 +137,7 @@ export class ApiService {
     });
     return this.http.delete(`${this.apiUrl}/api/products/reviews/${reviewId}`,{ headers })
   }
+<<<<<<< HEAD
   // deleteReview(reviewId: number): Observable<any> {
   //   const token = localStorage.getItem('access_token');
   //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -133,6 +146,9 @@ export class ApiService {
   //   return this.http.delete(url, { headers });
   // }
   
+=======
+
+>>>>>>> d71a9a630eadfff3cb4c47bebb765b2016054d7b
 
 
 
