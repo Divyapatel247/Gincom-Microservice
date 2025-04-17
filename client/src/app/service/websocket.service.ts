@@ -21,6 +21,7 @@ export class WebsocketService implements OnDestroy {
     this.loadNotificationsFromStorage();
 
     this.initializeSignalR();
+    setInterval(() => this.clearOldNotifications(), 1800000);
   }
 
   private loadNotificationsFromStorage(): void {
@@ -68,9 +69,11 @@ export class WebsocketService implements OnDestroy {
           this.joinUserGroup(userId);
         })
         .catch((err) => console.error('SignalR connection error:', err));
+        this.reconnect();
 
       this.hubConnection.onclose((error) => {
         console.log('SignalR connection closed:', error);
+        this.reconnect();
       });
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
@@ -145,5 +148,15 @@ export class WebsocketService implements OnDestroy {
     this.notifications = notifications;
     this.notificationsSubject.next([...this.notifications]);
     this.saveNotificationsToStorage();
+  }
+
+  private clearOldNotifications(): void {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      localStorage.removeItem(`${this.STORAGE_KEY}_${userId}`);
+      this.notifications = [];
+      this.notificationsSubject.next([]);
+      console.log('Notifications cleared from localStorage after 30 minutes');
+    }
   }
 }
