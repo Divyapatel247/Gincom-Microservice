@@ -21,6 +21,8 @@ export interface IProduct {
   thumbnail?: string;
   categoryId: number;
   categoryName?: string | null;
+  IsNotifyDisabled?: boolean;
+  
 }
 export interface IReview {
   id:number

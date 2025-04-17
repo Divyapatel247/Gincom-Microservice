@@ -24,7 +24,7 @@ public class ProductsRepository : IProductRepository
         await connection.OpenAsync();
         using var transaction = await connection.BeginTransactionAsync();
 
-       
+
 
         var sql = @"
                 INSERT INTO Products (
@@ -43,34 +43,34 @@ public class ProductsRepository : IProductRepository
         var id = await connection.QuerySingleAsync<int>(sql, product);
         product.Id = id;
 
-        
-        product.Reviews ??= new List<Review>();
-    product.RelatedProducts ??= new List<Product>();
 
-    // Insert related products
-    if (relatedProductIds != null && relatedProductIds.Any())
-    {
-        var relatedSql = "INSERT INTO RelatedProducts (ProductId, RelatedProductId) VALUES (@ProductId, @RelatedProductId)";
-        foreach (var relatedId in relatedProductIds.Where(rid => rid != product.Id))
+        product.Reviews ??= new List<Review>();
+        product.RelatedProducts ??= new List<Product>();
+
+        // Insert related products
+        if (relatedProductIds != null && relatedProductIds.Any())
         {
-            await connection.ExecuteAsync(relatedSql, new { ProductId = product.Id, RelatedProductId = relatedId }, transaction);
+            var relatedSql = "INSERT INTO RelatedProducts (ProductId, RelatedProductId) VALUES (@ProductId, @RelatedProductId)";
+            foreach (var relatedId in relatedProductIds.Where(rid => rid != product.Id))
+            {
+                await connection.ExecuteAsync(relatedSql, new { ProductId = product.Id, RelatedProductId = relatedId }, transaction);
+            }
+
+            // Fetch related products with categories
+            // product.RelatedProducts = await connection.QueryAsync<Product, Category, Product>(
+            //     "SELECT p.*, c.Id, c.Name FROM Products p LEFT JOIN Categories c ON p.CategoryId = c.Id WHERE p.Id IN @Ids",
+            //     (p, c) => { p.Category = c; return p; },
+            //     new { Ids = relatedProductIds },
+            //     transaction,
+            //     splitOn: "Id"
+            // ).AsList();
         }
 
-        // Fetch related products with categories
-        // product.RelatedProducts = await connection.QueryAsync<Product, Category, Product>(
-        //     "SELECT p.*, c.Id, c.Name FROM Products p LEFT JOIN Categories c ON p.CategoryId = c.Id WHERE p.Id IN @Ids",
-        //     (p, c) => { p.Category = c; return p; },
-        //     new { Ids = relatedProductIds },
-        //     transaction,
-        //     splitOn: "Id"
-        // ).AsList();
-    }
-
-    await transaction.CommitAsync();
+        await transaction.CommitAsync();
         return product;
     }
 
-    
+
 
     public async Task<bool> DeleteProductAsync(int id)
     {
@@ -311,7 +311,7 @@ public class ProductsRepository : IProductRepository
         var deleteSql = "DELETE FROM RelatedProducts WHERE ProductId = @ProductId";
         await connection.ExecuteAsync(deleteSql, new { ProductId = product.Id }, transaction);
 
-        
+
 
         await transaction.CommitAsync();
         return product;
@@ -377,15 +377,18 @@ public class ProductsRepository : IProductRepository
     public async Task RegisterNotificationRequestAsync(int userId, int productId)
     {
         using var connection = new MySqlConnection(_connectionString);
-        var sql = "INSERT IGNORE INTO StockNotificationRequests (UserId, ProductId) VALUES (@UserId, @ProductId)";
-        await connection.ExecuteAsync(sql, new {UserId = userId, ProductId= productId});
+        var sql = @"
+        INSERT IGNORE INTO StockNotificationRequests 
+        (UserId, ProductId) 
+        VALUES (@UserId, @ProductId)";
+        await connection.ExecuteAsync(sql, new { UserId = userId, ProductId = productId });
     }
 
     public async Task UpdateProductStockAsync(int productId, int newStock)
     {
         using var connection = new MySqlConnection(_connectionString);
         var sql = "UPDATE Products SET Stock = @NewStock WHERE Id = @ProductId";
-        await connection.ExecuteAsync(sql, new{ProductId = productId, NewStock= newStock});
+        await connection.ExecuteAsync(sql, new { ProductId = productId, NewStock = newStock });
     }
 
     public async Task<List<int>> WhomToNotify(int productId)
@@ -396,9 +399,22 @@ public class ProductsRepository : IProductRepository
             FROM StockNotificationRequests 
             WHERE ProductId = @ProductId 
             AND IsNotified = FALSE";
-        
+
         var userIds = await connection.QueryAsync<int>(sql, new { ProductId = productId });
         return userIds.AsList();
     }
+
+    public async Task<bool> CheckNotificationExistsAsync(int productId, int userId)
+{
+    using var connection = new MySqlConnection(_connectionString);
+    var sql = @"SELECT COUNT(*) 
+                FROM StockNotificationRequests 
+                WHERE UserId = @UserId 
+                  AND ProductId = @ProductId 
+                  AND IsNotified = false"; // only check unnotified entries
+
+    var count = await connection.ExecuteScalarAsync<int>(sql, new { UserId = userId, ProductId = productId });
+    return count > 0;
+}
 }
 

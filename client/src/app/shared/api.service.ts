@@ -206,4 +206,22 @@ export class ApiService {
     return this.http.get<OrderResponse[]>(`${this.apiUrl}/api/orders/${userId}`, {headers});
   }
 
+  //-------------------store the product id and user id in table
+  registerNotification(productId : number, userId: number){
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+     return this.http.post(`${this.apiUrl}/api/products/notifyMe`,{productId, userId}, {headers})
+  }
+
+  checkNotification(productId: number, userId: number): Observable<boolean> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<boolean>(`${this.apiUrl}/api/products/check`, {headers});
+  }
+  
+
 }

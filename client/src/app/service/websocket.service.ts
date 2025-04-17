@@ -75,6 +75,14 @@ export class WebsocketService implements OnDestroy {
     return this.notificationsSubject.asObservable();
   }
 
+  sendNotification(message: string): void {
+    const notification: Notification = {
+      message: message,
+      timestamp: new Date().toISOString(),
+    };
+    this.notifications.push(notification);
+    this.notificationsSubject.next([...this.notifications]);
+  }
 
   ngOnDestroy() {
     if (this.hubConnection) {

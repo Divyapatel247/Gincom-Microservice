@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { IProduct, IReview } from '../product/productModel';
 import { ApiService } from '../../shared/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,7 +12,9 @@ import {
 } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
-
+import { Subscription } from 'rxjs';
+import { WebsocketService } from '../../service/websocket.service';
+import { Notification } from '../../models/notification.interface';
 
 
 @Component({
@@ -20,6 +22,7 @@ import { AuthService } from '../../service/auth.service';
   imports: [NgClass, NgIf, DatePipe, NgFor, CommonModule, FormsModule],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',
+  
 })
 export class ProductDetailComponent implements OnInit {
   isToggle: any;
@@ -45,12 +48,16 @@ export class ProductDetailComponent implements OnInit {
     reviews: [],
   };
 
+  
+ 
+
   constructor(
     private api: ApiService,
     private activadedRoute: ActivatedRoute,
     private router: Router,
     private location: Location,
-    private authservice: AuthService
+    private authservice: AuthService,
+    
   ) {}
 
 
@@ -64,12 +71,13 @@ export class ProductDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    let productid = this.activadedRoute.snapshot.paramMap.get('productid');
+    const productid = this.activadedRoute.snapshot.paramMap.get('productid');
     // console.log(productid);
     productid &&
       this.api.getProductById(productid).subscribe((res: IProduct) => {
-        this.productDetail = res;
         console.log(res);
+        this.productDetail = res;
+        
       });
     if (productid) {
       this.api
@@ -80,7 +88,17 @@ export class ProductDetailComponent implements OnInit {
           console.log('Reviews:', reviews);
         });
     }
+
+    
+    
+    
   }
+
+  // ngOnDestroy(): void {
+  //   if (this.Subscription) {
+  //     this.Subscription.unsubscribe();
+  //   }
+  // }
 
   showAllReviews: boolean = false;
 
@@ -134,4 +152,9 @@ export class ProductDetailComponent implements OnInit {
       this.productDetail.reviews = this.productDetail.reviews?.filter(r=>r.id !== reviewId);
     })
   }
+
+  
+  
 }
+
+

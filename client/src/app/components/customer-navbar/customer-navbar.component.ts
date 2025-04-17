@@ -23,6 +23,7 @@ export class CustomerNavbarComponent implements OnInit, OnDestroy{
   ngOnInit(): void {
     this.subscription = this.websocketService.getNotifications().subscribe(notifs => {
       this.notifications = notifs;
+      console.log(this.notifications)
       // Force change detection to update the UI
       this.cdr.detectChanges();
     });

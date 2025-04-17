@@ -9,3 +9,11 @@ public interface ProductUpdatedStock
     List<int> UserIds { get; }
     DateTime UpdatedAt { get; }
 }
+
+public class ProductUpdatedStockEvent : ProductUpdatedStock
+    {
+        public int ProductId { get; set; }
+        public int NewStock { get; set; }
+        public List<int> UserIds { get; set; } = new List<int>();
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    }

@@ -19,30 +19,14 @@ public class ProductController : ControllerBase
     private readonly IReviewRepository _reviewRepo;
 
     private readonly IPublishEndpoint _publishEndpoint;
-    public ProductController(IProductRepository repository, IReviewRepository reviewRepo,IPublishEndpoint publishEndpoint)
+    public ProductController(IProductRepository repository, IReviewRepository reviewRepo, IPublishEndpoint publishEndpoint)
     {
         _repository = repository;
         _reviewRepo = reviewRepo;
         _publishEndpoint = publishEndpoint;
     }
-[Route("api/products")]
-public class ProductController : ControllerBase
-{
-    private readonly IProductRepository _repository;
-    private readonly IReviewRepository _reviewRepo;
-    public ProductController(IProductRepository repository, IReviewRepository reviewRepo)
-    {
-        _repository = repository;
-        _reviewRepo = reviewRepo;
-    }
 
-    [HttpGet]
-    public async Task<IActionResult> GetProducts()
-    {
-        var products = await _repository.GetAllProductsAsync();
-        var productDtos = products.Select(p => p.ToProductDto()).ToList();
-        return Ok(productDtos);
-    }
+
     [HttpGet]
     public async Task<IActionResult> GetProducts()
     {
@@ -62,29 +46,8 @@ public class ProductController : ControllerBase
         var productDto = product.ToProductDto();
         return Ok(productDto);
     }
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(int id)
-    {
-        var product = await _repository.GetProductByIdAsync(id);
-        if (product == null)
-        {
-            return NotFound();
-        }
-        var productDto = product.ToProductDto();
-        return Ok(productDto);
-    }
 
-    [HttpPost("add")]
 
-    public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO createProductDto)
-    {
-        var category = await _repository.GetCategoryByNameAsync(createProductDto.CategoryName);
-        if (category == null)
-        {
-            return BadRequest("Category not found");
-        }
-        var product = createProductDto.ToProductFromCreate();
-        product.CategoryId = category.Id;
     [HttpPost("add")]
 
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO createProductDto)
@@ -103,24 +66,10 @@ public class ProductController : ControllerBase
         //  return Ok();
         return CreatedAtAction(nameof(GetProductById), new { id = productDto.Id }, productDto);
     }
-        var createdProduct = await _repository.CreateProductAsync(product, createProductDto.RelatedProductIds);
-        var productWithCategory = await _repository.GetProductByIdAsync(createdProduct.Id);
-        var productDto = productWithCategory.ToProductDto();
-        //  return Ok();
-        return CreatedAtAction(nameof(GetProductById), new { id = productDto.Id }, productDto);
-    }
+
+
 
     [HttpPut("{id}")]
-
-    public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto, [FromQuery] List<int> relatedProductIds)
-    {
-        var existingProduct = await _repository.GetProductByIdAsync(id);
-        if (existingProduct == null)
-        {
-            return NotFound();
-        }
-    [HttpPut("{id}")]
-
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto)
     {
         var existingProduct = await _repository.GetProductByIdAsync(id);
@@ -136,25 +85,27 @@ public class ProductController : ControllerBase
         }
         existingProduct.UpdateFromDto(updateProductDto);
         existingProduct.CategoryId = category.Id;
-        var category = await _repository.GetCategoryByNameAsync(updateProductDto.CategoryName);
-        if (category == null)
-        {
-            return BadRequest("Category not found");
-        }
-        existingProduct.UpdateFromDto(updateProductDto);
-        existingProduct.CategoryId = category.Id;
 
-        await _repository.UpdateProductAsync(existingProduct, relatedProductIds);
-        var updatedProduct = await _repository.GetProductByIdAsync(id);
-        var productDto = updatedProduct.ToProductDto();
-        return Ok(productDto);
-    }
+
+
         await _repository.UpdateProductAsync(existingProduct);
         var updatedProduct = await _repository.GetProductByIdAsync(id);
         var productDto = updatedProduct.ToProductDto();
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
+        await _publishEndpoint.Publish<ProductUpdatedStock>(new ProductUpdatedStockEvent
+        {
+            ProductId = id,
+            NewStock = updatedProduct.Stock, // Assuming Stock is a property
+            UserIds = new List<int> { userId }, // Add the current user ID
+            UpdatedAt = DateTime.UtcNow
+        });
         return Ok(productDto);
     }
 
+
+
     [HttpDelete("{id}")]
 
     public async Task<IActionResult> DeleteProduct(int id)
@@ -166,26 +117,8 @@ public class ProductController : ControllerBase
         }
         return NoContent();
     }
-    [HttpDelete("{id}")]
 
-    public async Task<IActionResult> DeleteProduct(int id)
-    {
-        var deleted = await _repository.DeleteProductAsync(id);
-        if (!deleted)
-        {
-            return NotFound();
-        }
-        return NoContent();
-    }
 
-    [HttpGet("category/{categoryName}")]
-    public async Task<IActionResult> GetProductsByCategory(string categoryName)
-    {
-        var products = await _repository.GetProductsByCategoryAsync(categoryName);
-        if (products == null || !products.Any())
-        {
-            return NotFound($"No products found for category '{categoryName}'");
-        }
     [HttpGet("category/{categoryName}")]
     public async Task<IActionResult> GetProductsByCategory(string categoryName)
     {
@@ -210,21 +143,7 @@ public class ProductController : ControllerBase
         var productDtos = products.Select(p => p.ToProductDto()).ToList();
         return Ok(productDtos);
     }
-        var productsWithEmptyCategory = products.Where(p => string.IsNullOrEmpty(p.Category?.Name)).ToList();
-        if (productsWithEmptyCategory.Any())
-        {
-            foreach (var product in products)
-            {
-                if (string.IsNullOrEmpty(product.Category?.Name))
-                {
-                    var category = await _repository.GetCategoryByNameAsync(categoryName);
-                    product.Category = category;
-                }
-            }
-        }
-        var productDtos = products.Select(p => p.ToProductDto()).ToList();
-        return Ok(productDtos);
-    }
+
 
 
     // New Review Endpoints
@@ -281,18 +200,23 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost("notifyMe")]
-    public async Task<IActionResult> RegisterNotification([FromBody] notifyMeRequest request){
+    public async Task<IActionResult> RegisterNotification([FromBody] notifyMeRequest request)
+    {
         await _repository.RegisterNotificationRequestAsync(request.userId, request.productId);
         Console.WriteLine("notifyme clicked and data added in table");
         return Ok();
     }
 
     [HttpPut("{id}/stock")]
-    public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockRequest request){
+    public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockRequest request)
+    {
         await _repository.UpdateProductStockAsync(id, request.NewStock);
-        if(request.NewStock>0){
-            var userIds = await _repository.WhomToNotify(id);
-            await _publishEndpoint.Publish<ProductUpdatedStock>(new{
+        if (request.NewStock > 0)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int userIds = userIdClaim != null ? int.Parse(userIdClaim) : 0;
+            await _publishEndpoint.Publish<ProductUpdatedStock>(new
+            {
                 ProductId = id,
                 NewStock = request.NewStock,
                 UserIds = userIds,
@@ -302,19 +226,28 @@ public class ProductController : ControllerBase
         Console.WriteLine("event publish for stock added by admin");
         return Ok();
     }
- 
+    [HttpGet("check")]
+    public async Task<IActionResult> CheckNotificationExists(int productId, int userId)
+    {
+        
+       var exists =  await _repository.CheckNotificationExistsAsync(productId, userId);
+        return Ok(exists); // returns true or false
+    }
+
+}
+
+
+
+public class notifyMeRequest
+{
+    public int userId { get; set; }
+    public int productId { get; set; }
+}
+
+public class UpdateStockRequest
+{
+    public int NewStock { get; set; }
 }
 
 
-
-public class notifyMeRequest{
-    public int userId{ get; set; }
-    public int productId{ get; set; }
-}
-
-public class UpdateStockRequest{
-    public int NewStock{ get; set; }
-}
-
-}
 
