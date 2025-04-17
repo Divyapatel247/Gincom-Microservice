@@ -52,6 +52,7 @@ export class AddProductComponent implements OnInit{
   if (trimmed && !this.tagsArray.includes(trimmed)) {
     this.tagsArray.push(trimmed);
     this.updateTagsControl();
+
   }
 
   // Clear input field

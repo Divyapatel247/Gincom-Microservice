@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Order } from '../../models/order.interface';
 
 @Component({
   selector: 'app-common-statistics',
@@ -7,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrl: './common-statistics.component.css'
 })
 export class CommonStatisticsComponent {
+  @Input() totalOrders: number = 0;
 
 }

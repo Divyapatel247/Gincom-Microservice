@@ -1,4 +1,4 @@
 
-  <app-common-statistics></app-common-statistics>
-  <app-order-total></app-order-total>
-  <app-latest-orders></app-latest-orders>
+  <app-common-statistics [totalOrders]="orders.length" ></app-common-statistics>
+  <app-order-total [orders]="orders"></app-order-total>
+  <app-latest-orders [orders]="latestOrders"></app-latest-orders>

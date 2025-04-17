@@ -15,6 +15,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ShowProductDetailComponent } from './pages/show-product-detail/show-product-detail.component';
 import { AddToCartComponent } from './pages/add-to-cart/add-to-cart/add-to-cart.component';
 import { MyOrdersComponent } from './pages/my-orders/my-orders.component';
+import { AppComponent } from './app.component';
 
 // export const routes: Routes = [
 //   {
@@ -86,10 +87,11 @@ export const routes: Routes = [
       { path: '', redirectTo: 'product', pathMatch: 'full' }, // Default to products
       { path: 'product', component: ProductComponent },
       { path: 'product-detail/:productid', component: ProductDetailComponent }
-    ] 
+    ]
   },
   { path: 'login', component: LoginComponent  },
   { path: 'register', component: RegisterComponent  },
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '/login' },
+  { path: '', component: AppComponent }
 ];
 
