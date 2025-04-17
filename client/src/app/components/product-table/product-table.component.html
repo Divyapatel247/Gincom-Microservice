@@ -1,27 +1,27 @@
-<!-- Include Font Awesome -->
+<!-- bg-gradient-to-r from-[#abd373] to-[#73777c] -->
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 />
   <div
-    class="container w-screen p-8 bg-gradient-to-br from-gray-50 to-white shadow-2xl rounded-xl "
+    class="container w-screen  p-8 rounded"
   >
     <!-- Header with Add Product Button -->
     <div class="flex justify-between items-center mb-8">
       <h2 class="text-4xl font-bold text-gray-800">Inventory</h2>
       <button
         routerLink="/add-product"
-        class="flex items-center gap-2 bg-gradient-to-r from-[#abd373] to-[#73777c] text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:from-[#5c6166] hover:to-[#abd373] transition-all duration-300"
+        class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl hover:from-[#5c6166] hover:to-[#abd373] transition-all duration-300"
       >
         <i class="fa-solid fa-plus"></i> Add Product
       </button>
     </div>
 
     <!-- Product Table -->
-    <div class="overflow-x-auto rounded-2xl shadow-lg">
+    <div class="overflow-x-auto rounded shadow-lg">
       <table class="w-full border-collapse">
         <thead
-          class="bg-gradient-to-r from-[#abd373] to-[#bcc3ca] text-white uppercase text-sm tracking-wider"
+          class="bg-gray-900 text-white uppercase text-sm tracking-wider"
         >
           <tr>
             <th class="px-8 py-4 text-left">Product Name</th>
@@ -35,15 +35,16 @@
           <tr
             *ngFor="let product of products"
             class="hover:bg-gray-50 transition-all duration-200"
+            [routerLink]="['/admin/product/'+product.id]"
           >
-            <td class="px-8 py-5 text-gray-800 font-semibold">
+            <td class="px-8 py-2 text-gray-800 font-semibold">
               {{ product.title }}
             </td>
-            <td class="px-8 py-5 text-gray-600">
+            <td class="px-8 py-2 text-gray-600">
               {{ product.price | currency }}
             </td>
-            <td class="px-8 py-5 text-gray-600">{{ product.categoryName }}</td>
-            <td class="px-8 py-5 text-gray-600">
+            <td class="px-8 py-2 text-gray-600">{{ product.categoryName }}</td>
+            <td class="px-8 py-2 text-gray-600">
               <span
                 class="px-3 py-1 rounded-full text-sm font-medium"
                 [ngClass]="{
@@ -60,18 +61,18 @@
                 }}
               </span>
             </td>
-            <td class="px-8 py-5 flex justify-center gap-4">
+            <td class="px-8 py-2 flex justify-center gap-4">
               <!-- Edit Button -->
               <button
                 (click)="openUpdatePanel(product)"
-                class="p-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gradient-to-r hover:from-[#abd373] hover:to-[#3B82F6] hover:text-white transition-all duration-300"
+                class="p-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gradient-to-r hover:from-[#abd373] hover:to-[#3B82F6] hover:text-white transition-all duration-300"
               >
                 <i class="fa-solid fa-pencil"></i>
               </button>
               <!-- Delete Button -->
               <button
                 (click)="deleteProduct(product.id)"
-                class="p-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gradient-to-r hover:from-[#F87171] hover:to-[#EF4444] hover:text-white transition-all duration-300"
+                class="p-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gradient-to-r hover:from-[#F87171] hover:to-[#EF4444] hover:text-white transition-all duration-300"
               >
                 <i class="fa-solid fa-trash"></i>
               </button>
@@ -82,25 +83,3 @@
     </div>
   </div>
 
-<!-- Update Product Lateral Panel -->
-<div
-  *ngIf="selectedProduct"
-  class="fixed top-0 right-0 w-96 h-full bg-gradient-to-br from-gray-50 to-white shadow-2xl p-8 transition-transform duration-300 transform translate-x-0"
->
-  <!-- Close Button -->
-  <button
-    (click)="closeUpdatePanel()"
-    class="absolute top-4 right-4 text-gray-500 hover:text-red-500"
-  >
-    <i class="fa-solid fa-xmark text-2xl"></i>
-  </button>
-
-  <!-- Update Product Form -->
-  <app-update-product
-    *ngIf="selectedProduct"
-    [product]="selectedProduct"
-    (update)="updateProduct($event)"
-    (close)="closeUpdatePanel()"
-  >
-  </app-update-product>
-</div>

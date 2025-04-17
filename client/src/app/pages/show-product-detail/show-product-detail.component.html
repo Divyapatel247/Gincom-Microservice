@@ -1,0 +1,135 @@
+<div class="p-6 bg-white rounded-lg shadow-md">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Left: Image and Title -->
+    <div>
+      <div class="relative w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+        <img *ngIf="product.image" [src]="product.images" class="h-full object-contain" />
+        <i class="fa fa-pen absolute bottom-4 right-4 bg-white p-2 rounded-full shadow cursor-pointer"></i>
+      </div>
+
+      <div class="mt-4">
+        <label class="block text-sm font-semibold text-gray-700">Product name:</label>
+        <input [(ngModel)]="product.title" class="mt-1 w-full p-2 border rounded" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <div>
+          <label>Price:</label>
+          <input [(ngModel)]="product.price" type="number" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label>Discount(%):</label>
+          <input [(ngModel)]="product.discountPercentage" type="number" class="w-full p-2 border rounded" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Product Info -->
+    <div>
+      <h2 class="text-xl font-bold mb-4">Product Information</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label>Width:</label>
+          <input [ngModel]="product.dimensions?.width" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label>Height:</label>
+          <input [(ngModel)]="product.dimensions" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label>Depth:</label>
+          <input [(ngModel)]="product.dimensions" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label>Weight:</label>
+          <input [(ngModel)]="product.weight" class="w-full p-2 border rounded" />
+        </div>
+        <div class="col-span-2">
+          <label>Brand:</label>
+          <input [(ngModel)]="product.brand" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label>Stock:</label>
+          <input [(ngModel)]="product.stock" type="number" class="w-full p-2 border rounded" />
+        </div>
+        <div>
+          <label>SKU:</label>
+          <input [(ngModel)]="product.sku" class="w-full p-2 border rounded" />
+        </div>
+        <div class="col-span-2">
+          <label>Tags:</label>
+          <div class="flex items-center gap-2 mt-1">
+            <input [(ngModel)]="newTag" placeholder="Add tag..." class="flex-grow p-2 border rounded" />
+            <button (click)="addTag()" class="px-3 py-2 bg-green-500 text-white rounded">+</button>
+          </div>
+          <div class="flex gap-2 mt-2 flex-wrap">
+            <span
+              *ngFor="let tag of product.tags"
+              class="bg-gray-200 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+            >
+              {{ tag }} <i class="fa fa-times text-xs cursor-pointer" (click)="removeTag(tag)"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related & Cross Products -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold">Related Products</h3>
+        <button class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+      </div>
+      <div class="max-h-60 overflow-y-auto space-y-3 border p-4 rounded">
+        <div *ngFor="let item of relatedProducts" class="flex items-center gap-4 border-b pb-2">
+          <div class="w-16 h-16 bg-gray-100 rounded"></div>
+          <div class="flex-grow">
+            <p class="text-sm font-semibold">Product name</p>
+            <p class="text-sm">$4.00</p>
+            <div class="text-yellow-500 text-xs">★★★★★ 4.00</div>
+          </div>
+          <i class="fa fa-trash text-red-500 cursor-pointer"></i>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold">Cross Products</h3>
+        <button class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+      </div>
+      <div class="max-h-60 overflow-y-auto space-y-3 border p-4 rounded">
+        <div *ngFor="let item of crossProducts" class="flex items-center gap-4 border-b pb-2">
+          <div class="w-16 h-16 bg-gray-100 rounded"></div>
+          <div class="flex-grow">
+            <p class="text-sm font-semibold">Product name</p>
+            <p class="text-sm">$4.00</p>
+            <div class="text-yellow-500 text-xs">★★★★★ 4.00</div>
+          </div>
+          <i class="fa fa-trash text-red-500 cursor-pointer"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-row items-end justify-end pt-4 gap-4">
+    <div>
+      <button
+      routerLink="/add-product"
+      class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl hover:from-[#5c6166] hover:to-[#abd373] transition-all duration-300"
+    > Save
+    </button>
+    </div>
+    <div>
+      <button
+        routerLink="/add-product"
+        class="flex items-center gap-2 bg-gray-900  text-white px-6 py-3 rounded shadow-lg hover:shadow-xl hover:from-[#5c6166] hover:to-[#abd373] transition-all duration-300"
+      >
+         delete
+      </button>
+    </div>
+  </div>
+
+</div>
