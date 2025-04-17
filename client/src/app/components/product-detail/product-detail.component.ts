@@ -10,14 +10,11 @@ import {
 } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
-<<<<<<< HEAD
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '../../service/websocket.service';
 import { Notification } from '../../models/notification.interface';
-=======
 import { BasketItem, BasketResponse } from '../../models/cart.interface';
 
->>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
 
 
 @Component({
@@ -25,7 +22,7 @@ import { BasketItem, BasketResponse } from '../../models/cart.interface';
   imports: [ NgIf, NgFor, CommonModule, FormsModule],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',
-  
+
 })
 export class ProductDetailComponent implements OnInit {
   isToggle: any;
@@ -57,20 +54,15 @@ export class ProductDetailComponent implements OnInit {
   errorMessage: string = '';
 
 
-  
- 
+
+
 
   constructor(
     private api: ApiService,
     private activadedRoute: ActivatedRoute,
     private router: Router,
     private location: Location,
-<<<<<<< HEAD
-    private authservice: AuthService,
-    
-=======
     private authService: AuthService
->>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
   ) {}
 
 
@@ -88,16 +80,10 @@ export class ProductDetailComponent implements OnInit {
     // console.log(productid);
     productid &&
       this.api.getProductById(productid).subscribe((res: IProduct) => {
-<<<<<<< HEAD
-        console.log(res);
-        this.productDetail = res;
-        
-=======
         this.productDetail = res;
         this.remainingStock = res.stock;
         console.log(res);
         this.adjustRemainingStock(this.currentUserId!.toString(), this.productDetail.id);
->>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
       });
     if (productid) {
       this.api
@@ -109,9 +95,9 @@ export class ProductDetailComponent implements OnInit {
         });
     }
 
-    
-    
-    
+
+
+
   }
 
   // ngOnDestroy(): void {
@@ -173,10 +159,6 @@ export class ProductDetailComponent implements OnInit {
     })
   }
 
-<<<<<<< HEAD
-  
-  
-=======
 
   clampQuantity(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
@@ -243,7 +225,6 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
->>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
 }
 
 

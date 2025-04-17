@@ -120,7 +120,6 @@ export class WebsocketService implements OnDestroy {
     return this.notificationsSubject.asObservable();
   }
 
-<<<<<<< HEAD
   sendNotification(message: string): void {
     const notification: Notification = {
       message: message,
@@ -130,8 +129,6 @@ export class WebsocketService implements OnDestroy {
     this.notificationsSubject.next([...this.notifications]);
   }
 
-=======
->>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
   ngOnDestroy() {
     if (this.hubConnection) {
       this.hubConnection.stop().catch((err) => console.error('Error stopping connection:', err));

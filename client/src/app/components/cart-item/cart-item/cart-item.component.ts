@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BasketItem } from '../../../models/cart.interface';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Product } from '../../../models/product.interface';
 import { ApiService } from '../../../shared/api.service';
+import { IProduct } from '../../product/productModel';
 
 @Component({
   selector: 'app-cart-item',
@@ -15,7 +15,7 @@ export class CartItemComponent implements OnInit {
   @Input() item!: BasketItem;
   @Output() updateQuantity = new EventEmitter<{ id: number; quantity: number }>();
   @Output() removeItem = new EventEmitter<number>();
-  product: Product | null = null;
+  product: IProduct | null = null;
   stock: number = 0;
   error: string | null = null;
 
