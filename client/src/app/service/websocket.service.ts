@@ -69,11 +69,9 @@ export class WebsocketService implements OnDestroy {
           this.joinUserGroup(userId);
         })
         .catch((err) => console.error('SignalR connection error:', err));
-        this.reconnect();
 
       this.hubConnection.onclose((error) => {
         console.log('SignalR connection closed:', error);
-        this.reconnect();
       });
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
