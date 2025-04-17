@@ -1,3 +1,4 @@
+
 export interface IProduct {
   id: number;
   title: string;
@@ -21,9 +22,18 @@ export interface IProduct {
   thumbnail?: string;
   categoryId: number;
   categoryName?: string | null;
+<<<<<<< HEAD
   IsNotifyDisabled?: boolean;
   
+=======
+  relatedProductIds : Number[]
+>>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
 }
+
+export interface IProductWithRelatedProducts extends IProduct {
+  relatedProducts : [{title:string,price:number}]
+}
+
 export interface IReview {
   id:number
   productId:number;

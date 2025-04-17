@@ -5,8 +5,9 @@ import { BehaviorSubject, tap } from 'rxjs';
 import { async, firstValueFrom, Observable, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
-import { IProduct, IReview } from '../components/product/productModel';
-import { Basket, BasketResponse } from '../models/cart.interface';
+import { IProduct, IProductWithRelatedProducts, IReview } from '../components/product/productModel';
+import { Basket, BasketItem, BasketResponse } from '../models/cart.interface';
+
 import { Order, OrderResponse } from '../models/order.interface';
 import { AuthService } from '../service/auth.service';
 import { Product } from '../models/product.interface';
@@ -39,12 +40,12 @@ export class ApiService {
     );
   }
 
-  getProductById(productId: string): Observable<IProduct> {
+  getProductById(productId: string): Observable<IProductWithRelatedProducts> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}` , {headers});
+    return this.http.get<IProductWithRelatedProducts>(`${this.apiUrl}/api/products/${productId}` , {headers});
 
   }
 
@@ -103,8 +104,12 @@ export class ApiService {
   }
 
   getProductCategory(categoryName: string): Observable<IProduct[]> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
     return this.http.get<IProduct[]>(
-      `${this.apiUrl}/products/category/${categoryName}`
+      `${this.apiUrl}/api/products/category/${categoryName}`,{headers}
     );
   }
   getCategoryList(): Observable<string[]> {
@@ -206,12 +211,17 @@ export class ApiService {
     return this.http.get<OrderResponse[]>(`${this.apiUrl}/api/orders/${userId}`, {headers});
   }
 
+<<<<<<< HEAD
   //-------------------store the product id and user id in table
   registerNotification(productId : number, userId: number){
+=======
+  addToCartBulk(userId: string, items: BasketItem[]): Observable<BasketResponse> {
+>>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
+<<<<<<< HEAD
      return this.http.post(`${this.apiUrl}/api/products/notifyMe`,{productId, userId}, {headers})
   }
 
@@ -224,4 +234,10 @@ export class ApiService {
   }
   
 
+=======
+    const request = { Items: items };
+    return this.http.post<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart/items/bulk`, request, {headers});
+  }
+
+>>>>>>> 31137c9a6ec154a4a96d465194914a83b49c0b4a
 }
