@@ -12,30 +12,43 @@ import { Notification } from '../models/notification.interface';
 export class WebsocketService implements OnDestroy {
   private hubConnection: HubConnection | null = null;
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
-  private notifications: Notification[] = [];
-  private readonly STORAGE_KEY = 'user_notifications';
+  private userNotifications: Notification[] = [];
+  private adminNotificationsSubject = new BehaviorSubject<Notification[]>([]);
+  private adminNotifications: Notification[] = [];
+  private readonly USER_STORAGE_KEY = 'user_notifications';
+  private readonly ADMIN_STORAGE_KEY = 'admin_notifications';
   private readonly MAX_NOTIFICATIONS = 5;
-
 
   constructor(private authService: AuthService) {
     this.loadNotificationsFromStorage();
-
     this.initializeSignalR();
     setInterval(() => this.clearOldNotifications(), 1800000);
   }
 
   private loadNotificationsFromStorage(): void {
     const userId = this.authService.getUserId();
-    if (userId) {
-      const savedNotifications = localStorage.getItem(`${this.STORAGE_KEY}_${userId}`);
-      if (savedNotifications) {
+    const role = this.authService.getRole();
+    if (userId && role !== 'Admin') {
+      const savedUserNotifications = localStorage.getItem(`${this.USER_STORAGE_KEY}_${userId}`);
+      if (savedUserNotifications) {
         try {
-          this.notifications = JSON.parse(savedNotifications);
-          this.notificationsSubject.next([...this.notifications]);
+          this.userNotifications = JSON.parse(savedUserNotifications);
+          this.notificationsSubject.next([...this.userNotifications]);
         } catch (e) {
-          console.error('Error parsing saved notifications:', e);
-          // Reset if corrupted
-          localStorage.removeItem(`${this.STORAGE_KEY}_${userId}`);
+          console.error('Error parsing user notifications:', e);
+          localStorage.removeItem(`${this.USER_STORAGE_KEY}_${userId}`);
+        }
+      }
+    }
+    if (role === 'Admin') {
+      const savedAdminNotifications = localStorage.getItem(this.ADMIN_STORAGE_KEY);
+      if (savedAdminNotifications) {
+        try {
+          this.adminNotifications = JSON.parse(savedAdminNotifications);
+          this.adminNotificationsSubject.next([...this.adminNotifications]);
+        } catch (e) {
+          console.error('Error parsing admin notifications:', e);
+          localStorage.removeItem(this.ADMIN_STORAGE_KEY);
         }
       }
     }
@@ -43,13 +56,16 @@ export class WebsocketService implements OnDestroy {
 
   private saveNotificationsToStorage(): void {
     const userId = this.authService.getUserId();
-    if (userId) {
-      // Keep only the most recent 5 notifications
-      const recentNotifications = this.notifications.slice(0, this.MAX_NOTIFICATIONS);
-      localStorage.setItem(`${this.STORAGE_KEY}_${userId}`, JSON.stringify(recentNotifications));
+    const role = this.authService.getRole();
+    if (userId && role !== 'Admin') {
+      const recentUserNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
+      localStorage.setItem(`${this.USER_STORAGE_KEY}_${userId}`, JSON.stringify(recentUserNotifications));
+    }
+    if (role === 'Admin') {
+      const recentAdminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
+      localStorage.setItem(this.ADMIN_STORAGE_KEY, JSON.stringify(recentAdminNotifications));
     }
   }
-
 
   private initializeSignalR() {
     const userId = this.authService.getUserId();
@@ -66,47 +82,66 @@ export class WebsocketService implements OnDestroy {
         .start()
         .then(() => {
           console.log('SignalR connection started');
-          this.joinUserGroup(userId);
+          this.joinGroups(userId);
         })
-        .catch((err) => console.error('SignalR connection error:', err));
+        .catch((err) => {
+          console.error('SignalR connection error:', err);
+          this.reconnect();
+        });
 
       this.hubConnection.onclose((error) => {
         console.log('SignalR connection closed:', error);
+        this.reconnect();
       });
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
         console.log('Received notification data:', data);
-        if (data.messageType === 'UserNotification') {
-          const userNotification: Notification = {
-            message: data.details,
-            timestamp: new Date().toISOString(),
-          };
-          console.log('User notification received:', userNotification);
+        const notification: Notification = {
+          message: data.details || 'No details',
+          timestamp: new Date().toISOString(),
+          status: data.status || 'Unknown',
+          createdAt: data.createdAt || new Date().toISOString(), 
+        };
+        const role = this.authService.getRole();
 
-          // Add new notification to the beginning of the array
-          this.notifications.unshift(userNotification);
-
-          // Keep only the most recent notifications
-          if (this.notifications.length > this.MAX_NOTIFICATIONS) {
-            this.notifications = this.notifications.slice(0, this.MAX_NOTIFICATIONS);
+        if (data.messageType === 'UserNotification' && role !== 'Admin') {
+          this.userNotifications.unshift(notification);
+          if (this.userNotifications.length > this.MAX_NOTIFICATIONS) {
+            this.userNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
           }
-
-          // Update the subject and save to local storage
-          this.notificationsSubject.next([...this.notifications]);
-          this.saveNotificationsToStorage();
+          this.notificationsSubject.next([...this.userNotifications]);
+        } else if (data.messageType === 'AdminNotification' && role === 'Admin') {
+          this.adminNotifications.unshift(notification);
+          if (this.adminNotifications.length > this.MAX_NOTIFICATIONS) {
+            this.adminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
+          }
+          this.adminNotificationsSubject.next([...this.adminNotifications]);
         }
+
+        this.saveNotificationsToStorage();
       });
     } else {
       console.error('UserId or access_token not found');
     }
   }
 
-
-  private joinUserGroup(userId: string) {
+  private joinGroups(userId: string) {
     if (this.hubConnection) {
-      this.hubConnection.invoke('JoinUserGroup', userId)
-        .then(() => console.log(`Joined group User_${userId}`))
-        .catch((err) => console.error('Error joining group:', err));
+      const role = this.authService.getRole();
+      if (role !== 'Admin') {
+        this.hubConnection.invoke('JoinUserGroup', userId)
+          .then(() => console.log(`Joined group User_${userId}`))
+          .catch((err) => console.error('Error joining user group:', err));
+      } else {
+        this.hubConnection.invoke('JoinAdminGroup')
+          .then(() => console.log('Joined group Admin'))
+          .catch((err) => {
+            console.error('Error joining admin group:', err.message);
+            if (err.source && err.source.error) {
+              console.error('Server error details:', err.source.error);
+            }
+          });
+      }
     }
   }
   private reconnect() {
@@ -121,13 +156,18 @@ export class WebsocketService implements OnDestroy {
     return this.notificationsSubject.asObservable();
   }
 
+  getAdminNotifications(): Observable<Notification[]> {
+    return this.adminNotificationsSubject.asObservable();
+  }
+
   sendNotification(message: string): void {
     const notification: Notification = {
       message: message,
       timestamp: new Date().toISOString(),
     };
-    this.notifications.push(notification);
-    this.notificationsSubject.next([...this.notifications]);
+    this.userNotifications.push(notification);
+    this.notificationsSubject.next([...this.userNotifications]);
+    this.saveNotificationsToStorage();
   }
 
   ngOnDestroy() {
@@ -137,24 +177,43 @@ export class WebsocketService implements OnDestroy {
   }
 
   clearNotifications(): void {
-    this.notifications = [];
+    this.userNotifications = [];
+    this.adminNotifications = [];
     this.notificationsSubject.next([]);
+    this.adminNotificationsSubject.next([]);
     this.saveNotificationsToStorage();
   }
 
   updateNotifications(notifications: Notification[]): void {
-    this.notifications = notifications;
-    this.notificationsSubject.next([...this.notifications]);
+    this.userNotifications = notifications;
+    this.notificationsSubject.next([...this.userNotifications]);
+    this.saveNotificationsToStorage();
+  }
+
+  updateAdminNotifications(notifications: Notification[]): void {
+    this.adminNotifications = notifications;
+    this.adminNotificationsSubject.next([...this.adminNotifications]);
+    this.saveNotificationsToStorage();
+  }
+
+  clearAdminNotifications(): void {
+    this.adminNotifications = [];
+    this.adminNotificationsSubject.next([]);
     this.saveNotificationsToStorage();
   }
 
   private clearOldNotifications(): void {
     const userId = this.authService.getUserId();
-    if (userId) {
-      localStorage.removeItem(`${this.STORAGE_KEY}_${userId}`);
-      this.notifications = [];
-      this.notificationsSubject.next([]);
-      console.log('Notifications cleared from localStorage after 30 minutes');
+    if (userId && this.authService.getRole() !== 'Admin') {
+      localStorage.removeItem(`${this.USER_STORAGE_KEY}_${userId}`);
+      this.userNotifications = [];
     }
+    if (this.authService.getRole() === 'Admin') {
+      localStorage.removeItem(this.ADMIN_STORAGE_KEY);
+      this.adminNotifications = [];
+    }
+    this.notificationsSubject.next([]);
+    this.adminNotificationsSubject.next([]);
+    console.log('Notifications cleared from localStorage after 30 minutes');
   }
 }
