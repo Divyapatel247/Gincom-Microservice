@@ -13,13 +13,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
-builder.Services.AddScoped<NotificationServiceForOrderCreated>(); 
+builder.Services.AddScoped<NotificationServiceForOrderCreated>();
 
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserLoggedInConsumer>();
     x.AddConsumer<OrderCreatedConsumer>();
-
+    x.AddConsumer<ProductStockUpdateConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", h =>
@@ -30,18 +30,26 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint("a", e =>
         {
             e.Bind("xxxx");
-             e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<UserLoggedInConsumer>(context);
             // e.ConfigureConsumer<OrderCreatedConsumer>(context);
         });
         cfg.ReceiveEndpoint("order-created-notification-queue", e =>
         {
             e.Bind("Common.Events:OrderCreatedEvent");
-             e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        });
+        cfg.ReceiveEndpoint("product-stock-updated-queue", e =>
+        {
+            e.Bind("Common.Events:ProductUpdatedStock");
+            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<ProductStockUpdateConsumer>(context);
         });
     });
 });
+
+
 
 
 
@@ -52,13 +60,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<NotificationHub>("/notificationHub"); 
+    endpoints.MapHub<NotificationHub>("/notificationHub");
     endpoints.MapControllers();
 });
 app.Run();

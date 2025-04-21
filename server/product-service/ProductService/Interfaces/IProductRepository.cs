@@ -13,4 +13,9 @@ Task<List<Product>> GetAllProductsAsync();
         Task<bool> DeleteProductAsync(int id);
         Task<List<Product>> GetProductsByCategoryAsync(string categoryName);
         Task<bool> DeductStockAsync(int productId, int quantity);
+
+        Task RegisterNotificationRequestAsync(int userId, int productId);
+        Task UpdateProductStockAsync(int productId, int newStock);
+        Task <bool> CheckNotificationExistsAsync(int productId, int userId);
+        Task<List<int>> WhomToNotify(int productId);
 }

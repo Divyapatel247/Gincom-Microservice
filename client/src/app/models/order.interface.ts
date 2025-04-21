@@ -1,9 +1,9 @@
-import { Product } from "./product.interface";
+import { IProduct } from "../components/product/productModel";
 
 export interface OrderItem {
   productId: number;
   quantity: number;
-  product? : Product
+  product? : IProduct
 }
 
 export interface Order {

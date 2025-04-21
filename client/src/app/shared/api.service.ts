@@ -6,10 +6,10 @@ import { async, firstValueFrom, Observable, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { IProduct, IProductWithRelatedProducts, IReview } from '../components/product/productModel';
-import { Basket, BasketResponse } from '../models/cart.interface';
+import { Basket, BasketItem, BasketResponse } from '../models/cart.interface';
+
 import { Order, OrderResponse } from '../models/order.interface';
 import { AuthService } from '../service/auth.service';
-import { Product } from '../models/product.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -141,6 +141,13 @@ export class ApiService {
     });
     return this.http.delete(`${this.apiUrl}/api/products/reviews/${reviewId}`,{ headers })
   }
+  // deleteReview(reviewId: number): Observable<any> {
+  //   const token = localStorage.getItem('access_token');
+  //   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  //   const url = `${this.apiUrl}/reviews/${reviewId}`;
+  //   console.log('DELETE Request:', { url, token });
+  //   return this.http.delete(url, { headers });
+  // }
 
 
 
@@ -187,12 +194,12 @@ export class ApiService {
     return this.http.post<OrderResponse>(`${this.apiUrl}/api/orders/${userId}`, {}, {headers});
   }
 
-  getProduct(productId: number): Observable<Product> {
+  getProduct(productId: number): Observable<IProduct> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.get<Product>(`${this.apiUrl}/api/products/${productId}`, {headers});
+    return this.http.get<IProduct>(`${this.apiUrl}/api/products/${productId}`, {headers});
   }
 
   getOrdersByUserId(userId: string): Observable<OrderResponse[]> {
@@ -218,5 +225,31 @@ export class ApiService {
     return this.http.put<Order>(`${this.apiUrl}/api/orders/${orderId}/status`, {Status} ,{headers});
   }
 
+
+  //-------------------store the product id and user id in table
+  registerNotification(productId : number, userId: number){
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+     return this.http.post(`${this.apiUrl}/api/products/notifyMe`,{productId, userId}, {headers})
+  }
+
+  checkNotification(productId: number, userId: number): Observable<boolean> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<boolean>(`${this.apiUrl}/api/products/check`, {headers});
+  }
+
+  addToCartBulk(userId: string, items: BasketItem[]): Observable<BasketResponse> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    const request = { Items: items };
+    return this.http.post<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart/items/bulk`, request, {headers});
+  }
 
 }

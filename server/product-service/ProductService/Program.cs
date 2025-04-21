@@ -1,5 +1,6 @@
 using Dapper;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MySql.Data.MySqlClient;
 using ProductService.Consumers;
 using ProductService.Handlers;
@@ -7,7 +8,6 @@ using ProductService.Interfaces;
 using ProductService.Model;
 using ProductService.Repository;
 using ProductService.Service;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 

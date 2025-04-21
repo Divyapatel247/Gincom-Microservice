@@ -22,6 +22,7 @@ export interface IProduct {
   thumbnail?: string;
   categoryId: number;
   categoryName?: string | null;
+  IsNotifyDisabled?: boolean;
   relatedProductIds : Number[]
 }
 

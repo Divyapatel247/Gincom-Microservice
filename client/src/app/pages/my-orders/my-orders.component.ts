@@ -4,7 +4,7 @@ import { Order, OrderItem, OrderResponse } from '../../models/order.interface';
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../service/auth.service';
 import { lastValueFrom } from 'rxjs';
-import { Product } from '../../models/product.interface';
+import { IProduct } from '../../components/product/productModel';
 
 @Component({
   selector: 'app-my-orders',
@@ -57,7 +57,7 @@ export class MyOrdersComponent implements OnInit {
     this.orders.forEach(order => {
       order.items.forEach((item: OrderItem) => {
         this.apiService.getProduct(item.productId).subscribe({
-          next: (product: Product) => {
+          next: (product: IProduct) => {
             item.product = product;
           },
           error: (err) => {
