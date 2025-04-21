@@ -209,6 +209,22 @@ export class ApiService {
      });
     return this.http.get<OrderResponse[]>(`${this.apiUrl}/api/orders/${userId}`, {headers});
   }
+  getOrders(): Observable<OrderResponse[]> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<OrderResponse[]>(`${this.apiUrl}/api/orders`, {headers});
+  }
+
+  changeOrderStatus(orderId:number,Status:string): Observable<Order>{
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.put<Order>(`${this.apiUrl}/api/orders/${orderId}/status`, {Status} ,{headers});
+  }
+
 
   //-------------------store the product id and user id in table
   registerNotification(productId : number, userId: number){

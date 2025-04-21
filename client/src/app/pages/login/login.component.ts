@@ -32,7 +32,7 @@ export class LoginComponent {
         const role = this.authService.getRole();
         console.log('Logged in user role:', role);
 
-        alert(`Welcome, ${res.username}! You have successfully logged in.`);
+        alert(`Welcome,You have successfully logged in.`);
 
         if (role === 'Admin') {
           this.router.navigateByUrl('/admin');
