@@ -17,5 +17,9 @@ Task<List<Product>> GetAllProductsAsync();
         Task RegisterNotificationRequestAsync(int userId, int productId);
         Task UpdateProductStockAsync(int productId, int newStock);
         Task <bool> CheckNotificationExistsAsync(int productId, int userId);
+
+        Task<IEnumerable<int>> GetNotifiedProductIdsAsync(int userId); 
+         Task<IEnumerable<int>> GetUsersToNotifyAsync(int productId);
+         Task MarkNotified(int productId, int userId);
         Task<List<int>> WhomToNotify(int productId);
 }

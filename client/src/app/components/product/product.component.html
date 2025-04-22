@@ -31,14 +31,31 @@
   <div class="w-full md:w-3/4 flex-1 p-2 sm:p-4">
     <div
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 md:gap-6 w-full"
-      
     >
+
+    <div class="relative"  *ngFor="let item of products">
+      <!-- Bell Icon outside blurred card -->
+      <button
+        *ngIf="item.stock === 0"
+        class="absolute top-2 right-2 z-30 cursor-pointer"
+        (click)="notifyMe(item.id)"
+        [disabled]="item.IsNotifyDisabled"
+        title="Notify me when product is back in stock"
+      >
+        <i
+          class="fas fa-bell text-xl"
+          [ngClass]="{
+            'text-red-600': !item.IsNotifyDisabled,
+            'text-gray-400': item.IsNotifyDisabled
+          }"
+        ></i>
+      </button>
+      <!-- *ngFor="let item of products" -->
     <div
-    *ngFor="let item of products"
     class="m-1 sm:m-2 group px-2 sm:px-4 md:px-6 py-2 sm:py-4 md:py-5 bg-white/10 rounded-lg flex flex-col items-center justify-center gap-1 sm:gap-2 relative after:absolute after:h-full after:bg-[#abd373] z-20 shadow-lg after:-z-20 after:w-full after:inset-0 after:rounded-lg transition-all duration-300 hover:transition-all hover:duration-300 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden cursor-pointer after:-translate-y-full after:hover:translate-y-0 [&_p]:delay-200 [&_p]:transition-all"
     [ngClass]="{ ' grayscale opacity-60  bg-gray-200 ': item.stock == 0 }"
     >
-    <button
+    <!-- <button
       *ngIf="item.stock == 0"
       
       class="absolute top-2 right-2  text-red-600 cursor-pointer z-20  filter-none opacity-100"
@@ -48,7 +65,7 @@
       title="notify me when product is updated"
     >
       <i class=" fas fa-bell text-xl text-red-600  "> </i>
-    </button>
+    </button> -->
       
         <a
           routerLink="/customer/product-detail/{{ item.id }}"
@@ -59,7 +76,7 @@
           >
             <img
               [src]="item.thumbnail"
-              [alt]="item.title + ' image'"
+              
               class="w-20 sm:w-28 md:w-32 lg:w-36 aspect-square text-[#abd373] group-hover:bg-gray-800 text-2xl sm:text-3xl md:text-4xl rounded-full p-1 sm:p-2 transition-all duration-300 group-hover:transition-all group-hover:duration-300 group-hover:-translate-y-1 mx-auto"
             />
             <span
@@ -107,5 +124,15 @@
         </a>
       </div>
     </div>
+    
+
+    <!-- <app-product-card
+    *ngFor="let item of products"
+    [item]="item"
+    [getStars]="getStars"
+    >
+      
+    </app-product-card> -->
+    
   </div>
 </div>

@@ -1,13 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
-import  { HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import * as signalR from '@microsoft/signalr';
 
 import { Notification } from '../models/notification.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WebsocketService implements OnDestroy {
   private hubConnection: HubConnection | null = null;
@@ -19,6 +19,9 @@ export class WebsocketService implements OnDestroy {
   private readonly ADMIN_STORAGE_KEY = 'admin_notifications';
   private readonly MAX_NOTIFICATIONS = 5;
 
+  private stockUpdateSubject = new Subject<{ productId: string }>();
+  stockUpdate = this.stockUpdateSubject.asObservable();
+
   constructor(private authService: AuthService) {
     this.loadNotificationsFromStorage();
     this.initializeSignalR();
@@ -27,10 +30,11 @@ export class WebsocketService implements OnDestroy {
 
   private loadNotificationsFromStorage(): void {
     const userId = this.authService.getUserId();
-    const role = this.authService.getRole();
-    if (userId && role !== 'Admin') {
-      const savedUserNotifications = localStorage.getItem(`${this.USER_STORAGE_KEY}_${userId}`);
-      if (savedUserNotifications) {
+    if (userId) {
+      const savedNotifications = localStorage.getItem(
+        `${this.STORAGE_KEY}_${userId}`
+      );
+      if (savedNotifications) {
         try {
           this.userNotifications = JSON.parse(savedUserNotifications);
           this.notificationsSubject.next([...this.userNotifications]);
@@ -56,14 +60,16 @@ export class WebsocketService implements OnDestroy {
 
   private saveNotificationsToStorage(): void {
     const userId = this.authService.getUserId();
-    const role = this.authService.getRole();
-    if (userId && role !== 'Admin') {
-      const recentUserNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
-      localStorage.setItem(`${this.USER_STORAGE_KEY}_${userId}`, JSON.stringify(recentUserNotifications));
-    }
-    if (role === 'Admin') {
-      const recentAdminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
-      localStorage.setItem(this.ADMIN_STORAGE_KEY, JSON.stringify(recentAdminNotifications));
+    if (userId) {
+      // Keep only the most recent 5 notifications
+      const recentNotifications = this.notifications.slice(
+        0,
+        this.MAX_NOTIFICATIONS
+      );
+      localStorage.setItem(
+        `${this.STORAGE_KEY}_${userId}`,
+        JSON.stringify(recentNotifications)
+      );
     }
   }
 
@@ -96,52 +102,50 @@ export class WebsocketService implements OnDestroy {
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
         console.log('Received notification data:', data);
-        const notification: Notification = {
-          message: data.details || 'No details',
-          timestamp: new Date().toISOString(),
-          status: data.status || 'Unknown',
-          createdAt: data.createdAt || new Date().toISOString(), 
-        };
-        const role = this.authService.getRole();
+        if (data.messageType === 'UserNotification') {
+          const userNotification: Notification = {
+            message: data.details,
+            timestamp: new Date().toISOString(),
+            
+          };
+          console.log('User notification received:', userNotification);
 
-        if (data.messageType === 'UserNotification' && role !== 'Admin') {
-          this.userNotifications.unshift(notification);
-          if (this.userNotifications.length > this.MAX_NOTIFICATIONS) {
-            this.userNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
+          // Add new notification to the beginning of the array
+          this.notifications.unshift(userNotification);
+
+          // Keep only the most recent notifications
+          if (this.notifications.length > this.MAX_NOTIFICATIONS) {
+            this.notifications = this.notifications.slice(
+              0,
+              this.MAX_NOTIFICATIONS
+            );
           }
-          this.notificationsSubject.next([...this.userNotifications]);
-        } else if (data.messageType === 'AdminNotification' && role === 'Admin') {
-          this.adminNotifications.unshift(notification);
-          if (this.adminNotifications.length > this.MAX_NOTIFICATIONS) {
-            this.adminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
-          }
-          this.adminNotificationsSubject.next([...this.adminNotifications]);
+
+          // Update the subject and save to local storage
+          this.notificationsSubject.next([...this.notifications]);
+          this.saveNotificationsToStorage();
         }
 
-        this.saveNotificationsToStorage();
-      });
+        
+          const productId = data.productId; // Ensure it's a number
+          if (productId && !isNaN(productId)) {
+            console.log('Triggering stock update for productId:', productId);
+            this.stockUpdateSubject.next({ productId: productId });
+          }
+        
+      }
+    );
     } else {
       console.error('UserId or access_token not found');
     }
   }
 
-  private joinGroups(userId: string) {
+  private joinUserGroup(userId: string) {
     if (this.hubConnection) {
-      const role = this.authService.getRole();
-      if (role !== 'Admin') {
-        this.hubConnection.invoke('JoinUserGroup', userId)
-          .then(() => console.log(`Joined group User_${userId}`))
-          .catch((err) => console.error('Error joining user group:', err));
-      } else {
-        this.hubConnection.invoke('JoinAdminGroup')
-          .then(() => console.log('Joined group Admin'))
-          .catch((err) => {
-            console.error('Error joining admin group:', err.message);
-            if (err.source && err.source.error) {
-              console.error('Server error details:', err.source.error);
-            }
-          });
-      }
+      this.hubConnection
+        .invoke('JoinUserGroup', userId)
+        .then(() => console.log(`Joined group User_${userId}`))
+        .catch((err) => console.error('Error joining group:', err));
     }
   }
   private reconnect() {
@@ -172,7 +176,9 @@ export class WebsocketService implements OnDestroy {
 
   ngOnDestroy() {
     if (this.hubConnection) {
-      this.hubConnection.stop().catch((err) => console.error('Error stopping connection:', err));
+      this.hubConnection
+        .stop()
+        .catch((err) => console.error('Error stopping connection:', err));
     }
   }
 

@@ -45,6 +45,7 @@ export class ShowProductDetailComponent implements OnInit {
       this.product = p
     });
     console.log("product :", this.product)
+    
   }
 
 

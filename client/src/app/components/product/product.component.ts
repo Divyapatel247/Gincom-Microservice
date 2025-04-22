@@ -5,10 +5,12 @@ import { CommonModule, CurrencyPipe, NgClass, NgFor } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
+import { WebsocketService } from '../../service/websocket.service';
+
 
 @Component({
   selector: 'app-product',
-  imports: [NgFor, CurrencyPipe,NgClass, RouterLink,FormsModule,CommonModule],
+  imports: [NgFor, CurrencyPipe, NgClass, RouterLink, FormsModule, CommonModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
@@ -18,7 +20,7 @@ export class ProductComponent implements OnInit {
   selectedCategory: string = '';
   categories: string[] = [];
   clicked: boolean = false;
-  constructor(private api : ApiService, private route : ActivatedRoute, private auth: AuthService) {
+  constructor(private api : ApiService, private route : ActivatedRoute, private auth: AuthService, private websocketService: WebsocketService) {
 
   }
   ngOnInit(): void {
@@ -30,6 +32,8 @@ export class ProductComponent implements OnInit {
       } else {
         this.displayProducts();
       }
+
+      
     });
     
     
@@ -37,16 +41,24 @@ export class ProductComponent implements OnInit {
 
     const userId = parseInt(this.auth.getUserId() || '', 10);
 
-  this.api.getProducts().subscribe(products => {
-    this.products = products;
-
-    // Loop through all products and check notification status
-    this.products.forEach(product => {
-      this.api.checkNotification(product.id, userId).subscribe((exists: boolean) => {
-        product.IsNotifyDisabled = exists; // ✅ true if already requested
+    this.api.getNotifiedProductIds(userId).subscribe((notifiedIds: number[])=>{
+          this.products.forEach(p => {
+            p.IsNotifyDisabled = notifiedIds.includes(p.id);
+          });
+    });
+  
+    this.websocketService.stockUpdate.subscribe(({ productId }) => {
+      console.log('SignalR update received for productId:', productId);
+      this.api.getProductById(productId).subscribe(updated => {
+        console.log('Fetched updated product:', updated);
+        const index = this.products.findIndex(p => p.id === parseInt(productId));
+        if (index !== -1) {
+          this.products[index] = updated;
+          this.products = [...this.products]; // reassign to trigger change detection
+          console.log('Product index found in list:', index);
+        }
       });
     });
-  });
 
   }
 

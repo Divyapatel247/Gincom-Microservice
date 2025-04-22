@@ -405,16 +405,45 @@ public class ProductsRepository : IProductRepository
     }
 
     public async Task<bool> CheckNotificationExistsAsync(int productId, int userId)
-{
-    using var connection = new MySqlConnection(_connectionString);
-    var sql = @"SELECT COUNT(*) 
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        var sql = @"SELECT COUNT(*) 
                 FROM StockNotificationRequests 
                 WHERE UserId = @UserId 
                   AND ProductId = @ProductId 
                   AND IsNotified = false"; // only check unnotified entries
 
-    var count = await connection.ExecuteScalarAsync<int>(sql, new { UserId = userId, ProductId = productId });
-    return count > 0;
-}
+        var count = await connection.ExecuteScalarAsync<int>(sql, new { UserId = userId, ProductId = productId });
+        return count > 0;
+    }
+
+    public async Task<IEnumerable<int>> GetNotifiedProductIdsAsync(int userId)
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        var sql = @"Select ProductId from StockNotificationRequests where userId = @userId and Isnotified = false";
+        var result = await connection.QueryAsync<int>(sql, new { userid = userId });
+        return result.ToList();
+    }
+
+    public async Task<IEnumerable<int>> GetUsersToNotifyAsync(int productId)
+    {
+        using var conn = new MySqlConnection(_connectionString);
+        var sql = "SELECT UserId FROM StockNotificationRequests WHERE ProductId = @ProductId AND IsNotified = false";
+        return await conn.QueryAsync<int>(sql, new { ProductId = productId });
+    }
+
+    public async Task MarkNotified(int productId, int userId)
+    {
+        using var conn = new MySqlConnection(_connectionString);
+        var sql = "UPDATE StockNotificationRequests SET IsNotified = true WHERE ProductId = @ProductId AND UserId = @UserId";
+        await conn.ExecuteAsync(sql, new { ProductId = productId, UserId = userId });
+
+        
+        var deleteSql = "DELETE FROM StockNotificationRequests WHERE ProductId = @ProductId AND UserId = @UserId";
+        await conn.ExecuteAsync(deleteSql, new { ProductId = productId, UserId = userId });
+        Console.WriteLine("deleting noti req deleted");
+    }
+
+
 }
 

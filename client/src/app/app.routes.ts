@@ -86,8 +86,12 @@ export const routes: Routes = [
       // other customer routes
       { path: '', redirectTo: 'product', pathMatch: 'full' }, // Default to products
       { path: 'product', component: ProductComponent },
-      { path: 'product-detail/:productid', component: ProductDetailComponent }
-    ]
+      { path: 'product-detail/:productid', component: ProductDetailComponent },
+      {
+        path: 'product/:category',
+        component: ProductComponent
+      }
+    ] 
   },
   { path: 'login', component: LoginComponent  },
   { path: 'register', component: RegisterComponent  },

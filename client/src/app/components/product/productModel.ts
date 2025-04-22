@@ -23,6 +23,7 @@ export interface IProduct {
   categoryId: number;
   categoryName?: string | null;
   IsNotifyDisabled?: boolean;
+  
   relatedProductIds : Number[]
 }
 
