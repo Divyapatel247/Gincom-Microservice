@@ -1,78 +1,90 @@
-<div class="max-w-6xl mx-auto mt-8 mb-16">
+<div id="orders-container" class="max-w-6xl mx-auto mt-8 mb-16">
   <!-- Page Header -->
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">My Orders</h1>
-    <p class="text-gray-500 mt-2">Track and manage your recent purchases</p>
+  <div id="page-header" class="mb-8">
+    <h1 id="page-title" class="text-3xl font-bold text-gray-900">My Orders</h1>
+    <p id="page-description" class="text-gray-500 mt-2">Track and manage your recent purchases</p>
   </div>
 
   @if (error) {
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-      <p class="text-red-700">{{ error }}</p>
+    <div id="error-message" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+      <p id="error-text" class="text-red-700">{{ error }}</p>
     </div>
   } @else if (orders.length === 0) {
-    <div class="bg-white rounded-xl shadow-sm p-12 text-center">
-      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div id="empty-orders" class="bg-white rounded-xl shadow-sm p-12 text-center">
+      <div id="empty-icon-container" class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg
+          id="empty-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-8 w-8 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-gray-900">No orders yet</h3>
-      <p class="text-gray-500 mt-2">When you place an order, it will appear here</p>
+      <h3 id="empty-title" class="text-lg font-medium text-gray-900">No orders yet</h3>
+      <p id="empty-description" class="text-gray-500 mt-2">When you place an order, it will appear here</p>
     </div>
   } @else {
-    <div class="space-y-6 overflow-y-auto max-h-[700px] pr-1">
+    <div id="orders-list" class="space-y-6 overflow-y-auto max-h-[700px] pr-1">
       @for (order of orders; track order.id) {
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+        <div id="order-{{order.id}}" class="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
           <!-- Order Header -->
-          <div class="px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-100">
-            <div>
-              <h3 class="text-lg font-medium text-gray-900">Order #{{ order.id }}</h3>
-              <p class="text-sm text-gray-500 mt-1">{{ order.createdAt | date:'medium' }}</p>
+          <div id="order-header-{{order.id}}" class="px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-100">
+            <div id="order-info-{{order.id}}">
+              <h3 id="order-title-{{order.id}}" class="text-lg font-medium text-gray-900">Order #{{ order.id }}</h3>
+              <p id="order-date-{{order.id}}" class="text-sm text-gray-500 mt-1">{{ order.createdAt | date:'medium' }}</p>
             </div>
-            <div class="mt-2 md:mt-0">
+            <div id="order-status-container-{{order.id}}" class="mt-2 md:mt-0">
               <span
-              class="inline-flex items-center px-3 py-1 rounded-full text-sm"
-              [ngClass]="{
-                'bg-amber-50 text-amber-700': order.status === 'Pending',
-                'bg-green-50 text-green-700': order.status === 'Completed' || order.status === 'Delivered',
-                'bg-blue-50 text-blue-700': order.status === 'Processing',
-                'bg-indigo-50 text-indigo-700': order.status === 'Shipped',
-                'bg-red-50 text-red-700': order.status === 'Cancelled',
-                'bg-gray-50 text-gray-700': !['Pending', 'Completed', 'Delivered', 'Processing', 'Shipped', 'Cancelled'].includes(order.status)
-              }"
-            >
-              <span
-                class="w-2 h-2 mr-2 rounded-full"
+                id="order-status-{{order.id}}"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm"
                 [ngClass]="{
-                  'bg-amber-500': order.status === 'Pending',
-                  'bg-green-500': order.status === 'Completed' || order.status === 'Delivered',
-                  'bg-blue-500': order.status === 'Processing',
-                  'bg-indigo-500': order.status === 'Shipped',
-                  'bg-red-500': order.status === 'Cancelled',
-                  'bg-gray-500': !['Pending', 'Completed', 'Delivered', 'Processing', 'Shipped', 'Cancelled'].includes(order.status)
+                  'bg-amber-50 text-amber-700': order.status === 'Pending',
+                  'bg-green-50 text-green-700': order.status === 'Completed' || order.status === 'Delivered',
+                  'bg-blue-50 text-blue-700': order.status === 'Processing',
+                  'bg-indigo-50 text-indigo-700': order.status === 'Shipped',
+                  'bg-red-50 text-red-700': order.status === 'Cancelled',
+                  'bg-gray-50 text-gray-700': !['Pending', 'Completed', 'Delivered', 'Processing', 'Shipped', 'Cancelled'].includes(order.status)
                 }"
-              ></span>
-              {{ order.status }}
-            </span>
-
+              >
+                <span
+                  id="status-indicator-{{order.id}}"
+                  class="w-2 h-2 mr-2 rounded-full"
+                  [ngClass]="{
+                    'bg-amber-500': order.status === 'Pending',
+                    'bg-green-500': order.status === 'Completed' || order.status === 'Delivered',
+                    'bg-blue-500': order.status === 'Processing',
+                    'bg-indigo-500': order.status === 'Shipped',
+                    'bg-red-500': order.status === 'Cancelled',
+                    'bg-gray-500': !['Pending', 'Completed', 'Delivered', 'Processing', 'Shipped', 'Cancelled'].includes(order.status)
+                  }"
+                ></span>
+                {{ order.status }}
+              </span>
             </div>
           </div>
 
           <!-- Order Items -->
-          <div class="px-6 py-3">
+          <div id="order-items-{{order.id}}" class="px-6 py-3">
             @for (item of order.items; track item.productId) {
-              <div class="flex py-4 border-b border-gray-100 last:border-b-0">
-                <div class="h-20 w-20 flex-shrink-0 bg-gray-50 rounded-md overflow-hidden">
-                  <img [src]="item.product?.thumbnail || '/api/placeholder/80/80'" alt="{{ item.product?.title }}"
-                       class="h-full w-full object-cover" />
+              <div id="item-{{item.productId}}" class="flex py-4 border-b border-gray-100 last:border-b-0">
+                <div id="item-image-container-{{item.productId}}" class="h-20 w-20 flex-shrink-0 bg-gray-50 rounded-md overflow-hidden">
+                  <img
+                    id="item-image-{{item.productId}}"
+                    [src]="item.product?.thumbnail || '/api/placeholder/80/80'"
+                    alt="{{ item.product?.title }}"
+                    class="h-full w-full object-cover"
+                  />
                 </div>
-                <div class="ml-4 flex-1 flex flex-col md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h4 class="font-medium text-gray-900">{{ item.product?.title || 'Loading...' }}</h4>
-                    <p class="text-sm text-gray-500 mt-1">Qty: {{ item.quantity }}</p>
+                <div id="item-details-{{item.productId}}" class="ml-4 flex-1 flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div id="item-info-{{item.productId}}">
+                    <h4 id="item-title-{{item.productId}}" class="font-medium text-gray-900">{{ item.product?.title || 'Loading...' }}</h4>
+                    <p id="item-quantity-{{item.productId}}" class="text-sm text-gray-500 mt-1">Qty: {{ item.quantity }}</p>
                   </div>
-                  <div class="mt-2 md:mt-0">
-                    <p class="font-medium text-gray-900">₹{{ (item.product?.price || 0) * item.quantity | number:'1.2-2' }}</p>
+                  <div id="item-total-{{item.productId}}" class="mt-2 md:mt-0">
+                    <p id="item-total-amount-{{item.productId}}" class="font-medium text-gray-900">₹{{ (item.product?.price || 0) * item.quantity | number:'1.2-2' }}</p>
                   </div>
                 </div>
               </div>
@@ -80,14 +92,14 @@
           </div>
 
           <!-- Order Footer -->
-          <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col md:flex-row justify-between">
-            <div class="text-sm text-gray-500">
+          <div id="order-footer-{{order.id}}" class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col md:flex-row justify-between">
+            <div id="payment-info-{{order.id}}" class="text-sm text-gray-500">
               @if (order.razorpayOrderId) {
-                Payment ID: {{ order.razorpayOrderId }}
+                <span id="razorpay-id-{{order.id}}">Payment ID: {{ order.razorpayOrderId }}</span>
               }
             </div>
-            <div class="mt-2 md:mt-0 text-lg font-medium text-gray-900">
-              Total: ₹{{ getOrderTotal(order) | number:'1.2-2' }}
+            <div id="order-total-container-{{order.id}}" class="mt-2 md:mt-0 text-lg font-medium text-gray-900">
+              <span id="order-total-{{order.id}}">Total: ₹{{ getOrderTotal(order) | number:'1.2-2' }}</span>
             </div>
           </div>
         </div>

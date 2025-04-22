@@ -1,35 +1,34 @@
-<!-- <div class="d-flex flex-col w-full">
-  <div class="">
-    <app-admin-navbar></app-admin-navbar>
+<!-- Commented-out section with IDs -->
+<!--
+<div id="main-container" class="d-flex flex-col w-full">
+  <div id="navbar-container">
+    <app-admin-navbar id="admin-navbar"></app-admin-navbar>
   </div>
-  <div class="flex flex-row">
-    <div class="">
-
-      <app-admin-sidebar></app-admin-sidebar>
+  <div id="content-container" class="flex flex-row">
+    <div id="sidebar-container">
+      <app-admin-sidebar id="admin-sidebar"></app-admin-sidebar>
     </div>
-
-      <router-outlet></router-outlet>
-
+    <router-outlet id="router-outlet"></router-outlet>
   </div>
-</div> -->
+</div>
+-->
 
-<div class="flex flex-col h-screen">
+<div id="layout-container" class="flex flex-col h-screen">
   <!-- Fixed Navbar -->
-  <div class="fixed top-0 left-0 w-full z-50">
-    <app-admin-navbar></app-admin-navbar>
+  <div id="fixed-navbar" class="fixed top-0 left-0 w-full z-50">
+    <app-admin-navbar id="admin-navbar"></app-admin-navbar>
   </div>
 
   <!-- Main content under navbar -->
-  <div class="flex flex-row pt-[64px] h-full">
+  <div id="main-content" class="flex flex-row pt-[64px] h-full">
     <!-- Fixed Sidebar -->
-    <div class="fixed top-[64px] left-0 w-72 h-[calc(100vh-64px)] bg-white shadow z-40">
-      <app-admin-sidebar></app-admin-sidebar>
+    <div id="fixed-sidebar" class="fixed top-[64px] left-0 w-72 h-[calc(100vh-64px)] bg-white shadow z-40">
+      <app-admin-sidebar id="admin-sidebar"></app-admin-sidebar>
     </div>
 
     <!-- Page Content -->
-    <div class="ml-70 w-full overflow-y-auto p-4">
-      <router-outlet></router-outlet>
+    <div id="page-content" class="ml-70 w-full overflow-y-auto p-4">
+      <router-outlet id="router-outlet"></router-outlet>
     </div>
   </div>
 </div>
-

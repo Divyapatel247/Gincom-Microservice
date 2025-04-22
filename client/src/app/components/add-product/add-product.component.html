@@ -1,11 +1,11 @@
 <!-- Add Product Form Component -->
-<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-  <h2 class="text-2xl font-bold text-gray-900 mb-6">Add New Product</h2>
+<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100" id="add-product-container">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6" id="form-title">Add New Product</h2>
 
-  <form [formGroup]="productForm" class="space-y-5">
+  <form [formGroup]="productForm" class="space-y-5" id="product-form">
     <!-- Product Title -->
-    <div>
-      <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Product Title</label>
+    <div id="title-container">
+      <label for="title" class="block text-sm font-medium text-gray-700 mb-1" id="title-label">Product Title</label>
       <input
         id="title"
         type="text"
@@ -13,18 +13,18 @@
         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
         placeholder="Enter product title"
       />
-      <div class="text-red-500 text-xs mt-1">
+      <div class="text-red-500 text-xs mt-1" id="title-errors">
         @if (productForm.controls['title'].errors?.['required'] && productForm.controls['title'].touched) {
-          <span>This is required</span>
+          <span id="title-required-error">This is required</span>
         }
         @if (productForm.controls['title'].errors?.['minlength']) {
-          <span>Min 3 characters required.</span>
+          <span id="title-minlength-error">Min 3 characters required.</span>
         }
       </div>
     </div>
 
-    <div>
-      <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+    <div id="thumbnail-container">
+      <label for="thumbnail" class="block text-sm font-medium text-gray-700 mb-1" id="thumbnail-label">Product Image</label>
       <input
         id="thumbnail"
         type="text"
@@ -32,19 +32,19 @@
         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
         placeholder="Enter product thumbnail"
       />
-      <div class="text-red-500 text-xs mt-1">
+      <div class="text-red-500 text-xs mt-1" id="thumbnail-errors">
         @if (productForm.controls['thumbnail'].errors?.['required'] && productForm.controls['thumbnail'].touched) {
-          <span>This is required</span>
+          <span id="thumbnail-required-error">This is required</span>
         }
         @if (productForm.controls['thumbnail'].errors?.['minlength']) {
-          <span>Min 3 characters required.</span>
+          <span id="thumbnail-minlength-error">Min 3 characters required.</span>
         }
       </div>
     </div>
 
     <!-- Description -->
-    <div>
-      <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+    <div id="description-container">
+      <label for="description" class="block text-sm font-medium text-gray-700 mb-1" id="description-label">Description</label>
       <textarea
         id="description"
         formControlName="description"
@@ -52,40 +52,40 @@
         rows="3"
         placeholder="Enter product description"
       ></textarea>
-      <div class="text-red-500 text-xs mt-1">
+      <div class="text-red-500 text-xs mt-1" id="description-errors">
         @if (productForm.controls['description'].errors?.['required'] && productForm.controls['description'].touched) {
-          <span>This is required</span>
+          <span id="description-required-error">This is required</span>
         }
         @if (productForm.controls['description'].errors?.['minlength']) {
-          <span>Min 10 characters required.</span>
+          <span id="description-minlength-error">Min 10 characters required.</span>
         }
       </div>
     </div>
 
 
     <!-- Price and Stock in a grid -->
-    <div class="grid grid-cols-4 gap-4">
+    <div class="grid grid-cols-4 gap-4" id="product-details-grid">
       <!-- Category -->
-      <div>
-        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+      <div id="category-container">
+        <label for="category" class="block text-sm font-medium text-gray-700 mb-1" id="category-label">Category</label>
         <select
           id="category"
           formControlName="category"
           class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm appearance-none"
         >
-          <option value="" disabled>Select a category</option>
-          <option *ngFor="let category of categories" [value]="category">
+          <option value="" disabled id="category-default-option">Select a category</option>
+          <option *ngFor="let category of categories" [value]="category" id="category-option-{{category}}">
             {{ category }}
           </option>
         </select>
-        <div class="text-red-500 text-xs mt-1">
+        <div class="text-red-500 text-xs mt-1" id="category-errors">
           @if (productForm.controls['category'].errors?.['required'] && productForm.controls['category'].touched) {
-            <span>This is required</span>
+            <span id="category-required-error">This is required</span>
           }
         </div>
       </div>
-      <div>
-        <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+      <div id="price-container">
+        <label for="price" class="block text-sm font-medium text-gray-700 mb-1" id="price-label">Price ($)</label>
         <input
           id="price"
           type="number"
@@ -93,18 +93,18 @@
           class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
           placeholder="0.00"
         />
-        <div class="text-red-500 text-xs mt-1">
+        <div class="text-red-500 text-xs mt-1" id="price-errors">
           @if (productForm.get('price')?.errors?.['required'] && productForm.get('price')?.touched) {
-            <span>Price is required.</span>
+            <span id="price-required-error">Price is required.</span>
           }
           @if (productForm.get('price')?.errors?.['min']) {
-            <span>Price must be 1 or greater.</span>
+            <span id="price-min-error">Price must be 1 or greater.</span>
           }
         </div>
       </div>
 
-      <div>
-        <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+      <div id="stock-container">
+        <label for="stock" class="block text-sm font-medium text-gray-700 mb-1" id="stock-label">Stock Quantity</label>
         <input
           id="stock"
           type="number"
@@ -112,19 +112,19 @@
           class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
           placeholder="0"
         />
-        <div class="text-red-500 text-xs mt-1">
+        <div class="text-red-500 text-xs mt-1" id="stock-errors">
           @if (productForm.get('stock')?.errors?.['required'] && productForm.get('stock')?.touched) {
-            <span>Stock is required.</span>
+            <span id="stock-required-error">Stock is required.</span>
           }
           @if (productForm.get('stock')?.errors?.['min']) {
-            <span>Stock must be 0 or greater.</span>
+            <span id="stock-min-error">Stock must be 0 or greater.</span>
           }
         </div>
       </div>
 
       <!-- Discount -->
-      <div>
-        <label for="discount" class="block text-sm font-medium text-gray-700 mb-1">Discount (%)</label>
+      <div id="discount-container">
+        <label for="discount" class="block text-sm font-medium text-gray-700 mb-1" id="discount-label">Discount (%)</label>
         <input
           id="discount"
           type="number"
@@ -132,15 +132,15 @@
           class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
           placeholder="0"
         />
-        <div class="text-red-500 text-xs mt-1">
+        <div class="text-red-500 text-xs mt-1" id="discount-errors">
           @if (productForm.get('discountPercentage')?.errors?.['required']) {
-            <span>Discount is required.</span>
+            <span id="discount-required-error">Discount is required.</span>
           }
           @if (productForm.get('discountPercentage')?.errors?.['min']) {
-            <span>Discount must be 0 or greater.</span>
+            <span id="discount-min-error">Discount must be 0 or greater.</span>
           }
           @if (productForm.get('discountPercentage')?.errors?.['max']) {
-            <span>Discount must be less than or equal to 100.</span>
+            <span id="discount-max-error">Discount must be less than or equal to 100.</span>
           }
         </div>
       </div>
@@ -148,18 +148,19 @@
 
 
     <!-- Tags -->
-    <div class="col-span-2">
-      <label>Tags:</label>
-      <div class="flex items-center gap-2 mt-1">
-        <input formControlName="tags"  placeholder="Add tag..." class="flex-grow p-2 rounded-md  border border-gray-200" />
-        <button (click)="addTag()" class="px-3 py-2 bg-green-500 text-white rounded">+</button>
+    <div class="col-span-2" id="tags-section">
+      <label id="tags-label">Tags:</label>
+      <div class="flex items-center gap-2 mt-1" id="tags-input-container">
+        <input formControlName="tags" id="tags-input" placeholder="Add tag..." class="flex-grow p-2 rounded-md border border-gray-200" />
+        <button (click)="addTag()" id="add-tag-button" class="px-3 py-2 bg-green-500 text-white rounded">+</button>
       </div>
-      <div class="flex gap-2 mt-2 flex-wrap">
+      <div class="flex gap-2 mt-2 flex-wrap" id="tags-list">
         <span
           *ngFor="let tag of tagsArray"
           class="bg-gray-200 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+          id="tag-{{tag}}"
         >
-          {{ tag }} <i class="fa fa-times text-xs cursor-pointer" (click)="removeTag(tag)"></i>
+          {{ tag }} <i class="fa fa-times text-xs cursor-pointer" id="remove-tag-{{tag}}" (click)="removeTag(tag)"></i>
         </span>
       </div>
     </div>
@@ -174,8 +175,8 @@
       />
     </div> -->
 
-    <div>
-      <app-add-cross-products (selectedProductsChange)="onSelectedProductsChange($event)" ></app-add-cross-products>
+    <div id="cross-products-section">
+      <app-add-cross-products (selectedProductsChange)="onSelectedProductsChange($event)" id="cross-products-component"></app-add-cross-products>
     </div>
 
     <!-- Submit Button -->
@@ -184,6 +185,7 @@
       (click)="onSubmit()"
       class="w-full bg-black text-white py-3 px-4 rounded-md font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       type="submit"
+      id="submit-button"
     >
       Add Product
     </button>

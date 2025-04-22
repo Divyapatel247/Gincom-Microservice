@@ -1,9 +1,10 @@
-<div class="w-full p-6">
-  <div class="bg-white border border-black/5 shadow-sm p-8 rounded-xl">
+<div id="order-container" class="w-full p-6">
+  <div id="order-card" class="bg-white border border-black/5 shadow-sm p-8 rounded-xl">
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-black/5 pb-6 mb-6">
-      <div class="flex items-center gap-3">
+    <div id="order-header" class="flex items-center justify-between border-b border-black/5 pb-6 mb-6">
+      <div id="order-title-container" class="flex items-center gap-3">
         <svg
+          id="order-icon"
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5 text-black"
           fill="none"
@@ -17,79 +18,118 @@
             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
           />
         </svg>
-        <h2 class="text-lg font-medium text-black">Order #{{ order.id }}</h2>
+        <h2 id="order-title" class="text-lg font-medium text-black">Order #{{ order.id }}</h2>
       </div>
-      <div class="relative inline-block text-left">
+      <div id="order-status-container" class="relative inline-block text-left">
         <span
+          id="order-status"
           class="inline-flex px-3 py-1 text-xs font-medium uppercase tracking-wider rounded-md"
           [ngClass]="{
             'bg-green-50 text-green-700 border border-green-100': order.status === 'Completed',
             'bg-blue-50 text-blue-700 border border-blue-100': order.status === 'Processing',
             'bg-yellow-50 text-yellow-700 border border-yellow-100': order.status === 'Pending',
             'bg-red-50 text-red-700 border border-red-100': order.status === 'Cancelled'
-          }">
+          }"
+        >
           {{ order.status }}
         </span>
       </div>
     </div>
 
     <!-- Order Info -->
-    <div class="flex justify-between items-center text-sm mb-6">
-      <p class="text-black/60">
-        Placed on: <span class="text-black">{{ order.createdAt | date:'mediumDate' }}</span>
+    <div id="order-info" class="flex justify-between items-center text-sm mb-6">
+      <p id="order-date" class="text-black/60">
+        Placed on: <span id="order-date-value" class="text-black">{{ order.createdAt | date:'mediumDate' }}</span>
       </p>
-      <p class="text-black/60" *ngIf="order.razorpayOrderId">
-        Razorpay ID: <span class="text-black">{{ order.razorpayOrderId }}</span>
+      <p id="razorpay-id" class="text-black/60" *ngIf="order.razorpayOrderId">
+        Razorpay ID: <span id="razorpay-id-value" class="text-black">{{ order.razorpayOrderId }}</span>
       </p>
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto -mx-6">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="border-b border-black/5">
-            <th class="px-6 py-3 text-left font-medium text-black/70">Product</th>
-            <th class="px-6 py-3 text-left font-medium text-black/70">Price</th>
-            <th class="px-6 py-3 text-left font-medium text-black/70">Quantity</th>
-            <th class="px-6 py-3 text-left font-medium text-black/70">Total</th>
-            <th class="px-6 py-3 text-right font-medium text-black/70">Actions</th>
+    <div id="order-table-container" class="overflow-x-auto -mx-6">
+      <table id="order-table" class="min-w-full text-sm">
+        <thead id="table-header">
+          <tr id="header-row" class="border-b border-black/5">
+            <th id="column-product" class="px-6 py-3 text-left font-medium text-black/70">Product</th>
+            <th id="column-price" class="px-6 py-3 text-left font-medium text-black/70">Price</th>
+            <th id="column-quantity" class="px-6 py-3 text-left font-medium text-black/70">Quantity</th>
+            <th id="column-total" class="px-6 py-3 text-left font-medium text-black/70">Total</th>
+            <th id="column-actions" class="px-6 py-3 text-right font-medium text-black/70">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let item of order.items" class="border-b border-black/5 hover:bg-black/[0.02] transition-all">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-4">
-                <img [src]="item.product?.thumbnail" alt="product" class="w-16 h-16 object-cover" />
-                <div>
-                  <div class="font-medium text-black hover:underline cursor-pointer">
+        <tbody id="table-body">
+          <tr
+            id="item-row-{{item.product?.id}}"
+            *ngFor="let item of order.items"
+            class="border-b border-black/5 hover:bg-black/[0.02] transition-all"
+          >
+            <td id="item-product-{{item.product?.id}}" class="px-6 py-4">
+              <div id="product-details-{{item.product?.id}}" class="flex items-center gap-4">
+                <img
+                  id="product-image-{{item.product?.id}}"
+                  [src]="item.product?.thumbnail"
+                  alt="product"
+                  class="w-16 h-16 object-cover"
+                />
+                <div id="product-info-{{item.product?.id}}">
+                  <div id="product-title-{{item.product?.id}}" class="font-medium text-black hover:underline cursor-pointer">
                     {{ item.product?.title }}
                   </div>
-                  <div class="text-black/60 text-xs mt-1">SKU: {{ item.product?.sku }}</div>
+                  <div id="product-sku-{{item.product?.id}}" class="text-black/60 text-xs mt-1">
+                    SKU: {{ item.product?.sku }}
+                  </div>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4">${{ item.product?.price }}</td>
-            <td class="px-6 py-4">{{ item.quantity }}</td>
-            <td class="px-6 py-4">
+            <td id="item-price-{{item.product?.id}}" class="px-6 py-4">${{ item.product?.price }}</td>
+            <td id="item-quantity-{{item.product?.id}}" class="px-6 py-4">{{ item.quantity }}</td>
+            <td id="item-total-{{item.product?.id}}" class="px-6 py-4">
               $100
               <!-- ${{ (item.product?.price * item.quantity).toFixed(2) }} -->
             </td>
-            <td class="px-6 py-4 text-right space-x-2">
+            <td id="item-actions-{{item.product?.id}}" class="px-6 py-4 text-right space-x-2">
               <button
+                id="edit-button-{{item.product?.id}}"
                 (click)="onEdit(item)"
                 class="inline-flex items-center px-3 py-1.5 border border-black/10 rounded-md text-sm font-medium text-black bg-white hover:bg-black/5 transition-all"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                <svg
+                  id="edit-icon-{{item.product?.id}}"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M11 5H6a2 2 0 00-2"
+                  />
                 </svg>
                 Edit
               </button>
               <button
+                id="delete-button-{{item.product?.id}}"
                 (click)="onDelete(item)"
                 class="inline-flex items-center px-3 py-1.5 border border-black/10 rounded-md text-sm font-medium text-black bg-white hover:bg-black/5 transition-all"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg
+                  id="delete-icon-{{item.product?.id}}"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
                 Delete
               </button>
@@ -100,10 +140,10 @@
     </div>
 
     <!-- Total -->
-    <div class="flex justify-end items-center pt-6 mt-6 border-t border-black/5">
-      <div class="text-right">
-        <span class="text-black/70">Grand Total:</span>
-        <span class="text-xl font-medium text-black ml-3">$2,145.00</span>
+    <div id="order-total" class="flex justify-end items-center pt-6 mt-6 border-t border-black/5">
+      <div id="total-container" class="text-right">
+        <span id="total-label" class="text-black/70">Grand Total:</span>
+        <span id="total-amount" class="text-xl font-medium text-black ml-3">$2,145.00</span>
         <!-- ${{
           order.items.reduce((sum, item) => sum + (item.product?.price ?? 0) * item.quantity, 0).toFixed(2)
         }} -->

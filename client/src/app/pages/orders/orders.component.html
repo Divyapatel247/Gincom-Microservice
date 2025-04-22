@@ -1,9 +1,10 @@
-<div class="w-full p-6 ">
-  <div class="bg-white rounded-xl shadow-sm border border-black/5 p-8">
+<div id="orders-container" class="w-full p-6">
+  <div id="orders-card" class="bg-white rounded-xl shadow-sm border border-black/5 p-8">
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-black/5 pb-6 mb-6">
-      <div class="flex items-center gap-3">
+    <div id="orders-header" class="flex items-center justify-between border-b border-black/5 pb-6 mb-6">
+      <div id="header-content" class="flex items-center gap-3">
         <svg
+          id="orders-icon"
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5 text-black"
           fill="none"
@@ -17,31 +18,33 @@
             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
           />
         </svg>
-        <h2 class="text-lg font-medium text-black">Orders</h2>
+        <h2 id="orders-title" class="text-lg font-medium text-black">Orders</h2>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto -mx-6">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="border-b border-black/5">
-            <th class="px-6 py-3 text-left font-medium text-black/70">Order #</th>
-            <th class="px-6 py-3 text-left font-medium text-black/70">Status</th>
-            <th class="px-6 py-3 text-left font-medium text-black/70">Customer</th>
-            <th class="px-6 py-3 text-left font-medium text-black/70">Created on</th>
-            <th class="px-6 py-3 text-right font-medium text-black/70">Actions</th>
+    <div id="orders-table-container" class="overflow-x-auto -mx-6">
+      <table id="orders-table" class="min-w-full text-sm">
+        <thead id="table-header">
+          <tr id="header-row" class="border-b border-black/5">
+            <th id="column-order-id" class="px-6 py-3 text-left font-medium text-black/70">Order #</th>
+            <th id="column-status" class="px-6 py-3 text-left font-medium text-black/70">Status</th>
+            <th id="column-customer" class="px-6 py-3 text-left font-medium text-black/70">Customer</th>
+            <th id="column-created" class="px-6 py-3 text-left font-medium text-black/70">Created on</th>
+            <th id="column-actions" class="px-6 py-3 text-right font-medium text-black/70">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="table-body">
           <tr
+            id="order-row-{{order.id}}"
             *ngFor="let order of orders"
             class="hover:bg-black/[0.02] transition-all border-b border-black/5"
           >
-            <td class="px-6 py-4 font-medium">{{ order.id }}</td>
-            <td class="px-6 py-4">
-              <div class="relative inline-block text-left">
+            <td id="order-id-{{order.id}}" class="px-6 py-4 font-medium">{{ order.id }}</td>
+            <td id="order-status-{{order.id}}" class="px-6 py-4">
+              <div id="status-select-container-{{order.id}}" class="relative inline-block text-left">
                 <select
+                  id="status-select-{{order.id}}"
                   [(ngModel)]="order.status"
                   (ngModelChange)="handleStatusChange(order.id, $event)"
                   [ngClass]="getStatusStyle(order.status)"
@@ -54,20 +57,22 @@
                     background-size: 1em;
                   "
                 >
-                  <option value="Pending" class="bg-yellow-100 text-yellow-800">Pending</option>
-                  <option value="Processing" class="bg-blue-100 text-blue-800">Processing</option>
-                  <option value="Completed" class="bg-green-100 text-green-800">Completed</option>
+                  <option id="status-option-pending-{{order.id}}" value="Pending" class="bg-yellow-100 text-yellow-800">Pending</option>
+                  <option id="status-option-processing-{{order.id}}" value="Processing" class="bg-blue-100 text-blue-800">Processing</option>
+                  <option id="status-option-completed-{{order.id}}" worth="Completed" class="bg-green-100 text-green-800">Completed</option>
                 </select>
               </div>
             </td>
-            <td class="px-6 py-4">{{ order.userId }}</td>
-            <td class="px-6 py-4 text-black/60">{{ order.createdAt | date: 'MMM d, h:mm a' }}</td>
-            <td class="px-6 py-4 text-right">
+            <td id="order-customer-{{order.id}}" class="px-6 py-4">{{ order.userId }}</td>
+            <td id="order-created-{{order.id}}" class="px-6 py-4 text-black/60">{{ order.createdAt | date: 'MMM d, h:mm a' }}</td>
+            <td id="order-actions-{{order.id}}" class="px-6 py-4 text-right">
               <button
+                id="view-button-{{order.id}}"
                 (click)="onView(order.id)"
                 class="inline-flex items-center px-3 py-1.5 border border-black/10 rounded-md text-sm font-medium text-black bg-white hover:bg-black/5 transition-all"
               >
                 <svg
+                  id="view-icon-{{order.id}}"
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-4 w-4 mr-1"
                   fill="none"

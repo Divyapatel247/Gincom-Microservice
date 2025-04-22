@@ -1,16 +1,16 @@
 <!-- Cross Products Component -->
-<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 h-full">
-  <div class="flex justify-between items-center mb-4">
-    <h3 class="text-lg font-bold text-gray-900">Cross Products</h3>
-    <div class="w-1/4">
+<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 h-full" id="cross-products-container">
+  <div class="flex justify-between items-center mb-4" id="header-container">
+    <h3 class="text-lg font-bold text-gray-900" id="section-title">Cross Products</h3>
+    <div class="w-1/4" id="category-dropdown-container">
       <select
         id="category"
         [(ngModel)]="selectedCategory"
         (ngModelChange)="onCategoryChange()"
         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm appearance-none"
       >
-        <option value="" disabled>Select a category</option>
-        <option *ngFor="let category of categories" [value]="category">
+        <option value="" disabled id="default-option">Select a category</option>
+        <option *ngFor="let category of categories" [value]="category" id="category-option-{{category}}">
           {{ category }}
         </option>
       </select>
@@ -18,31 +18,32 @@
   </div>
 
   <!-- Empty states -->
-  <div *ngIf="!selectedCategory" class="py-8 text-center text-gray-500 text-sm">
+  <div *ngIf="!selectedCategory" class="py-8 text-center text-gray-500 text-sm" id="empty-state-no-category">
     Please select a category to view products
   </div>
 
-  <div *ngIf="selectedCategory && products.length === 0" class="py-8 text-center text-gray-500 text-sm">
+  <div *ngIf="selectedCategory && products.length === 0" class="py-8 text-center text-gray-500 text-sm" id="empty-state-no-products">
     No products found for this category
   </div>
 
   <!-- Products list -->
-  <div class="max-h-96 overflow-y-auto mt-2 border border-gray-100 rounded-md">
-    <div *ngFor="let product of products" class="flex items-center gap-4 p-3 border-b border-gray-100 hover:bg-gray-50">
+  <div class="max-h-96 overflow-y-auto mt-2 border border-gray-100 rounded-md" id="products-list-container">
+    <div *ngFor="let product of products" class="flex items-center gap-4 p-3 border-b border-gray-100 hover:bg-gray-50" id="product-item-{{product.id}}">
       <input
         type="checkbox"
+        id="product-checkbox-{{product.id}}"
         [checked]="selectedProductIds.includes(product.id)"
         [disabled]="isCheckboxDisabled(product.id)"
         (change)="onCheckboxChange($event, product.id)"
         class="h-4 w-4 border-gray-300 rounded text-black focus:ring-black"
       />
-      <div class="w-14 h-14 bg-gray-50 rounded-md flex items-center justify-center border border-gray-100"></div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-gray-900 truncate">{{ product.title }}</p>
-        <p class="text-sm text-gray-700">${{ product.price.toFixed(2) }}</p>
-        <div class="flex items-center mt-1">
-          <div class="text-sm text-gray-600">{{ product.rating?.toFixed(1) }}</div>
-          <div class="ml-1 flex text-gray-300">
+      <div class="w-14 h-14 bg-gray-50 rounded-md flex items-center justify-center border border-gray-100" id="product-image-{{product.id}}"></div>
+      <div class="flex-1 min-w-0" id="product-details-{{product.id}}">
+        <p class="text-sm font-medium text-gray-900 truncate" id="product-title-{{product.id}}">{{ product.title }}</p>
+        <p class="text-sm text-gray-700" id="product-price-{{product.id}}">${{ product.price.toFixed(2) }}</p>
+        <div class="flex items-center mt-1" id="product-rating-container-{{product.id}}">
+          <div class="text-sm text-gray-600" id="product-rating-value-{{product.id}}">{{ product.rating?.toFixed(1) }}</div>
+          <div class="ml-1 flex text-gray-300" id="product-rating-stars-{{product.id}}">
             <span class="text-xs">★★★★★</span>
           </div>
         </div>
@@ -51,11 +52,12 @@
   </div>
 
   <!-- Counter -->
-  <div class="text-xs text-gray-600 mt-3 flex justify-between items-center">
-    <div>{{ selectedProductIds.length }} of 4 products selected</div>
-    <div class="bg-gray-100 h-1 w-24 rounded-full">
+  <div class="text-xs text-gray-600 mt-3 flex justify-between items-center" id="selection-counter-container">
+    <div id="selection-count-text">{{ selectedProductIds.length }} of 4 products selected</div>
+    <div class="bg-gray-100 h-1 w-24 rounded-full" id="selection-progress-container">
       <div
         class="bg-black h-1 rounded-full"
+        id="selection-progress-bar"
         [style.width.%]="(selectedProductIds.length / 4) * 100"
       ></div>
     </div>
