@@ -1,13 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
-import  { HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import * as signalR from '@microsoft/signalr';
 
 import { Notification } from '../models/notification.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WebsocketService implements OnDestroy {
   private hubConnection: HubConnection | null = null;
@@ -19,6 +19,9 @@ export class WebsocketService implements OnDestroy {
   private readonly ADMIN_STORAGE_KEY = 'admin_notifications';
   private readonly MAX_NOTIFICATIONS = 5;
   public notification$ = new Subject<any>();
+
+  private stockUpdateSubject = new Subject<{ productId: string }>();
+  stockUpdate = this.stockUpdateSubject.asObservable();
 
   constructor(private authService: AuthService) {
     this.loadNotificationsFromStorage();
@@ -67,7 +70,6 @@ export class WebsocketService implements OnDestroy {
       localStorage.setItem(this.ADMIN_STORAGE_KEY, JSON.stringify(recentAdminNotifications));
     }
   }
-
   private initializeSignalR() {
     const userId = this.authService.getUserId();
     const token = localStorage.getItem('access_token');
@@ -112,12 +114,22 @@ export class WebsocketService implements OnDestroy {
             this.userNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
           }
           this.notificationsSubject.next([...this.userNotifications]);
+          const productId = data.productId;
+          if (productId && !isNaN(productId)) {
+            console.log('Triggering stock update for productId:', productId);
+            this.stockUpdateSubject.next({ productId: productId });
+          }
         } else if (data.messageType === 'AdminNotification' && role === 'Admin') {
           this.adminNotifications.unshift(notification);
           if (this.adminNotifications.length > this.MAX_NOTIFICATIONS) {
             this.adminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
           }
           this.adminNotificationsSubject.next([...this.adminNotifications]);
+          // const productId = data.productId;
+          // if (productId && !isNaN(productId)) {
+          //   console.log('Triggering stock update for productId:', productId);
+          //   this.stockUpdateSubject.next({ productId: productId });
+          // }
         }
 
         this.saveNotificationsToStorage();
@@ -174,7 +186,9 @@ export class WebsocketService implements OnDestroy {
 
   ngOnDestroy() {
     if (this.hubConnection) {
-      this.hubConnection.stop().catch((err) => console.error('Error stopping connection:', err));
+      this.hubConnection
+        .stop()
+        .catch((err) => console.error('Error stopping connection:', err));
     }
   }
 

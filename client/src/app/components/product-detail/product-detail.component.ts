@@ -17,6 +17,7 @@ import { BasketItem, BasketResponse } from '../../models/cart.interface';
 
 
 
+
 @Component({
   selector: 'app-product-detail',
   imports: [ NgIf, NgFor, CommonModule, FormsModule],
@@ -80,6 +81,9 @@ export class ProductDetailComponent implements OnInit {
     // console.log(productid);
     productid &&
       this.api.getProductById(productid).subscribe((res: IProduct) => {
+        console.log(res);
+        this.productDetail = res;
+        
         this.productDetail = res;
         this.remainingStock = res.stock;
         console.log(res);
@@ -159,6 +163,8 @@ export class ProductDetailComponent implements OnInit {
     })
   }
 
+  
+  
 
   clampQuantity(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));

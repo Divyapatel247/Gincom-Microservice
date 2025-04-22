@@ -210,28 +210,54 @@ public class ProductController : ControllerBase
     [HttpPut("{id}/stock")]
     public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockRequest request)
     {
+        Console.WriteLine($"🔍 Received productId: {id}, newStock: {request.NewStock}");
         await _repository.UpdateProductStockAsync(id, request.NewStock);
         if (request.NewStock > 0)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             int userIds = userIdClaim != null ? int.Parse(userIdClaim) : 0;
+
             await _publishEndpoint.Publish<ProductUpdatedStock>(new
             {
                 ProductId = id,
                 NewStock = request.NewStock,
                 UserIds = userIds,
-                UpdatedAt = DateTime.UtcNow
+                Title = request.Title,
+                UpdatedAt = DateTime.UtcNow,
             });
+            Console.WriteLine($"event publish for stock added by admin product id {id}  userid {userIds}");
         }
-        Console.WriteLine("event publish for stock added by admin");
+
         return Ok();
     }
     [HttpGet("check")]
     public async Task<IActionResult> CheckNotificationExists(int productId, int userId)
     {
-        
-       var exists =  await _repository.CheckNotificationExistsAsync(productId, userId);
+        var exists = await _repository.CheckNotificationExistsAsync(productId, userId);
         return Ok(exists); // returns true or false
+    }
+
+    [HttpGet("user-notified-products")]
+    public async Task<IActionResult> GetNotifiedProductIds([FromQuery] int userId)
+    {
+        if (userId == null)
+            return BadRequest("userId is required.");
+        var productIds = await _repository.GetNotifiedProductIdsAsync(userId);
+        return Ok(productIds);
+    }
+
+    [HttpGet("users-to-notify")]
+    public async Task<IActionResult> GetUsersToNotify([FromQuery] int productId)
+    {
+        var userIds = await _repository.WhomToNotify(productId);
+        return Ok(userIds);
+    }
+
+    [HttpPost("mark-notified")]
+    public async Task<IActionResult> MarkAsNotified(int productId, int userId)
+    {
+        await _repository.MarkNotified(productId, userId);
+        return Ok();
     }
 
 }
@@ -247,6 +273,7 @@ public class notifyMeRequest
 public class UpdateStockRequest
 {
     public int NewStock { get; set; }
+    public string Title { get; set; }
 }
 
 

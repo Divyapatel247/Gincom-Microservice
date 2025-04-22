@@ -51,7 +51,7 @@ builder.Services.AddMassTransit(x =>
 
 
 
-
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

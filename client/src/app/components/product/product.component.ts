@@ -5,10 +5,12 @@ import { CommonModule, CurrencyPipe, NgClass, NgFor } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
+import { WebsocketService } from '../../service/websocket.service';
+
 
 @Component({
   selector: 'app-product',
-  imports: [NgFor, CurrencyPipe,NgClass, RouterLink,FormsModule,CommonModule],
+  imports: [NgFor, CurrencyPipe, NgClass, RouterLink, FormsModule, CommonModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
@@ -18,7 +20,7 @@ export class ProductComponent implements OnInit {
   selectedCategory: string = '';
   categories: string[] = [];
   clicked: boolean = false;
-  constructor(private api : ApiService, private route : ActivatedRoute, private auth: AuthService) {
+  constructor(private api : ApiService, private route : ActivatedRoute, private auth: AuthService, private websocketService: WebsocketService) {
 
   }
   ngOnInit(): void {
@@ -30,23 +32,33 @@ export class ProductComponent implements OnInit {
       } else {
         this.displayProducts();
       }
+
+
     });
-    
-    
+
+
     this.getCategoryList();
 
-    const userId = parseInt(this.auth.getUserId() || '', 10);
+    const userId = parseInt(this.auth.getUserId() || '');
+    console.log("userId", userId, typeof userId);
+    this.api.getNotifiedProductIds(userId).subscribe((notifiedIds: number[])=>{
+          this.products.forEach(p => {
+            p.IsNotifyDisabled = notifiedIds.includes(p.id);
+          });
+    });
 
-  this.api.getProducts().subscribe(products => {
-    this.products = products;
-
-    // Loop through all products and check notification status
-    this.products.forEach(product => {
-      this.api.checkNotification(product.id, userId).subscribe((exists: boolean) => {
-        product.IsNotifyDisabled = exists; // ✅ true if already requested
+    this.websocketService.stockUpdate.subscribe(({ productId }) => {
+      console.log('SignalR update received for productId:', productId);
+      this.api.getProductById(productId).subscribe(updated => {
+        console.log('Fetched updated product:', updated);
+        const index = this.products.findIndex(p => p.id === parseInt(productId));
+        if (index !== -1) {
+          this.products[index] = updated;
+          this.products = [...this.products]; // reassign to trigger change detection
+          console.log('Product index found in list:', index);
+        }
       });
     });
-  });
 
   }
 
@@ -72,14 +84,14 @@ export class ProductComponent implements OnInit {
   }
 
   getStars(rating: number | undefined): number[] {
-    const validRating = rating ?? 0; 
+    const validRating = rating ?? 0;
     return Array.from({ length: 5 }, (_, i) => i + 1);
   }
 
   notifyMe(productId: number): void{
 
     // const userId = this.auth.getUserId()
-    
+
     // const product = this.products.find(p => p.id === productId);
     const userId = this.auth.getUserId() ? parseInt(this.auth.getUserId()!, 10) : null;
     console.log("notify me function")
@@ -91,10 +103,10 @@ export class ProductComponent implements OnInit {
     // });
     this.api.checkNotification(productId, userId).subscribe((exists: boolean) => {
       if (exists) return; // already registered
-  
+
       this.api.registerNotification(productId, userId).subscribe(() => {
         console.log("notification registered");
-  
+
         // ✅ Disable button for this product
         const product = this.products.find(p => p.id == productId);
         if (product) {
