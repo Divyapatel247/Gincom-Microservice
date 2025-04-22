@@ -86,5 +86,7 @@ public static class ProductMapper
         product.Description = updateProductDto.Description;
         product.Price = updateProductDto.Price;
         product.Stock = updateProductDto.Stock;
+        product.DiscountPercentage = updateProductDto.DiscountPercentage;
+        product.Tags = updateProductDto.Tags;
     }
 }
