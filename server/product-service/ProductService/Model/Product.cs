@@ -16,7 +16,7 @@ public class Product
         public string Brand { get; set; } = "DefaultBrand";
         public string Sku { get; set; } = "SKU-1000";
         public decimal Weight { get; set; } = 1.0m;
-        public Dimensions Dimensions { get; set; } = new Dimensions { Width = 0, Height = 0, Depth = 0 };
+        public Dimensions Dimensions { get; set; } = new Dimensions { Width = 10, Height = 12, Depth = 10 };
         public string WarrantyInformation { get; set; } = "No warranty";
         public string ShippingInformation { get; set; } = "Ships in 7 days";
         public string AvailabilityStatus { get; set; } = "In Stock";

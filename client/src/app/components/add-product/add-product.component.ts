@@ -27,7 +27,8 @@ export class AddProductComponent implements OnInit{
     discountPercentage: new FormControl(0, [Validators.min(0), Validators.max(100)]),
     category: new FormControl("", Validators.required),
     tags: new FormControl([""]),
-    relatedProductIds: new FormControl([])
+    relatedProductIds: new FormControl([]),
+    thumbnail : new FormControl("",[Validators.required, Validators.minLength(3)])
   });
   errorMessage: string = '';
   tagsArray: string[] = [];
@@ -94,7 +95,8 @@ export class AddProductComponent implements OnInit{
       discountPercentage: formValues.discountPercentage,
       categoryName: formValues.category,
       tags: this.tagsArray,
-      relatedProductIds : formValues.relatedProductIds
+      relatedProductIds : formValues.relatedProductIds,
+      thumbnail : formValues.thumbnail
     };
 
     console.log("productToAdd :",productToAdd)

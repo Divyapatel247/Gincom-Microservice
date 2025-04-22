@@ -16,6 +16,7 @@ import { ShowProductDetailComponent } from './pages/show-product-detail/show-pro
 import { AddToCartComponent } from './pages/add-to-cart/add-to-cart/add-to-cart.component';
 import { MyOrdersComponent } from './pages/my-orders/my-orders.component';
 import { AppComponent } from './app.component';
+import { AdminOrderDetailComponent } from './pages/admin-order-detail/admin-order-detail.component';
 
 // export const routes: Routes = [
 //   {
@@ -68,6 +69,7 @@ export const routes: Routes = [
       { path: 'products', component: ProductTableComponent },
       { path: 'product/:id', component: ShowProductDetailComponent },
       { path: 'orders', component: OrdersComponent },
+      {path: 'orders/:id', component : AdminOrderDetailComponent},
       {path: 'add-product', component: AddProductComponent}
       // { path: 'users', component: UserManagementComponent },
       // other admin routes

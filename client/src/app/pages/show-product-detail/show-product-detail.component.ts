@@ -28,12 +28,14 @@ export class ShowProductDetailComponent implements OnInit {
     categoryId: 0,
     stock: 0,
     relatedProductIds: [],
-    relatedProducts: [{title:'',price:0}]
+    relatedProducts: [{title:'',price:0,thumbnail:''}],
+    thumbnail : ''
   };
   // relatedProducts: object[] = []
 
 
   productId!: string;
+  categories: string[] = [];
 
 
   constructor(private route: ActivatedRoute,private api:ApiService,private router: Router) {}
@@ -45,6 +47,9 @@ export class ShowProductDetailComponent implements OnInit {
       this.product = p
     });
     console.log("product :", this.product)
+    this.api.getCategoryList().subscribe((res: string[]) => {
+      this.categories = res;
+    });
   }
 
 

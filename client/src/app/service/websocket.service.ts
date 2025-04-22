@@ -18,6 +18,7 @@ export class WebsocketService implements OnDestroy {
   private readonly USER_STORAGE_KEY = 'user_notifications';
   private readonly ADMIN_STORAGE_KEY = 'admin_notifications';
   private readonly MAX_NOTIFICATIONS = 5;
+  public notification$ = new Subject<any>();
 
   constructor(private authService: AuthService) {
     this.loadNotificationsFromStorage();
@@ -96,11 +97,12 @@ export class WebsocketService implements OnDestroy {
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
         console.log('Received notification data:', data);
+        this.notification$.next(data)
         const notification: Notification = {
           message: data.details || 'No details',
           timestamp: new Date().toISOString(),
           status: data.status || 'Unknown',
-          createdAt: data.createdAt || new Date().toISOString(), 
+          createdAt: data.createdAt || new Date().toISOString(),
         };
         const role = this.authService.getRole();
 

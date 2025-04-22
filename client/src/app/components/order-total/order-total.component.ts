@@ -21,12 +21,14 @@ interface AggregatedTotals {
   styleUrl: './order-total.component.css'
 })
 export class OrderTotalComponent implements OnChanges {
+  @Input() orders: Order[] = [];
   ngOnChanges(changes: SimpleChanges): void {
+    console.log("oreders chnged")
     if (changes['orders']) {
       this.calculateTotals();
+      console.log("in if orders")
     }
   }
- @Input() orders: Order[] = [];
  totals: AggregatedTotals = {};
  overallTotal = { today: 0, thisWeek: 0, thisMonth: 0, thisYear: 0, allTime: 0 };
  highestValue = 0;
