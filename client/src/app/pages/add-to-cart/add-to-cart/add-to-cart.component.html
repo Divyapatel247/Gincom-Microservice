@@ -1,45 +1,63 @@
 <!-- add-to-cart.html - fully responsive -->
-<div class="container mx-auto py-4 sm:py-8 px-3 sm:px-4 max-w-7xl">
-  <div class="flex justify-between items-center mb-4 sm:mb-6">
-    <h2 class="text-xl sm:text-2xl font-medium text-gray-900">My Cart</h2>
-    <span class="text-gray-500 text-sm sm:text-base">{{ totalQuantity }} items</span>
+<div id="cart-container" class="container mx-auto py-4 sm:py-8 px-3 sm:px-4 max-w-7xl">
+  <div id="cart-header" class="flex justify-between items-center mb-4 sm:mb-6">
+    <h2 id="cart-title" class="text-xl sm:text-2xl font-medium text-gray-900">My Cart</h2>
+    <span id="item-count" class="text-gray-500 text-sm sm:text-base">{{ totalQuantity }} items</span>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-4 sm:gap-8">
+  <div id="cart-content" class="flex flex-col lg:flex-row gap-4 sm:gap-8">
     <!-- Left column: Cart items -->
-    <div class="flex-grow order-2 lg:order-1">
+    <div id="cart-items" class="flex-grow order-2 lg:order-1">
       @if (basket?.items?.length) {
-        <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div id="items-container" class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <!-- Header - hidden on mobile -->
-          <div class="hidden sm:block p-4 sm:p-6 border-b border-gray-100 bg-gray-50">
-            <div class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-500">
-              <div class="col-span-6">Product</div>
-              <div class="col-span-2 text-center">Price</div>
-              <div class="col-span-3 text-center">Quantity</div>
-              <div class="col-span-1 text-right">Total</div>
+          <div id="items-header" class="hidden sm:block p-4 sm:p-6 border-b border-gray-100 bg-gray-50">
+            <div id="header-grid" class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-500">
+              <div id="header-product" class="col-span-6">Product</div>
+              <div id="header-price" class="col-span-2 text-center">Price</div>
+              <div id="header-quantity" class="col-span-3 text-center">Quantity</div>
+              <div id="header-total" class="col-span-1 text-right">Total</div>
             </div>
           </div>
 
           <!-- Items -->
-          <div class="divide-y divide-gray-100">
+          <div id="items-list" class="divide-y divide-gray-100">
             @for (item of basket?.items; track item.id) {
-              <div class="p-3 sm:p-6">
+              <div id="item-{{item.id}}" class="p-3 sm:p-6">
                 <app-cart-item
+                  id="cart-item-{{item.id}}"
                   [item]="item"
                   (updateQuantity)="updateQuantity($event)"
-                  (removeItem)="removeItem($event)">
-                </app-cart-item>
+                  (removeItem)="removeItem($event)"
+                ></app-cart-item>
               </div>
             }
           </div>
         </div>
       } @else {
-        <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-8 sm:p-16 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        <div id="empty-cart" class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-8 sm:p-16 text-center">
+          <svg
+            id="empty-cart-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-gray-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+            />
           </svg>
-          <p class="mt-4 text-gray-500">Your cart is empty</p>
-          <button [routerLink]="['/customer/product']" routerLinkActive="router-link-active"  class="mt-6 px-4 sm:px-6 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition">
+          <p id="empty-cart-message" class="mt-4 text-gray-500">Your cart is empty</p>
+          <button
+            id="continue-shopping-button"
+            [routerLink]="['/customer/product']"
+            routerLinkActive="router-link-active"
+            class="mt-6 px-4 sm:px-6 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition"
+          >
             Continue Shopping
           </button>
         </div>
@@ -47,54 +65,74 @@
     </div>
 
     <!-- Right column: Order summary - moves to top on mobile -->
-    <div class="w-full lg:w-96 flex-shrink-0 order-1 lg:order-2">
+    <div id="order-summary" class="w-full lg:w-96 flex-shrink-0 order-1 lg:order-2">
       @if (basket?.items?.length) {
-        <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-8">
-          <div class="p-4 sm:p-6 border-b border-gray-100">
-            <h3 class="text-base sm:text-lg font-medium text-gray-900">Order Summary</h3>
+        <div id="summary-container" class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-8">
+          <div id="summary-header" class="p-4 sm:p-6 border-b border-gray-100">
+            <h3 id="summary-title" class="text-base sm:text-lg font-medium text-gray-900">Order Summary</h3>
           </div>
 
-          <div class="p-4 sm:p-6">
-            <div class="space-y-3 sm:space-y-4 text-sm">
-              <div class="flex justify-between items-center">
-                <span class="text-gray-600">Subtotal ({{ totalQuantity }} items)</span>
-                <span class="font-medium text-gray-900">₹{{ totalAmount | number:'1.2-2' }}</span>
+          <div id="summary-details" class="p-4 sm:p-6">
+            <div id="summary-items" class="space-y-3 sm:space-y-4 text-sm">
+              <div id="subtotal" class="flex justify-between items-center">
+                <span id="subtotal-label" class="text-gray-600">Subtotal ({{ totalQuantity }} items)</span>
+                <span id="subtotal-amount" class="font-medium text-gray-900">₹{{ totalAmount | number:'1.2-2' }}</span>
               </div>
 
-              <div class="flex justify-between items-center">
-                <span class="text-gray-600">Tax</span>
-                <span class="font-medium text-gray-900">₹0.00</span>
+              <div id="tax" class="flex justify-between items-center">
+                <span id="tax-label" class="text-gray-600">Tax</span>
+                <span id="tax-amount" class="font-medium text-gray-900">₹0.00</span>
               </div>
 
               <!-- Estimated delivery section -->
-              <div class="pt-3 sm:pt-4 pb-2 border-t border-gray-100">
-                <div class="flex justify-between items-center mb-1 sm:mb-2">
-                  <span class="text-gray-600">Estimated delivery</span>
-                  <span class="font-medium text-gray-900">Free</span>
+              <div id="delivery" class="pt-3 sm:pt-4 pb-2 border-t border-gray-100">
+                <div id="delivery-info" class="flex justify-between items-center mb-1 sm:mb-2">
+                  <span id="delivery-label" class="text-gray-600">Estimated delivery</span>
+                  <span id="delivery-amount" class="font-medium text-gray-900">Free</span>
                 </div>
-                <p class="text-gray-400 text-xs">Delivery within 3-5 business days</p>
+                <p id="delivery-timeline" class="text-gray-400 text-xs">Delivery within 3-5 business days</p>
               </div>
 
-              <div class="pt-3 sm:pt-4 pb-2 border-t border-gray-100">
-                <div class="flex justify-between items-center text-base font-medium">
-                  <span class="text-gray-900">Total</span>
-                  <span class="text-gray-900">₹{{ totalAmount | number:'1.2-2' }}</span>
+              <div id="total" class="pt-3 sm:pt-4 pb-2 border-t border-gray-100">
+                <div id="total-info" class="flex justify-between items-center text-base font-medium">
+                  <span id="total-label" class="text-gray-900">Total</span>
+                  <span id="total-amount" class="text-gray-900">₹{{ totalAmount | number:'1.2-2' }}</span>
                 </div>
               </div>
             </div>
 
-            <button (click)="makeOrder()" class="w-full mt-4 sm:mt-6 px-4 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-900 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+            <button
+              id="checkout-button"
+              (click)="makeOrder()"
+              class="w-full mt-4 sm:mt-6 px-4 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-900 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+            >
               Proceed to Checkout
             </button>
 
-            <button (click)="deleteCart()" class="w-full mt-2 sm:mt-3 px-4 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition focus:outline-none">
+            <button
+              id="clear-cart-button"
+              (click)="deleteCart()"
+              class="w-full mt-2 sm:mt-3 px-4 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition focus:outline-none"
+            >
               Clear Cart
             </button>
 
             <!-- Security badge -->
-            <div class="mt-4 sm:mt-6 flex items-center justify-center text-xs text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <div id="security-badge" class="mt-4 sm:mt-6 flex items-center justify-center text-xs text-gray-400">
+              <svg
+                id="security-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
               </svg>
               Secure checkout with Razorpay
             </div>
@@ -102,8 +140,8 @@
         </div>
       } @else {
         <!-- Empty state - maintain consistent layout -->
-        <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden p-4 sm:p-6 text-center">
-          <p class="text-gray-400">Add items to your cart to see the order summary</p>
+        <div id="empty-summary" class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden p-4 sm:p-6 text-center">
+          <p id="empty-summary-message" class="text-gray-400">Add items to your cart to see the order summary</p>
         </div>
       }
     </div>
@@ -111,4 +149,4 @@
 </div>
 
 <!-- Razorpay Checkout Script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script id="razorpay-script" src="https://checkout.razorpay.com/v1/checkout.js"></script>

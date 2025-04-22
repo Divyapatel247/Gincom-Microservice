@@ -1,38 +1,46 @@
 <!-- Include Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link
+  id="font-awesome-styles"
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+/>
 
-<div class="update-form bg-gradient-to-br from-gray-50 to-white shadow-2xl rounded-2xl p-8">
-  <h3 class="text-2xl font-bold text-gray-800 mb-6">Update Product</h3>
+<div
+  id="update-form-container"
+  class="update-form bg-gradient-to-br from-gray-50 to-white shadow-2xl rounded-2xl p-8"
+>
+  <h3 id="update-form-title" class="text-2xl font-bold text-gray-800 mb-6">Update Product</h3>
 
-  <form (ngSubmit)="updateProduct()" class="space-y-6">
+  <form id="update-product-form" (ngSubmit)="updateProduct()" class="space-y-6">
     <!-- Title -->
-    <div>
-      <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+    <div id="title-field">
+      <label id="title-label" for="title" class="block text-sm font-medium text-gray-700">Title</label>
       <input
+        id="title-input"
         type="text"
-        id="title"
         [(ngModel)]="product.title"
         name="title"
         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all"
         placeholder="Enter product title"
         #title="ngModel"
         required="true"
-        minlength="3">
-        <div class="text-red-500">
-          @if(title.errors?.['required'] && title.touched && title.dirty) {
-            <span>This is Required</span>
-          }
-          @if(title.errors?.['minlength'] && title.touched && title.dirty) {
-            <span>Title must be at least 3 characters long</span>
-          }
-        </div>
+        minlength="3"
+      />
+      <div id="title-errors" class="text-red-500">
+        @if(title.errors?.['required'] && title.touched && title.dirty) {
+          <span id="title-required-error">This is Required</span>
+        }
+        @if(title.errors?.['minlength'] && title.touched && title.dirty) {
+          <span id="title-minlength-error">Title must be at least 3 characters long</span>
+        }
+      </div>
     </div>
 
     <!-- Description -->
-    <div>
-      <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+    <div id="description-field">
+      <label id="description-label" for="description" class="block text-sm font-medium text-gray-700">Description</label>
       <textarea
-        id="description"
+        id="description-input"
         [(ngModel)]="product.description"
         name="description"
         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all"
@@ -40,101 +48,108 @@
         placeholder="Enter product description"
         #description="ngModel"
         required="true"
-        minlength="10">
-        ></textarea>
-        <div class="text-red-500">
-          @if(description.errors?.['required'] && description.touched && description.dirty) {
-            <span>This is Required</span>
-          }
-          @if(description.errors?.['minlength'] && description.touched && description.dirty) {
-            <span>Description must be at least 10 characters long</span>
-          }
+        minlength="10"
+      ></textarea>
+      <div id="description-errors" class="text-red-500">
+        @if(description.errors?.['required'] && description.touched && description.dirty) {
+          <span id="description-required-error">This is Required</span>
+        }
+        @if(description.errors?.['minlength'] && description.touched && description.dirty) {
+          <span id="description-minlength-error">Description must be at least 10 characters long</span>
+        }
+      </div>
     </div>
-    </div>
-
 
     <!-- Price -->
-    <div>
-      <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
+    <div id="price-field">
+      <label id="price-label" for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
       <input
+        id="price-input"
         type="number"
-        id="price"
         [(ngModel)]="product.price"
         name="price"
         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all"
         placeholder="Enter price"
         #price="ngModel"
         required="true"
-        min="0">
-        <div class="text-red-500">
-          @if(price.errors?.['required'] && price.touched && price.dirty) {
-            <span>This is Required</span>
-          }
-          @if(price.errors?.['min'] && price.touched && price.dirty) {
-            <span>Price must be a positive number</span>
-          }
-    </div>
+        min="0"
+      />
+      <div id="price-errors" class="text-red-500">
+        @if(price.errors?.['required'] && price.touched && price.dirty) {
+          <span id="price-required-error">This is Required</span>
+        }
+        @if(price.errors?.['min'] && price.touched && price.dirty) {
+          <span id="price-min-error">Price must be a positive number</span>
+        }
+      </div>
     </div>
 
     <!-- Stock -->
-    <div>
-      <label for="stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+    <div id="stock-field">
+      <label id="stock-label" for="stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
       <input
+        id="stock-input"
         type="number"
-        id="stock"
         [(ngModel)]="product.stock"
         name="stock"
         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all"
         placeholder="Enter stock quantity"
         #stock="ngModel"
         required="true"
-        min="0">
-        <div class="text-red-500">
-          @if(stock.errors?.['required'] && stock.touched && stock.dirty) {
-            <span>This is Required</span>
-          }
-          @if(stock.errors?.['min'] && stock.touched && stock.dirty) {
-            <span>Stock must be a positive number</span>
-          }
-    </div>
-    </div>
-
-    <!-- Category -->
-    <div>
-      <label for="categoryName" class="block text-sm font-medium text-gray-700">Category</label>
-      <select
-        id="categoryName"
-        [(ngModel)]="product.categoryName"
-        name="categoryName"
-        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all"
-        #categoryName="ngModel"
-        required>
-        <option value="" disabled>Select a category</option>
-        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
-      </select>
-      <div class="text-red-500">
-        @if (categoryName.errors?.['required'] && categoryName.touched && categoryName.dirty) {
-          <span>This is Required</span>
+        min="0"
+      />
+      <div id="stock-errors" class="text-red-500">
+        @if(stock.errors?.['required'] && stock.touched && stock.dirty) {
+          <span id="stock-required-error">This is Required</span>
+        }
+        @if(stock.errors?.['min'] && stock.touched && stock.dirty) {
+          <span id="stock-min-error">Stock must be a positive number</span>
         }
       </div>
     </div>
 
+    <!-- Category -->
+    <div id="category-field">
+      <label id="category-label" for="categoryName" class="block text-sm font-medium text-gray-700">Category</label>
+      <select
+        id="category-select"
+        [(ngModel)]="product.categoryName"
+        name="categoryName"
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-all"
+        #categoryName="ngModel"
+        required
+      >
+        <option id="category-placeholder" value="" disabled>Select a category</option>
+        <option
+          id="category-option-{{category}}"
+          *ngFor="let category of categories"
+          [value]="category"
+        >{{ category }}</option>
+      </select>
+      <div id="category-errors" class="text-red-500">
+        @if (categoryName.errors?.['required'] && categoryName.touched && categoryName.dirty) {
+          <span id="category-required-error">This is Required</span>
+        }
+      </div>
+    </div>
 
     <!-- Buttons -->
-    <div class="flex justify-end gap-4">
+    <div id="form-buttons" class="flex justify-end gap-4">
       <button
+        id="cancel-button"
         type="button"
         (click)="close.emit()"
-        class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-all">
+        class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition-all"
+      >
         Cancel
       </button>
       <button
+        id="submit-button"
         type="submit"
-        class="px-6 py-2 bg-gradient-to-r from-[#6EE7B7] to-[#3B82F6] text-white rounded-lg shadow-lg hover:shadow-xl hover:from-[#3B82F6] hover:to-[#6EE7B7] transition-all duration-300">
+        class="px-6 py-2 bg-gradient-to-r from-[#6EE7B7] to-[#3B82F6] text-white rounded-lg shadow-lg hover:shadow-xl hover:from-[#3B82F6] hover:to-[#6EE7B7] transition-all duration-300"
+      >
         Update Product
       </button>
     </div>
   </form>
-
 </div>
-

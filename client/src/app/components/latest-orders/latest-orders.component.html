@@ -1,44 +1,44 @@
-<div class="w-full p-6 ">
-  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+<div class="w-full p-6" id="orders-container">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6" id="orders-card">
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
-      <div class="flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6" id="orders-header">
+      <div class="flex items-center gap-3" id="header-title-container">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="orders-icon">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
-        <h2 class="text-lg font-medium text-gray-900">Latest Orders</h2>
+        <h2 class="text-lg font-medium text-gray-900" id="orders-title">Latest Orders</h2>
       </div>
-      <button routerLink="/admin/orders" class="bg-black text-white px-4 py-2 rounded-md text-sm hover:bg-gray-800 transition-all">
+      <button routerLink="/admin/orders" class="bg-black text-white px-4 py-2 rounded-md text-sm hover:bg-gray-800 transition-all" id="view-all-button">
         View All
       </button>
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto -mx-6">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="border-b border-gray-100">
-            <th class="px-6 py-3 text-left font-medium text-gray-700">Order #</th>
-            <th class="px-6 py-3 text-left font-medium text-gray-700">Status</th>
-            <th class="px-6 py-3 text-left font-medium text-gray-700">Customer</th>
-            <th class="px-6 py-3 text-left font-medium text-gray-700">Created on</th>
-            <th class="px-6 py-3 text-right font-medium text-gray-700">Actions</th>
+    <div class="overflow-x-auto -mx-6" id="table-container">
+      <table class="min-w-full text-sm" id="orders-table">
+        <thead id="table-header">
+          <tr class="border-b border-gray-100" id="header-row">
+            <th class="px-6 py-3 text-left font-medium text-gray-700" id="order-number-header">Order #</th>
+            <th class="px-6 py-3 text-left font-medium text-gray-700" id="status-header">Status</th>
+            <th class="px-6 py-3 text-left font-medium text-gray-700" id="customer-header">Customer</th>
+            <th class="px-6 py-3 text-left font-medium text-gray-700" id="created-header">Created on</th>
+            <th class="px-6 py-3 text-right font-medium text-gray-700" id="actions-header">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="orders-body">
           @for(order of orders; track order.id;let i = $index){
-            <tr class="hover:bg-gray-50 transition-all border-b border-gray-100">
-              <td class="px-6 py-4">#{{i+1}}</td>
-              <td class="px-6 py-4">
-                <span [ngClass]="getStatusStyle(order.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+            <tr class="hover:bg-gray-50 transition-all border-b border-gray-100" id="order-row-{{order.id}}">
+              <td class="px-6 py-4" id="order-number-{{order.id}}">#{{i+1}}</td>
+              <td class="px-6 py-4" id="order-status-cell-{{order.id}}">
+                <span [ngClass]="getStatusStyle(order.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" id="order-status-{{order.id}}">
                   {{order.status}}
                 </span>
               </td>
-              <td class="px-6 py-4 font-medium">Steve Gates</td>
-              <td class="px-6 py-4 text-gray-600">{{order.createdAt | date:'short'}}</td>
-              <td class="px-6 py-4 text-right">
-                <button class="inline-flex items-center px-3 py-1 border border-gray-200 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <td class="px-6 py-4 font-medium" id="customer-name-{{order.id}}">Steve Gates</td>
+              <td class="px-6 py-4 text-gray-600" id="order-date-{{order.id}}">{{order.createdAt | date:'short'}}</td>
+              <td class="px-6 py-4 text-right" id="actions-cell-{{order.id}}">
+                <button class="inline-flex items-center px-3 py-1 border border-gray-200 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all" id="view-order-{{order.id}}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="view-icon-{{order.id}}">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
@@ -46,7 +46,6 @@
                 </button>
               </td>
             </tr>
-
           }
         </tbody>
       </table>

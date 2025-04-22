@@ -1,21 +1,23 @@
 <div class="container mx-auto px-4 py-8">
   <div *ngIf="productDetail" class="grid grid-cols-1 md:grid-cols-2 gap-8">
     <!-- Left side - Images -->
-    <div class="relative">
+    <div class="relative" id="product-image-container">
       <!-- Main large image with a subtle background -->
-      <div class="mb-6 rounded-lg p-4 overflow-hidden">
+      <div class="mb-6 rounded-lg p-4 overflow-hidden" id="main-image-wrapper">
         <img
           [src]="productDetail?.thumbnail"
           [alt]="productDetail?.title + 'image'"
           class="w-full h-auto rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+          id="product-main-image"
         />
       </div>
     </div>
 
-    <div>
+    <div id="product-info-container">
       <button
         (click)="goBack()"
         class="absolute left-4 top-4 flex items-center text-gray-700 hover:text-gray-900"
+        id="back-button"
       >
         <svg
           class="w-6 h-6"
@@ -23,6 +25,7 @@
           stroke="currentColor"
           stroke-width="2"
           viewBox="0 0 24 24"
+          id="back-icon"
         >
           <path
             stroke-linecap="round"
@@ -33,14 +36,15 @@
         <span class="ml-2 text-sm font-medium">Back</span>
       </button>
       <!-- Right side - Product Info -->
-      <div>
+      <div id="product-details">
         <!-- Product Title and Price -->
-        <h1 class="text-3xl font-bold">{{ productDetail.title }}</h1>
-        <div class="flex items-center gap-4 mt-2">
-          <p class="text-2xl font-semibold">${{ productDetail.price }}</p>
+        <h1 class="text-3xl font-bold" id="product-title">{{ productDetail.title }}</h1>
+        <div class="flex items-center gap-4 mt-2" id="product-price-container">
+          <p class="text-2xl font-semibold" id="product-price">${{ productDetail.price }}</p>
           <p
             *ngIf="productDetail.discountPercentage"
             class="text-sm text-red-500 line-through"
+            id="product-original-price"
           >
             ${{
               productDetail.price +
@@ -53,18 +57,20 @@
           <span
             *ngIf="productDetail.discountPercentage"
             class="bg-red-500 text-white text-sm px-2 py-1 rounded-full"
+            id="discount-badge"
             >-{{ productDetail.discountPercentage }}%</span
           >
         </div>
 
         <!-- Rating and Reviews -->
-        <div class="mt-4 flex items-center gap-2">
-          <div class="flex items-center">
+        <div class="mt-4 flex items-center gap-2" id="rating-container">
+          <div class="flex items-center" id="star-rating">
             <span *ngFor="let star of [1, 2, 3, 4, 5]" class="text-yellow-400">
               <svg
                 *ngIf="star <= (productDetail?.rating || 0)"
                 class="w-5 h-5 fill-current"
                 viewBox="0 0 20 20"
+                id="star-icon-{{star}}"
               >
                 <path
                   d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
@@ -72,40 +78,40 @@
               </svg>
             </span>
           </div>
-          <p class="text-sm text-gray-600">
+          <p class="text-sm text-gray-600" id="rating-text">
             ({{ productDetail?.rating }} rating)
           </p>
         </div>
 
         <!-- Product Information -->
-        <div class="mt-8">
+        <div class="mt-8" id="product-information">
           <h2 class="text-xl font-semibold mb-4">Product Information</h2>
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
+          <div class="grid grid-cols-2 gap-4 text-sm" id="product-specs">
+            <div id="product-width">
               <p class="text-gray-600">Width:</p>
               <p>{{ productDetail?.dimensions?.width }}</p>
             </div>
-            <div>
+            <div id="product-height">
               <p class="text-gray-600">Height:</p>
               <p>{{ productDetail?.dimensions?.height }}</p>
             </div>
-            <div>
+            <div id="product-depth">
               <p class="text-gray-600">Depth:</p>
               <p>{{ productDetail?.dimensions?.depth }}</p>
             </div>
-            <div>
+            <div id="product-weight">
               <p class="text-gray-600">Weight:</p>
               <p>{{ productDetail.weight }} kg</p>
             </div>
-            <div>
+            <div id="product-brand">
               <p class="text-gray-600">Brand:</p>
               <p>{{ productDetail.brand }}</p>
             </div>
-            <div>
+            <div id="product-sku">
               <p class="text-gray-600">SKU:</p>
               <p>{{ productDetail.sku }}</p>
             </div>
-            <div>
+            <div id="product-tags">
               <p class="text-gray-600">Tags:</p>
               <p>{{ productDetail.tags.join(", ") }}</p>
             </div>
@@ -113,8 +119,8 @@
         </div>
 
         <!-- Stock Information -->
-        <div class="mt-8">
-          <p class="text-sm text-gray-600">
+        <div class="mt-8" id="availability-section">
+          <p class="text-sm text-gray-600" id="availability-status">
             Availability:
             <span class="font-semibold">{{
               productDetail.availabilityStatus
@@ -122,7 +128,7 @@
           </p>
         </div>
 
-        <div class="mt-8 flex gap-4 items-center">
+        <div class="mt-8 flex gap-4 items-center" id="add-to-cart-section">
           <input
             type="number"
             [(ngModel)]="quantity"
@@ -130,45 +136,56 @@
             [max]="productDetail.stock"
             class="w-20 border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
             (change)="quantity = clampQuantity(quantity, 1, productDetail.stock)"
+            id="quantity-input"
           />
           <button
             (click)="addToCart()"
             class="flex-1 bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-400"
             [disabled]="!productDetail.id || productDetail.stock === 0 || quantity <= 0"
+            id="add-to-cart-button"
           >
             Add To Cart
           </button>
           <button
             class="p-3 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            id="wishlist-button"
           >
-            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24" id="wishlist-icon">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           </button>
         </div>
-        <div *ngIf="errorMessage" class="text-red-500 text-sm mt-2">{{ errorMessage }}</div>
+        <div *ngIf="errorMessage" class="text-red-500 text-sm mt-2" id="error-message">{{ errorMessage }}</div>
 
         <!-- Shipping and Warranty Information -->
-        <div class="mt-8">
+        <div class="mt-8" id="shipping-warranty-section">
           <h2 class="text-xl font-semibold mb-4">Shipping & Warranty</h2>
           <div class="text-sm text-gray-600">
-            <p>{{ productDetail.shippingInformation }}</p>
-            <p class="mt-2">{{ productDetail.warrantyInformation }}</p>
+            <p id="shipping-info">{{ productDetail.shippingInformation }}</p>
+            <p class="mt-2" id="warranty-info">{{ productDetail.warrantyInformation }}</p>
           </div>
         </div>
 
         <!-- Return Policy -->
-        <div class="mt-8">
+        <div class="mt-8" id="return-policy-section">
           <h2 class="text-xl font-semibold mb-4">Return Policy</h2>
-          <p class="text-sm text-gray-600">{{ productDetail.returnPolicy }}</p>
+          <p class="text-sm text-gray-600" id="return-policy-text">{{ productDetail.returnPolicy }}</p>
         </div>
 
         <!-- Reviews Section -->
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div class="mt-8" >
+=======
+        <div class="mt-8" *ngIf="productDetail?.reviews?.length" id="reviews-section">
+>>>>>>> Stashed changes
+=======
+        <div class="mt-8" *ngIf="productDetail?.reviews?.length" id="reviews-section">
+>>>>>>> Stashed changes
           <h2 class="text-xl font-semibold mb-4">Customer Reviews</h2>
 
           <!-- Add Review Section -->
-          <div class="flex items-center gap-2 mb-4">
+          <div class="flex items-center gap-2 mb-4" id="add-review-form">
             <!-- Rating Input -->
             <input
               type="number"
@@ -176,6 +193,7 @@
               placeholder="Rate it"
               class="border px-3 py-2 rounded w-32"
               (input)="checkRating()"
+              id="review-rating-input"
             />
 
             <!-- Review Text Input -->
@@ -184,12 +202,14 @@
               [(ngModel)]="newReview.description"
               placeholder="Write a review..."
               class="border px-3 py-2 rounded flex-1"
+              id="review-text-input"
             />
 
             <!-- Submit Button -->
             <button
               (click)="addReview()"
               class="bg-blue-500 text-white px-4 py-2 rounded"
+              id="submit-review-button"
             >
               Add
             </button>
@@ -197,28 +217,31 @@
           <div
             *ngIf="ratingWarning"
             class="text-red-500 text-sm mt-1 font-medium"
+            id="rating-warning"
           >
             ⚠️ Please enter a rating between 1 and 5.
           </div>
 
           <!-- Scrollable Wrapper Added Here -->
           <!-- Start: Review Section with Scrollable Container -->
-          <div class="max-h-60 overflow-y-auto pr-2">
-            <div class="space-y-4">
+          <div class="max-h-60 overflow-y-auto pr-2" id="reviews-container">
+            <div class="space-y-4" id="reviews-list">
               <div
-                *ngFor="let review of productDetail.reviews"
+                *ngFor="let review of productDetail.reviews; let i = index"
                 class="border-b pb-4"
+                id="review-item-{{i}}"
               >
-                <div class="flex items-center gap-2">
-                  <div class="flex items-center">
+                <div class="flex items-center gap-2" id="review-rating-display-{{i}}">
+                  <div class="flex items-center" id="review-stars-{{i}}">
                     <span
-                      *ngFor="let star of [1, 2, 3, 4, 5]"
+                      *ngFor="let star of [1, 2, 3, 4, 5]; let s = index"
                       class="text-yellow-400"
                     >
                       <svg
                         *ngIf="star <= review.rating"
                         class="w-5 h-5 fill-current"
                         viewBox="0 0 20 20"
+                        id="review-star-{{i}}-{{s}}"
                       >
                         <path
                           d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
@@ -228,8 +251,8 @@
                   </div>
                 </div>
                 <!-- Start: Update for Inline Delete Button -->
-                <div class="flex items-center justify-between mt-2">
-                  <p class="text-sm text-gray-600 flex-1">
+                <div class="flex items-center justify-between mt-2" id="review-content-{{i}}">
+                  <p class="text-sm text-gray-600 flex-1" id="review-description-{{i}}">
                     {{ review.description || "No description available" }}
                   </p>
                   @if(review.userId == currentUserId){
@@ -237,6 +260,7 @@
                       (click)="deleteReview(review.id, currentUserId)"
                       class="ml-4 text-red-600 hover:text-red-800"
                       title="Delete"
+                      id="delete-review-button-{{i}}"
                     >
                       Delete
                     </button>
