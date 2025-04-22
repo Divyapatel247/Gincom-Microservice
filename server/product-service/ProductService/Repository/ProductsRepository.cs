@@ -304,7 +304,9 @@ public class ProductsRepository : IProductRepository
                 Description = @Description,
                 Price = @Price,
                 Stock = @Stock,
-                CategoryId = @CategoryId
+                CategoryId = @CategoryId,
+                discountPercentage = @DiscountPercentage,
+                tags = @tags
             WHERE Id = @Id";
         await connection.ExecuteAsync(sql, product, transaction);
 

@@ -7,6 +7,7 @@ using ProductService.DTOs;
 using ProductService.DTOs.Review;
 using ProductService.Interfaces;
 using ProductService.Mapper;
+using System.Text.Json;
 
 namespace ProductService.Controllers;
 
@@ -73,6 +74,7 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDto)
     {
         var existingProduct = await _repository.GetProductByIdAsync(id);
+
         if (existingProduct == null)
         {
             return NotFound();
@@ -83,6 +85,10 @@ public class ProductController : ControllerBase
         {
             return BadRequest("Category not found");
         }
+
+        //  Storing old stock before update
+        int oldStock = existingProduct.Stock;
+
         existingProduct.UpdateFromDto(updateProductDto);
         existingProduct.CategoryId = category.Id;
 
@@ -94,13 +100,24 @@ public class ProductController : ControllerBase
 
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
-        await _publishEndpoint.Publish<ProductUpdatedStock>(new ProductUpdatedStockEvent
+
+        Console.WriteLine("Updated Product: " + JsonSerializer.Serialize(updatedProduct));
+
+        if (oldStock == 0 && updatedProduct.Stock > 0)
         {
-            ProductId = id,
-            NewStock = updatedProduct.Stock, // Assuming Stock is a property
-            UserIds = new List<int> { userId }, // Add the current user ID
-            UpdatedAt = DateTime.UtcNow
-        });
+            await _publishEndpoint.Publish<ProductUpdatedStock>(new ProductUpdatedStockEvent
+            {
+                ProductId = id,
+                Title = updatedProduct.Title,
+                NewStock = updatedProduct.Stock,
+                UserIds = new List<int> { userId },
+                UpdatedAt = DateTime.UtcNow
+            });
+            Console.WriteLine($"event generated for updating stock of{updatedProduct.Title} to {updatedProduct.Stock}");
+        }
+
+
+
         return Ok(productDto);
     }
 

@@ -5,7 +5,7 @@
       <!-- Main large image with a subtle background -->
       <div class="mb-6 rounded-lg p-4 overflow-hidden">
         <img
-          [src]="productDetail?.images?.[0]"
+          [src]="productDetail?.thumbnail"
           [alt]="productDetail?.title + 'image'"
           class="w-full h-auto rounded-lg object-cover transition-transform duration-300 hover:scale-105"
         />
@@ -164,7 +164,7 @@
         </div>
 
         <!-- Reviews Section -->
-        <div class="mt-8" *ngIf="productDetail?.reviews?.length">
+        <div class="mt-8" >
           <h2 class="text-xl font-semibold mb-4">Customer Reviews</h2>
 
           <!-- Add Review Section -->

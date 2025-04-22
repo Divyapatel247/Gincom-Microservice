@@ -11,5 +11,6 @@ public class UpdateProductDTO
         public int Stock { get; set; }
         public string CategoryName { get; set; } = string.Empty;
 
-        
+        public decimal DiscountPercentage { get; set; }
+        public List<string> Tags { get; set; } = new List<string>();  
 }
