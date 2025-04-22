@@ -30,11 +30,10 @@ export class WebsocketService implements OnDestroy {
 
   private loadNotificationsFromStorage(): void {
     const userId = this.authService.getUserId();
-    if (userId) {
-      const savedNotifications = localStorage.getItem(
-        `${this.STORAGE_KEY}_${userId}`
-      );
-      if (savedNotifications) {
+    const role = this.authService.getRole();
+    if (userId && role !== 'Admin') {
+      const savedUserNotifications = localStorage.getItem(`${this.USER_STORAGE_KEY}_${userId}`);
+      if (savedUserNotifications) {
         try {
           this.userNotifications = JSON.parse(savedUserNotifications);
           this.notificationsSubject.next([...this.userNotifications]);
@@ -60,19 +59,16 @@ export class WebsocketService implements OnDestroy {
 
   private saveNotificationsToStorage(): void {
     const userId = this.authService.getUserId();
-    if (userId) {
-      // Keep only the most recent 5 notifications
-      const recentNotifications = this.notifications.slice(
-        0,
-        this.MAX_NOTIFICATIONS
-      );
-      localStorage.setItem(
-        `${this.STORAGE_KEY}_${userId}`,
-        JSON.stringify(recentNotifications)
-      );
+    const role = this.authService.getRole();
+    if (userId && role !== 'Admin') {
+      const recentUserNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
+      localStorage.setItem(`${this.USER_STORAGE_KEY}_${userId}`, JSON.stringify(recentUserNotifications));
+    }
+    if (role === 'Admin') {
+      const recentAdminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
+      localStorage.setItem(this.ADMIN_STORAGE_KEY, JSON.stringify(recentAdminNotifications));
     }
   }
-
   private initializeSignalR() {
     const userId = this.authService.getUserId();
     const token = localStorage.getItem('access_token');
@@ -102,50 +98,62 @@ export class WebsocketService implements OnDestroy {
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
         console.log('Received notification data:', data);
-        if (data.messageType === 'UserNotification') {
-          const userNotification: Notification = {
-            message: data.details,
-            timestamp: new Date().toISOString(),
-            
-          };
-          console.log('User notification received:', userNotification);
+        const notification: Notification = {
+          message: data.details || 'No details',
+          timestamp: new Date().toISOString(),
+          status: data.status || 'Unknown',
+          createdAt: data.createdAt || new Date().toISOString(),
+        };
+        const role = this.authService.getRole();
 
-          // Add new notification to the beginning of the array
-          this.notifications.unshift(userNotification);
-
-          // Keep only the most recent notifications
-          if (this.notifications.length > this.MAX_NOTIFICATIONS) {
-            this.notifications = this.notifications.slice(
-              0,
-              this.MAX_NOTIFICATIONS
-            );
+        if (data.messageType === 'UserNotification' && role !== 'Admin') {
+          this.userNotifications.unshift(notification);
+          if (this.userNotifications.length > this.MAX_NOTIFICATIONS) {
+            this.userNotifications = this.userNotifications.slice(0, this.MAX_NOTIFICATIONS);
           }
-
-          // Update the subject and save to local storage
-          this.notificationsSubject.next([...this.notifications]);
-          this.saveNotificationsToStorage();
-        }
-
-        
-          const productId = data.productId; // Ensure it's a number
+          this.notificationsSubject.next([...this.userNotifications]);
+          const productId = data.productId;
           if (productId && !isNaN(productId)) {
             console.log('Triggering stock update for productId:', productId);
             this.stockUpdateSubject.next({ productId: productId });
           }
-        
-      }
-    );
+        } else if (data.messageType === 'AdminNotification' && role === 'Admin') {
+          this.adminNotifications.unshift(notification);
+          if (this.adminNotifications.length > this.MAX_NOTIFICATIONS) {
+            this.adminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);
+          }
+          this.adminNotificationsSubject.next([...this.adminNotifications]);
+          // const productId = data.productId;
+          // if (productId && !isNaN(productId)) {
+          //   console.log('Triggering stock update for productId:', productId);
+          //   this.stockUpdateSubject.next({ productId: productId });
+          // }
+        }
+
+        this.saveNotificationsToStorage();
+      });
     } else {
       console.error('UserId or access_token not found');
     }
   }
 
-  private joinUserGroup(userId: string) {
+  private joinGroups(userId: string) {
     if (this.hubConnection) {
-      this.hubConnection
-        .invoke('JoinUserGroup', userId)
-        .then(() => console.log(`Joined group User_${userId}`))
-        .catch((err) => console.error('Error joining group:', err));
+      const role = this.authService.getRole();
+      if (role !== 'Admin') {
+        this.hubConnection.invoke('JoinUserGroup', userId)
+          .then(() => console.log(`Joined group User_${userId}`))
+          .catch((err) => console.error('Error joining user group:', err));
+      } else {
+        this.hubConnection.invoke('JoinAdminGroup')
+          .then(() => console.log('Joined group Admin'))
+          .catch((err) => {
+            console.error('Error joining admin group:', err.message);
+            if (err.source && err.source.error) {
+              console.error('Server error details:', err.source.error);
+            }
+          });
+      }
     }
   }
   private reconnect() {

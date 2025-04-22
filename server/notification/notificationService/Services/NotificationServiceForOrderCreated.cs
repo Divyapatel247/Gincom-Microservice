@@ -57,7 +57,8 @@ namespace notificationService.Services
                 MessageType = "AdminNotification",
                 NewStock = update.NewStock,
                 ProductId = update.ProductId,
-                ProductTitle = update.Title
+                ProductTitle = update.Title,
+                Details = $"You updated the stock for Product #{update.Title} to {update.NewStock}."
             };
             await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
             Console.WriteLine($"Admin notification sent for OrderId: {update.Title}");

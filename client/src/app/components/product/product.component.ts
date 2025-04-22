@@ -33,20 +33,20 @@ export class ProductComponent implements OnInit {
         this.displayProducts();
       }
 
-      
+
     });
-    
-    
+
+
     this.getCategoryList();
 
-    const userId = parseInt(this.auth.getUserId() || '', 10);
-
+    const userId = parseInt(this.auth.getUserId() || '');
+    console.log("userId", userId, typeof userId);
     this.api.getNotifiedProductIds(userId).subscribe((notifiedIds: number[])=>{
           this.products.forEach(p => {
             p.IsNotifyDisabled = notifiedIds.includes(p.id);
           });
     });
-  
+
     this.websocketService.stockUpdate.subscribe(({ productId }) => {
       console.log('SignalR update received for productId:', productId);
       this.api.getProductById(productId).subscribe(updated => {
@@ -84,14 +84,14 @@ export class ProductComponent implements OnInit {
   }
 
   getStars(rating: number | undefined): number[] {
-    const validRating = rating ?? 0; 
+    const validRating = rating ?? 0;
     return Array.from({ length: 5 }, (_, i) => i + 1);
   }
 
   notifyMe(productId: number): void{
 
     // const userId = this.auth.getUserId()
-    
+
     // const product = this.products.find(p => p.id === productId);
     const userId = this.auth.getUserId() ? parseInt(this.auth.getUserId()!, 10) : null;
     console.log("notify me function")
@@ -103,10 +103,10 @@ export class ProductComponent implements OnInit {
     // });
     this.api.checkNotification(productId, userId).subscribe((exists: boolean) => {
       if (exists) return; // already registered
-  
+
       this.api.registerNotification(productId, userId).subscribe(() => {
         console.log("notification registered");
-  
+
         // ✅ Disable button for this product
         const product = this.products.find(p => p.id == productId);
         if (product) {

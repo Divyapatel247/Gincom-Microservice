@@ -240,6 +240,8 @@ public class ProductController : ControllerBase
     [HttpGet("user-notified-products")]
     public async Task<IActionResult> GetNotifiedProductIds([FromQuery] int userId)
     {
+        if (userId == null)
+            return BadRequest("userId is required.");
         var productIds = await _repository.GetNotifiedProductIdsAsync(userId);
         return Ok(productIds);
     }
