@@ -18,6 +18,7 @@ export class WebsocketService implements OnDestroy {
   private readonly USER_STORAGE_KEY = 'user_notifications';
   private readonly ADMIN_STORAGE_KEY = 'admin_notifications';
   private readonly MAX_NOTIFICATIONS = 5;
+  public notification$ = new Subject<any>();
 
   private stockUpdateSubject = new Subject<{ productId: string }>();
   stockUpdate = this.stockUpdateSubject.asObservable();
@@ -98,6 +99,7 @@ export class WebsocketService implements OnDestroy {
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
         console.log('Received notification data:', data);
+        this.notification$.next(data)
         const notification: Notification = {
           message: data.details || 'No details',
           timestamp: new Date().toISOString(),

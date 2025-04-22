@@ -28,7 +28,7 @@ export interface IProduct {
 }
 
 export interface IProductWithRelatedProducts extends IProduct {
-  relatedProducts : [{title:string,price:number}]
+  relatedProducts : [{title:string,price:number,thumbnail:string}]
 }
 
 export interface IReview {

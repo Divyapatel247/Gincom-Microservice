@@ -3,6 +3,7 @@ import { ApiService } from '../../shared/api.service';
 import { Order } from '../../models/order.interface';
 import { CommonModule, NgClass, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
@@ -14,7 +15,7 @@ export class OrdersComponent implements OnInit {
 
   orders : Order[] = []
 
-  constructor(private api:ApiService){}
+  constructor(private api:ApiService, private route:Router){}
   ngOnInit(): void {
     this.api.getOrders().subscribe((res)=>{
       this.orders = res;
@@ -44,5 +45,9 @@ export class OrdersComponent implements OnInit {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  }
+
+  onView(orderId:number){
+   this.route.navigateByUrl(`/admin/orders/${orderId}`)
   }
 }
