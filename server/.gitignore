@@ -22,8 +22,9 @@ logs/
 
 # Environment files
 .env
-appsettings.json  # Remove this line if you want to commit appsettings.json
-flyway.toml
+**/appsettings.json
+**/flyway.toml
+
 
 # Visual Studio / Rider
 .idea/
