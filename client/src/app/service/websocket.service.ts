@@ -75,7 +75,7 @@ export class WebsocketService implements OnDestroy {
     const token = localStorage.getItem('access_token');
     if (userId && token) {
       this.hubConnection = new HubConnectionBuilder()
-        .withUrl(`http://localhost:5100/notificationHub?userId=${userId}`, {
+        .withUrl(`http://10.13.106.46:5100/notificationHub?userId=${userId}`, {
           accessTokenFactory: () => token,
         })
         .configureLogging(signalR.LogLevel.None)
