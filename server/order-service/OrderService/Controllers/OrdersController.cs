@@ -128,13 +128,15 @@ namespace OrderService.Controllers
             return Ok(new { Order = OrderMapper.ToOrderResponse(order), RazorpayOrderId = razorpayOrderId });
         }
 
-        [HttpPut("{orderId}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequestDto request)
-        {
+        [HttpPut("{orderId}/status")] 
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequestDto request){
             var order = await _repository.GetOrderByIdAsync(orderId);
-            if (order == null) return NotFound();
-
-            order.Status = request.Status; // Admin changes status
+            if (order == null)
+            {
+                return NotFound($"Order with ID {orderId} not found.");
+            }
+            var oldStatus = order.Status;
+            order.Status = request.Status;
             await _repository.UpdateOrderAsync(order);
 
             var payment = await _repository.GetPaymentByOrderIdAsync(orderId);
@@ -143,6 +145,18 @@ namespace OrderService.Controllers
                 payment.Status = request.Status; // Sync payment status with order
                 await _repository.UpdatePaymentAsync(payment);
             }
+
+            var orderStatusUpdatedEvent = new OrderStatusUpdatedEvent
+            {
+                OrderId = order.Id,
+                UserId = order.UserId,
+                OldStatus = oldStatus,
+                NewStatus = order.Status,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _publishEndpoint.Publish(orderStatusUpdatedEvent);
+            Console.WriteLine($"Published OrderStatusUpdatedEvent for OrderId: {order.Id} from {oldStatus} to {order.Status}");
 
             return Ok(OrderMapper.ToOrderResponse(order));
         }
