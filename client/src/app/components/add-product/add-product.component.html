@@ -5,7 +5,7 @@
   <form [formGroup]="productForm" class="space-y-5" id="product-form">
     <!-- Product Title -->
     <div id="title-container">
-      <label for="title" class="block text-sm font-medium text-gray-700 mb-1" id="title-label">Product Title</label>
+      <label for="title" class="block text-sm font-medium text-gray-700 mb-1" id="title-label">Product Title <span class="text-red-500">*</span></label>
       <input
         id="title"
         type="text"
@@ -24,7 +24,7 @@
     </div>
 
     <div id="thumbnail-container">
-      <label for="thumbnail" class="block text-sm font-medium text-gray-700 mb-1" id="thumbnail-label">Product Image</label>
+      <label for="thumbnail" class="block text-sm font-medium text-gray-700 mb-1" id="thumbnail-label">Product Image <span class="text-red-500">*</span></label>
       <input
         id="thumbnail"
         type="text"
@@ -44,7 +44,7 @@
 
     <!-- Description -->
     <div id="description-container">
-      <label for="description" class="block text-sm font-medium text-gray-700 mb-1" id="description-label">Description</label>
+      <label for="description" class="block text-sm font-medium text-gray-700 mb-1" id="description-label">Description <span class="text-red-500">*</span></label>
       <textarea
         id="description"
         formControlName="description"
@@ -67,7 +67,7 @@
     <div class="grid grid-cols-4 gap-4" id="product-details-grid">
       <!-- Category -->
       <div id="category-container">
-        <label for="category" class="block text-sm font-medium text-gray-700 mb-1" id="category-label">Category</label>
+        <label for="category" class="block text-sm font-medium text-gray-700 mb-1" id="category-label">Category <span class="text-red-500">*</span></label>
         <select
           id="category"
           formControlName="category"
@@ -85,7 +85,7 @@
         </div>
       </div>
       <div id="price-container">
-        <label for="price" class="block text-sm font-medium text-gray-700 mb-1" id="price-label">Price ($)</label>
+        <label for="price" class="block text-sm font-medium text-gray-700 mb-1" id="price-label">Price ($) <span class="text-red-500">*</span></label>
         <input
           id="price"
           type="number"
@@ -104,7 +104,7 @@
       </div>
 
       <div id="stock-container">
-        <label for="stock" class="block text-sm font-medium text-gray-700 mb-1" id="stock-label">Stock Quantity</label>
+        <label for="stock" class="block text-sm font-medium text-gray-700 mb-1" id="stock-label">Stock Quantity <span class="text-red-500">*</span></label>
         <input
           id="stock"
           type="number"
@@ -124,7 +124,7 @@
 
       <!-- Discount -->
       <div id="discount-container">
-        <label for="discount" class="block text-sm font-medium text-gray-700 mb-1" id="discount-label">Discount (%)</label>
+        <label for="discount" class="block text-sm font-medium text-gray-700 mb-1" id="discount-label">Discount (%) <span class="text-red-500">*</span></label>
         <input
           id="discount"
           type="number"
@@ -149,7 +149,7 @@
 
     <!-- Tags -->
     <div class="col-span-2" id="tags-section">
-      <label id="tags-label">Tags:</label>
+      <label id="tags-label">Tags: <span class="text-red-500">*</span></label>
       <div class="flex items-center gap-2 mt-1" id="tags-input-container">
         <input formControlName="tags" id="tags-input" placeholder="Add tag..." class="flex-grow p-2 rounded-md border border-gray-200" />
         <button (click)="addTag()" id="add-tag-button" class="px-3 py-2 bg-green-500 text-white rounded">+</button>
