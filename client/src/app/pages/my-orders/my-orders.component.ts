@@ -47,7 +47,6 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
           createdAt: order.createdAt || new Date(),
           razorpayOrderId: order.razorpayOrderId || ''
         }));
-        this.loadProductDetails();
       },
       error: (err) => {
         console.error('Error fetching orders:', err);
@@ -55,20 +54,7 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
       }
     });
   }
-  loadProductDetails() {
-    this.orders.forEach(order => {
-      order.items.forEach((item: OrderItem) => {
-        this.apiService.getProduct(item.productId).subscribe({
-          next: (product: IProduct) => {
-            item.product = product;
-          },
-          error: (err) => {
-            console.error(`Error fetching product ${item.productId}:`, err);
-          }
-        });
-      });
-    });
-  }
+
 getOrderTotal(order: any): number {
   let total = 0;
   for (const item of order.items) {
