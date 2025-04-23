@@ -20,6 +20,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<UserLoggedInConsumer>();
     x.AddConsumer<OrderCreatedConsumer>();
     x.AddConsumer<ProductStockUpdateConsumer>();
+    x.AddConsumer<OrderStatusUpdatedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", h =>
@@ -45,6 +46,12 @@ builder.Services.AddMassTransit(x =>
             e.Bind("Common.Events:ProductUpdatedStock");
             e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<ProductStockUpdateConsumer>(context);
+        });
+        cfg.ReceiveEndpoint("order-status-updated-queue", e =>
+        {
+            e.Bind("Common.Events:OrderStatusUpdatedEvent");
+            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<OrderStatusUpdatedConsumer>(context);
         });
     });
 });

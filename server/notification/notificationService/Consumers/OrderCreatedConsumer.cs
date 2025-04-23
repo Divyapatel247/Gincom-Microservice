@@ -29,9 +29,6 @@ namespace notificationService.Consumers
             {
                 _logger.LogInformation("Item - ProductId: {ProductId}, Quantity: {Quantity}", item.ProductId, item.Quantity);
             }
-
-            // Delegate notification to the service
-            await Task.Delay(5000);
             await _notificationService.NotifyOrderCreated(order);
             _logger.LogInformation("Notifications sent for OrderId: {OrderId}", order.OrderId);
         }
