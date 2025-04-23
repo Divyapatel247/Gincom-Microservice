@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Common.Events;
 using Microsoft.AspNetCore.SignalR;
 using notificationService.Hubs;
 
@@ -88,8 +89,37 @@ namespace notificationService.Services
                 Console.WriteLine($"User {userId} marked as notified.");
                 else Console.WriteLine("database not updated");
             }
+        }
 
+        public async Task NotifyOrderStatusUpdated(OrderStatusUpdatedEvent orderEvent)
+        {
+            // Notification for Admin
+            var adminMessage = new
+            {
+                MessageType = "AdminNotification",
+                OrderId = orderEvent.OrderId,
+                UserId = orderEvent.UserId,
+                OldStatus = orderEvent.OldStatus,
+                NewStatus = orderEvent.NewStatus,
+                UpdatedAt = orderEvent.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                Details = $"Order {orderEvent.OrderId} status updated from {orderEvent.OldStatus} to {orderEvent.NewStatus} for User {orderEvent.UserId}."
+            };
+            await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
+            Console.WriteLine($"Admin notification sent for OrderId: {orderEvent.OrderId}");
 
+            // Notification for User
+            var userMessage = new
+            {
+                MessageType = "UserNotification",
+                OrderId = orderEvent.OrderId,
+                UserId = orderEvent.UserId,
+                OldStatus = orderEvent.OldStatus,
+                NewStatus = orderEvent.NewStatus,
+                UpdatedAt = orderEvent.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                Details = $"Your order (ID: {orderEvent.OrderId}) status has been updated from {orderEvent.OldStatus} to {orderEvent.NewStatus}."
+            };
+            await _hubContext.Clients.Group($"User_{orderEvent.UserId}").SendAsync("ReceiveNotification", userMessage);
+            Console.WriteLine($"User notification sent to User_{orderEvent.UserId} for OrderId: {orderEvent.OrderId}");
         }
 
 
