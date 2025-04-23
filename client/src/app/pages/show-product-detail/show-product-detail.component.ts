@@ -28,7 +28,7 @@ export class ShowProductDetailComponent implements OnInit {
     categoryId: 0,
     stock: 0,
     relatedProductIds: [],
-    relatedProducts: [{title:'',price:0,thumbnail:''}],
+    relatedProducts: [{id:0,title:'',price:0,thumbnail:''}],
     thumbnail : ''
   };
   // relatedProducts: object[] = []

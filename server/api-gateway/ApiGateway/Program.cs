@@ -20,7 +20,7 @@ builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer("IdentityServer", options =>
     {
-        options.Authority = "http://localhost:5001"; // Auth Service URL
+        options.Authority = "http://10.13.106.46:5001"; // Auth Service URL
         options.RequireHttpsMetadata = false; // For development
         options.Audience = "api"; // Match this with OrderService's expected audience
         options.TokenValidationParameters = new TokenValidationParameters
@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Add CORS for Angular
 builder.Services.AddCors(options =>{
     options.AddPolicy("AllowSpecificOrigins",
-    builder => builder.WithOrigins("http://localhost:4200")
+    builder => builder.WithOrigins("http://10.13.106.46:4200")
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials());

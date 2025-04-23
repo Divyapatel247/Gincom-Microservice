@@ -15,7 +15,7 @@ import { AuthService } from '../service/auth.service';
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:5100';
+  private apiUrl = 'http://10.13.106.46:5100';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -228,7 +228,7 @@ export class ApiService {
 
   //-------------------store the product id and user id in table
   registerNotification(productId : number, userId: number){
-  
+
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
@@ -251,7 +251,7 @@ export class ApiService {
      });
     return this.http.get<number[]>(`${this.apiUrl}/api/products/user-notified-products?userId=${userId}`,{headers});
   }
-  
+
   addToCartBulk(userId: string, items: BasketItem[]): Observable<BasketResponse> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
