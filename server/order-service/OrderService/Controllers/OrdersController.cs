@@ -7,6 +7,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Dtos.Requests;
+using OrderService.Dtos.Responses;
 using OrderService.Interfaces;
 using OrderService.Mappers;
 using OrderService.Models;
@@ -26,13 +27,14 @@ namespace OrderService.Controllers
 
         public OrdersController(IOrderRepository repository, ProductServiceClient productService, IPaymentService paymentService, IPublishEndpoint publishEndpoint)
         {
+            
             _repository = repository;
             _productService = productService;
             _paymentService = paymentService;
             _publishEndpoint = publishEndpoint;
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("user/{userId}")]
         // [Authorize(Policy = "AdminOnly")]
 
         public async Task<IActionResult> GetOrders(string userId)
@@ -157,6 +159,49 @@ namespace OrderService.Controllers
         {
             var orders = await _repository.GetOrdersByProductIdAsync(productId);
             return Ok(orders);
+        }
+
+        [HttpGet("{orderId}")]
+        public async Task<IActionResult> GetOrderById(int orderId)
+        {
+            try
+            {
+                var order = await _repository.GetOrderByIdAsync(orderId);
+                if (order == null)
+                {
+                    return NotFound($"Order with ID {orderId} not found.");
+                }
+
+                var orderDetailDto = new OrderDetailResDto
+                {
+                    Id = order.Id,
+                    UserId = order.UserId,
+                    Status = order.Status,
+                    Items = new List<OrderItemDetailResDto>(),
+                    CreatedAt = order.CreatedAt
+                };
+
+                // Fetch product details for each order item
+                foreach (var item in order.Items)
+                {
+                    // Pass token as null for now; adjust if authentication is required
+                    var productDetail = await _productService.GetProductAsync(item.ProductId, token: null);
+                    orderDetailDto.Items.Add(new OrderItemDetailResDto
+                    {
+                        Id = item.Id,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        CreatedAt = item.CreatedAt,
+                        Product = productDetail ?? new ProductDto { Id = item.ProductId, Title = "Unknown Product" }
+                    });
+                }
+
+                return Ok(orderDetailDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }
