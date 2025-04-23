@@ -11,6 +11,7 @@ export interface Order {
   userId: string;
   status: string;
   items: OrderItem[];
+  totalAmount?: number;
   razorpayOrderId?: string;
   createdAt?: Date;
 }

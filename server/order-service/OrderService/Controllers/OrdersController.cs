@@ -27,7 +27,7 @@ namespace OrderService.Controllers
 
         public OrdersController(IOrderRepository repository, ProductServiceClient productService, IPaymentService paymentService, IPublishEndpoint publishEndpoint)
         {
-            
+
             _repository = repository;
             _productService = productService;
             _paymentService = paymentService;
@@ -36,12 +36,50 @@ namespace OrderService.Controllers
 
         [HttpGet("user/{userId}")]
         // [Authorize(Policy = "AdminOnly")]
-
-        public async Task<IActionResult> GetOrders(string userId)
+        public async Task<IActionResult> GetOrdersByUser(string userId)
         {
-            var orders = await _repository.GetOrdersAsync(userId);
-            var response = orders.Select(OrderMapper.ToOrderResponse).ToList();
-            return Ok(response);
+            try
+            {
+                var orders = await _repository.GetOrdersAsync(userId);
+                if (orders == null || !orders.Any())
+                {
+                    return NotFound($"No orders found for user {userId}.");
+                }
+
+                var orderDetailDtos = new List<MyOrderResDto>();
+
+                foreach (var order in orders)
+                {
+                    var orderDetailDto = new MyOrderResDto
+                    {
+                        Id = order.Id,
+                        Status = order.Status,
+                        Items = new List<MyOrderItemDetailResDto>(),
+                        CreatedAt = order.CreatedAt
+                    };
+
+                    // Fetch product details for each order item
+                    foreach (var item in order.Items)
+                    {
+                        var productDetail = await _productService.GetProductAsync(item.ProductId);
+                        orderDetailDto.Items.Add(new MyOrderItemDetailResDto
+                        {
+                            Id = item.Id,
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            Product = productDetail ?? new ProductDto { Id = item.ProductId, Title = "Unknown Product" }
+                        });
+                    }
+
+                    orderDetailDtos.Add(orderDetailDto);
+                }
+
+                return Ok(orderDetailDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
         [HttpPost("{userId}")]
@@ -128,8 +166,9 @@ namespace OrderService.Controllers
             return Ok(new { Order = OrderMapper.ToOrderResponse(order), RazorpayOrderId = razorpayOrderId });
         }
 
-        [HttpPut("{orderId}/status")] 
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequestDto request){
+        [HttpPut("{orderId}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusRequestDto request)
+        {
             var order = await _repository.GetOrderByIdAsync(orderId);
             if (order == null)
             {
@@ -160,14 +199,58 @@ namespace OrderService.Controllers
 
             return Ok(OrderMapper.ToOrderResponse(order));
         }
-
-        [HttpGet]
+      [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
-            var orders = await _repository.GetAllOrdersAsync();
-            return Ok(orders);
-        }
+            try
+            {
+                var orders = await _repository.GetAllOrdersAsync();
+                if (orders == null || !orders.Any())
+                {
+                    return NotFound("No orders found.");
+                }
 
+                var orderResponseDtos = new List<OrderResponseDto>();
+
+                foreach (var order in orders)
+                {
+                    var orderResponseDto = new OrderResponseDto
+                    {
+                        Id = order.Id,
+                        UserId = order.UserId,
+                        Status = order.Status,
+                        Items = new List<OrderItemResponseDto>(),
+                        TotalAmount = 0,
+                        CreatedAt = order.CreatedAt
+                    };
+
+                    // Fetch product prices and calculate total
+                    decimal orderTotal = 0;
+                    foreach (var item in order.Items)
+                    {
+                        var product = await _productService.GetProductAsync(item.ProductId);
+                        decimal price = product?.Price ?? 0; // Use 0 if product fetch fails
+                        orderTotal += price * item.Quantity;
+
+                        orderResponseDto.Items.Add(new OrderItemResponseDto
+                        {
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            Price = price
+                        });
+                    }
+
+                    orderResponseDto.TotalAmount = orderTotal;
+                    orderResponseDtos.Add(orderResponseDto);
+                }
+
+                return Ok(orderResponseDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
         [HttpGet("product/{productId}")]
         public async Task<IActionResult> GetOrdersByProductId(int productId)
         {
