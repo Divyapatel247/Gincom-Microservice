@@ -261,12 +261,20 @@ export class ApiService {
     return this.http.post<BasketResponse>(`${this.apiUrl}/api/orders/${userId}/cart/items/bulk`, request, {headers});
   }
 
-  getOrdersByProductId(productId:number): Observable<BasketResponse> {
+  // getOrdersByProductId(productId:number): Observable<> {
+  //   const token = localStorage.getItem('access_token');
+  //   const headers = new HttpHeaders({
+  //      Authorization: `Bearer ${token}`
+  //    });
+  //   return this.http.get<>(`${this.apiUrl}/api/orders/product/${productId}`, {headers});
+  // }
+
+  getOrderByOrderId(orderId:number): Observable<Order> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.get<BasketResponse>(`${this.apiUrl}/api/orders/product/${productId}`, {headers});
+    return this.http.get<Order>(`${this.apiUrl}/api/orders/${orderId}`, {headers});
   }
 
 }
