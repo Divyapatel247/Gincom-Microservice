@@ -1,11 +1,9 @@
 import { IProduct } from "../components/product/productModel";
 
 export interface OrderItem {
-  id?:number;
   productId: number;
   quantity: number;
-  product? : IProduct;
-  createdAt? : Date;
+  product? : IProduct
 }
 
 export interface Order {
