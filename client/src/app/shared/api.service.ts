@@ -15,7 +15,7 @@ import { AuthService } from '../service/auth.service';
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = 'http://10.13.106.46:5100';
+  private apiUrl = 'http://localhost:5100';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
