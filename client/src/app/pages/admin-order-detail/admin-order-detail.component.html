@@ -85,7 +85,7 @@
             <td id="item-price-{{item.product?.id}}" class="px-6 py-4">${{ item.product?.price }}</td>
             <td id="item-quantity-{{item.product?.id}}" class="px-6 py-4">{{ item.quantity }}</td>
             <td id="item-total-{{item.product?.id}}" class="px-6 py-4">
-              $100
+             ${{item.quantity * (item.product?.price ?? 0 )}}
               <!-- ${{ (item.product?.price * item.quantity).toFixed(2) }} -->
             </td>
             <td id="item-actions-{{item.product?.id}}" class="px-6 py-4 text-right space-x-2">
@@ -143,7 +143,7 @@
     <div id="order-total" class="flex justify-end items-center pt-6 mt-6 border-t border-black/5">
       <div id="total-container" class="text-right">
         <span id="total-label" class="text-black/70">Grand Total:</span>
-        <span id="total-amount" class="text-xl font-medium text-black ml-3">$2,145.00</span>
+        <span id="total-amount" class="text-xl font-medium text-black ml-3">${{orderTotle}}</span>
         <!-- ${{
           order.items.reduce((sum, item) => sum + (item.product?.price ?? 0) * item.quantity, 0).toFixed(2)
         }} -->

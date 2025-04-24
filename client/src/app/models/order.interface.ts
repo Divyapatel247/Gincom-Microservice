@@ -1,9 +1,11 @@
 import { IProduct } from "../components/product/productModel";
 
 export interface OrderItem {
+  id?:number;
   productId: number;
   quantity: number;
-  product? : IProduct
+  product? : IProduct;
+  createdAt? : Date;
 }
 
 export interface Order {
@@ -11,6 +13,7 @@ export interface Order {
   userId: string;
   status: string;
   items: OrderItem[];
+  totalAmount?: number;
   razorpayOrderId?: string;
   createdAt?: Date;
 }

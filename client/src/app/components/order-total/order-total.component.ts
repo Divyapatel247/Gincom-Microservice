@@ -57,7 +57,8 @@ export class OrderTotalComponent implements OnChanges {
   this.orders.forEach(order => {
     const date = dayjs(order.createdAt);
     const status = order.status;
-    const amount = 100;
+
+    const amount = parseFloat((order.totalAmount || 0).toFixed(2));
     totalAmount += amount;
 
     this.totals[status].allTime += amount;
