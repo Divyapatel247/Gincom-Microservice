@@ -189,9 +189,11 @@ export class ApiService {
   createOrder(userId: string,userEmail: string): Observable<OrderResponse> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
-       Authorization: `Bearer ${token}`
+       Authorization: `Bearer ${token}`,
+       'Content-Type': 'application/json'
      });
-    return this.http.post<OrderResponse>(`${this.apiUrl}/api/orders/${userId}`, {userEmail}, {headers});
+    const body = {userEmail};
+    return this.http.post<OrderResponse>(`${this.apiUrl}/api/orders/${userId}`, body, {headers});
   }
 
   getProduct(productId: number): Observable<IProduct> {
