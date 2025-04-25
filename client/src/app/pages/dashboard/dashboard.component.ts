@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonStatisticsComponent } from '../../components/common-statistics/common-statistics.component';
 import { OrderTotalComponent } from '../../components/order-total/order-total.component';
 import { LatestOrdersComponent } from '../../components/latest-orders/latest-orders.component';
@@ -21,6 +21,8 @@ export class DashboardComponent implements OnInit {
 
   orders: Order[] = [];
   latestOrders: Order[] = [];
+  count:number = 0;
+  lowStokCount: number = 0;
 
   ngOnInit(): void {
     this.api.getOrders().subscribe((res) => {
@@ -29,9 +31,23 @@ export class DashboardComponent implements OnInit {
       this.latestOrders = this.getLatestFiveOrders(this.orders);
     });
 
-    this.ws.notification$.subscribe((data) => {
+    this.api.getCustomerCount().subscribe((res)=>{
+    this.count = res
+    })
+
+    this.api.getLowStockProducts().subscribe((res)=>{
+      this.lowStokCount = res;
+    })
+
+    this.ws.totalOrder$.subscribe((data) => {
       this.handleRealtimeOrder(data);
     });
+
+    this.ws.registerCustomer$.subscribe((data)=>{
+      console.log("data :",data.count)
+      this.count = data.count
+    })
+
   }
 
   getLatestFiveOrders(orders: Order[]): Order[] {

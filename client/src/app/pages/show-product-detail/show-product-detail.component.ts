@@ -76,11 +76,15 @@ export class ShowProductDetailComponent implements OnInit {
   }
 
   onDelete(){
-  this.api.deleteProduct(this.productId).subscribe()
-  this.router.navigate(['admin/products']);
+  this.api.deleteProduct(this.productId).subscribe(()=>{
+
+    this.router.navigateByUrl("/admin/products");
+  })
   }
 
   onSave(){
-    this.api.updateProduct(Number(this.productId),this.product).subscribe()
+    this.api.updateProduct(Number(this.productId),this.product).subscribe(()=>{
+      this.router.navigateByUrl("/admin/products");
+    })
   }
 }

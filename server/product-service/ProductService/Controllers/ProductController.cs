@@ -277,6 +277,13 @@ public class ProductController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("lowStok")]
+     public async Task<IActionResult> lowStokProduct()
+    {
+     var  lowstock =  await _repository.lowStokProductAsync();
+        return Ok(lowstock);
+    }
+
 }
 
 

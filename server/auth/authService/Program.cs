@@ -29,6 +29,7 @@ builder.Services.AddMassTransit(x =>
             h.Password("guest");
         });
         cfg.Publish<IUserLoggedInEvent>(x =>{    x.Exclude = true;});
+        cfg.Publish<IUserRegisterEvent>(x =>{    x.Exclude = true;});
         cfg.ConfigureEndpoints(context); // Auto-configures endpoints for consumers
     });
 });

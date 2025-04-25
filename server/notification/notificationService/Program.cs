@@ -18,6 +18,7 @@ builder.Services.AddScoped<NotificationServiceForOrderCreated>();
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserLoggedInConsumer>();
+    x.AddConsumer<UserRegisterConsumer>();
     x.AddConsumer<OrderCreatedConsumer>();
     x.AddConsumer<ProductStockUpdateConsumer>();
     x.AddConsumer<OrderStatusUpdatedConsumer>();
@@ -33,6 +34,13 @@ builder.Services.AddMassTransit(x =>
             e.Bind("xxxx");
             e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<UserLoggedInConsumer>(context);
+            // e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        });
+        cfg.ReceiveEndpoint("publish-user-register-queue", e =>
+        {
+            e.Bind("PublishUserRegister");
+            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<UserRegisterConsumer>(context);
             // e.ConfigureConsumer<OrderCreatedConsumer>(context);
         });
         cfg.ReceiveEndpoint("order-created-notification-queue", e =>

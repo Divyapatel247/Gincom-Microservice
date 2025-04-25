@@ -22,4 +22,5 @@ Task<List<Product>> GetAllProductsAsync();
          Task<IEnumerable<int>> GetUsersToNotifyAsync(int productId);
          Task MarkNotified(int productId, int userId);
         Task<List<int>> WhomToNotify(int productId);
+        Task<int> lowStokProductAsync();
 }

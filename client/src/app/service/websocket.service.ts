@@ -19,6 +19,8 @@ export class WebsocketService implements OnDestroy {
   private readonly ADMIN_STORAGE_KEY = 'admin_notifications';
   private readonly MAX_NOTIFICATIONS = 5;
   public notification$ = new Subject<any>();
+  public registerCustomer$ = new Subject<any>();
+  public totalOrder$ = new Subject<any>();
 
   private stockUpdateSubject = new Subject<{ productId: string }>();
   stockUpdate = this.stockUpdateSubject.asObservable();
@@ -99,7 +101,13 @@ export class WebsocketService implements OnDestroy {
 
       this.hubConnection.on('ReceiveNotification', (data: any) => {
         console.log('Received notification data:', data);
-        this.notification$.next(data)
+        this.notification$.next(data);
+        if(data.notificationType == 'regisrterCustomer'){
+          this.registerCustomer$.next(data);
+        }
+        if(data.notificationType == 'totalOrder'){
+          this.totalOrder$.next(data)
+        }
         const notification: Notification = {
           message: data.details || 'No details',
           timestamp: new Date().toISOString(),
@@ -120,6 +128,7 @@ export class WebsocketService implements OnDestroy {
             this.stockUpdateSubject.next({ productId: productId });
           }
         } else if (data.messageType === 'AdminNotification' && role === 'Admin') {
+
           this.adminNotifications.unshift(notification);
           if (this.adminNotifications.length > this.MAX_NOTIFICATIONS) {
             this.adminNotifications = this.adminNotifications.slice(0, this.MAX_NOTIFICATIONS);

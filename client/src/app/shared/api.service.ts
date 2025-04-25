@@ -24,6 +24,7 @@ export class ApiService {
 
   products$ = this.productsSubject.asObservable();
 
+
   getProducts(): Observable<IProduct[]> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
@@ -94,6 +95,12 @@ export class ApiService {
 
   register(registerObj: any) {
     return this.http.post<any>(`${this.apiUrl}/auth/register`, registerObj);
+  }
+
+  getCustomerCount(): Observable<number> {
+
+    return this.http.get<number>(`${this.apiUrl}/auth/count-users`);
+
   }
 
   refreshToken(refreshToken: string) {
@@ -275,6 +282,14 @@ export class ApiService {
        Authorization: `Bearer ${token}`
      });
     return this.http.get<Order>(`${this.apiUrl}/api/orders/${orderId}`, {headers});
+  }
+
+  getLowStockProducts(): Observable<number> {
+    const token = localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+       Authorization: `Bearer ${token}`
+     });
+    return this.http.get<number>(`${this.apiUrl}/api/products/lowStok`,{headers});
   }
 
 }

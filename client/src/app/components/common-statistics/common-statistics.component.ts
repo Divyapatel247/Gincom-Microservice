@@ -9,5 +9,7 @@ import { Order } from '../../models/order.interface';
 })
 export class CommonStatisticsComponent {
   @Input() totalOrders: number = 0;
+  @Input() totalUser :number = 0;
+  @Input() lowStokCount : number = 0;
 
 }

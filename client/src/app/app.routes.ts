@@ -64,7 +64,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     data: { role: 'Admin' },
     children: [
-      { path: '', component: ProductTableComponent },
+      { path: '', component: DashboardComponent },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'products', component: ProductTableComponent },
       { path: 'product/:id', component: ShowProductDetailComponent },
@@ -93,7 +93,7 @@ export const routes: Routes = [
         path: 'product/:category',
         component: ProductComponent
       }
-    ] 
+    ]
   },
   { path: 'login', component: LoginComponent  },
   { path: 'register', component: RegisterComponent  },
