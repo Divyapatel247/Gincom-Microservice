@@ -186,12 +186,12 @@ export class ApiService {
     return this.http.delete<any>(`${this.apiUrl}/api/orders/${userId}/cart`, {headers});
   }
 
-  createOrder(userId: string): Observable<OrderResponse> {
+  createOrder(userId: string,userEmail: string): Observable<OrderResponse> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({
        Authorization: `Bearer ${token}`
      });
-    return this.http.post<OrderResponse>(`${this.apiUrl}/api/orders/${userId}`, {}, {headers});
+    return this.http.post<OrderResponse>(`${this.apiUrl}/api/orders/${userId}`, {userEmail}, {headers});
   }
 
   getProduct(productId: number): Observable<IProduct> {

@@ -12,5 +12,7 @@ namespace Common.Events
         public string OldStatus { get; set; }
         public string NewStatus { get; set; }
         public DateTime UpdatedAt { get; set; }
+
+        public string Email {get;set;}
     }
 }
