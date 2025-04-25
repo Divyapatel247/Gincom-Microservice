@@ -25,4 +25,5 @@ export interface OrderResponse {
   items: OrderItem[];
   createdAt?: Date;
   razorpayOrderId?: string;
+  email : string;
 }

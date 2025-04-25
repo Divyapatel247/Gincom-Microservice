@@ -13,6 +13,8 @@ namespace Common.Events
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; } = "Pending"; 
+         
+         public string Email { get; set; }
  
     }
 
