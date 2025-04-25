@@ -14,6 +14,8 @@ builder.Services.AddLogging();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<NotificationServiceForOrderCreated>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddMassTransit(x =>
 {

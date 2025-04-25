@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Common.Events;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using notificationService.Hubs;
 
 namespace notificationService.Services
@@ -13,10 +14,13 @@ namespace notificationService.Services
     {
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly HttpClient _httpClient;
-        public NotificationServiceForOrderCreated(IHubContext<NotificationHub> hubContext, IHttpClientFactory httpClientFactory)
+        private readonly EmailService _emailService;
+        public NotificationServiceForOrderCreated(IHubContext<NotificationHub> hubContext, IHttpClientFactory httpClientFactory, EmailService emailService)
         {
             _hubContext = hubContext;
             _httpClient = httpClientFactory.CreateClient();
+            _emailService = emailService;
+
         }
 
         public async Task NotifyOrderCreated(Common.Events.OrderCreatedEvent order)
@@ -48,7 +52,32 @@ namespace notificationService.Services
             };
             await _hubContext.Clients.Group($"User_{order.UserId}").SendAsync("ReceiveNotification", userMessage);
             Console.WriteLine($"User notification sent to User_{order.UserId} for OrderId: {order.OrderId}");
+
+            try
+            {
+                var subject = $"Order #{order.OrderId} Confirmed";
+                var body = $@"
+                    <h2>Order Confirmation</h2>
+                    <p>Thank you for your order! Your order #{order.OrderId} has been confirmed.</p>
+                    <p><strong>Status:</strong> {order.Status ?? "Pending"}</p>
+                    <p><strong>Total Amount:</strong> ${order.TotalAmount}</p>
+                    <h3>Items:</h3>
+                    <ul>
+                        {string.Join("", order.Items.Select(item => $"<li>Product ID: {item.ProductId}, Quantity: {item.Quantity}</li>"))}
+                    </ul>
+                    <p>For any questions, contact us at support@ecommerce.com.</p>
+                ";
+                await _emailService.SendEmailAsync(order.Email, subject, body);
+                Console.WriteLine($"Email sent to {order.Email} for OrderId: {order.OrderId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send email for OrderId: {order.OrderId}, Error: {ex.Message}");
+            }
+
         }
+
+        
 
         public async Task NotifyStockUpdated(Common.Events.ProductUpdatedStock update, List<int> userIds)
         {
@@ -120,6 +149,7 @@ namespace notificationService.Services
             };
             await _hubContext.Clients.Group($"User_{orderEvent.UserId}").SendAsync("ReceiveNotification", userMessage);
             Console.WriteLine($"User notification sent to User_{orderEvent.UserId} for OrderId: {orderEvent.OrderId}");
+
         }
 
 
