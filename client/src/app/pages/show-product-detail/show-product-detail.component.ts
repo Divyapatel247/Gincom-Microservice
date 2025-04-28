@@ -22,7 +22,7 @@ export class ShowProductDetailComponent implements OnInit {
       height: 0
     },
     sku: '',
-    tags: ['Beauty', 'Eyeshadow'],
+    tags: [],
     id: 0,
     description: '',
     categoryId: 0,
@@ -54,25 +54,22 @@ export class ShowProductDetailComponent implements OnInit {
 
 
   relatedProducts = [1, 2, 3]; // Replace with real data
-  // crossProducts = [1, 2, 3]; // Replace with real data
 
   newTag = '';
 
-  // save(int productId) {
-  //   // send update to backend
-  //   this.api.updateProduct(productId,this.product); // update cache
-  //   this.router.navigate(['/products']); // go back
-  // }
+
 
   addTag() {
     if (this.newTag.trim()) {
       this.product.tags.push(this.newTag.trim());
       this.newTag = '';
     }
+    console.log("tags :",this.product.tags)
   }
 
   removeTag(tag: string) {
     this.product.tags = this.product.tags.filter(t => t !== tag);
+    console.log("tags :",this.product.tags)
   }
 
   onDelete(){

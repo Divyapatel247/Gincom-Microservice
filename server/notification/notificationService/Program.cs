@@ -22,6 +22,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<OrderCreatedConsumer>();
     x.AddConsumer<ProductStockUpdateConsumer>();
     x.AddConsumer<OrderStatusUpdatedConsumer>();
+    x.AddConsumer<LowStockProductConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", h =>
@@ -60,6 +61,12 @@ builder.Services.AddMassTransit(x =>
             e.Bind("Common.Events:OrderStatusUpdatedEvent");
             e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<OrderStatusUpdatedConsumer>(context);
+        });
+         cfg.ReceiveEndpoint("publish-lowStock-product-queue", e =>
+        {
+            e.Bind("Common.Events:ILowStockProduct");
+            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<LowStockProductConsumer>(context);
         });
     });
 });

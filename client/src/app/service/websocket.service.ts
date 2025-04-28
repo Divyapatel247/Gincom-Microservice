@@ -1,10 +1,10 @@
+import { Notification } from './../models/notification.interface';
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import * as signalR from '@microsoft/signalr';
 
-import { Notification } from '../models/notification.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +21,7 @@ export class WebsocketService implements OnDestroy {
   public notification$ = new Subject<any>();
   public registerCustomer$ = new Subject<any>();
   public totalOrder$ = new Subject<any>();
+  public lowStock$ = new Subject<any>();
 
   private stockUpdateSubject = new Subject<{ productId: string }>();
   stockUpdate = this.stockUpdateSubject.asObservable();
@@ -106,7 +107,10 @@ export class WebsocketService implements OnDestroy {
           this.registerCustomer$.next(data);
         }
         if(data.notificationType == 'totalOrder'){
-          this.totalOrder$.next(data)
+          this.totalOrder$.next(data);
+        }
+        if(data.notificationType == 'lowStockProduct'){
+          this.lowStock$.next(data);
         }
         const notification: Notification = {
           message: data.details || 'No details',

@@ -136,6 +136,19 @@ namespace notificationService.Services
             Console.WriteLine($"Admin notification sent for count: {message.count}");
         }
 
+         public async Task LowStock(ILowStockProduct message)
+        {
+            // Notification for Admin
+            var adminMessage = new
+            {
+                MessageType = "AdminNotification",
+                notificationType = "lowStockProduct",
+                lowStock = message.lowStock
+            };
+            await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
+            Console.WriteLine($"Admin notification sent for count: {message.lowStock}");
+        }
+
     }
 }
 

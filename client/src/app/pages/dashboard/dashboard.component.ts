@@ -1,8 +1,8 @@
+import { Order } from './../../models/order.interface';
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonStatisticsComponent } from '../../components/common-statistics/common-statistics.component';
 import { OrderTotalComponent } from '../../components/order-total/order-total.component';
 import { LatestOrdersComponent } from '../../components/latest-orders/latest-orders.component';
-import { Order } from '../../models/order.interface';
 import { ApiService } from '../../shared/api.service';
 import { WebsocketService } from '../../service/websocket.service';
 
@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit {
 
   orders: Order[] = [];
   latestOrders: Order[] = [];
+  pendingOrders:number = 0;
   count:number = 0;
   lowStokCount: number = 0;
 
@@ -29,6 +30,7 @@ export class DashboardComponent implements OnInit {
       console.log(res);
       this.orders = res;
       this.latestOrders = this.getLatestFiveOrders(this.orders);
+      this.getOrderWithPendingStatus(this.orders);
     });
 
     this.api.getCustomerCount().subscribe((res)=>{
@@ -46,6 +48,11 @@ export class DashboardComponent implements OnInit {
     this.ws.registerCustomer$.subscribe((data)=>{
       console.log("data :",data.count)
       this.count = data.count
+    })
+
+    this.ws.lowStock$.subscribe((data)=>{
+      console.log("lowStock :", data.lowStock)
+      this.lowStokCount = data.lowStock
     })
 
   }
@@ -76,5 +83,10 @@ export class DashboardComponent implements OnInit {
 
     this.orders = [newOrder, ...this.orders];
     this.latestOrders = this.getLatestFiveOrders(this.orders);
+  }
+
+  getOrderWithPendingStatus(orders: Order[]) {
+       this.pendingOrders =  orders.filter(order => order.status === "Pending").length;
+       console.log("pending orders :", this.pendingOrders)
   }
 }

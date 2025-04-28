@@ -75,13 +75,7 @@ export class ApiService {
       this.products[index] = product;
       this.productsSubject.next([...this.products]);
     }
-    return this.http.put<IProduct>(`${this.apiUrl}/api/products/${productId}`, {
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      stock: product.stock,
-      categoryName: product.categoryName,
-    },{headers});
+    return this.http.put<IProduct>(`${this.apiUrl}/api/products/${productId}`, product,{headers});
   }
 
   login(loginObj: any) {

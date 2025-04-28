@@ -11,10 +11,12 @@ namespace ProductService.Consumers
     public class OrderCreatedConsumer : IConsumer<OrderCreatedEvent>
     {
         private readonly IProductRepository _repository;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrderCreatedConsumer(IProductRepository repository)
+        public OrderCreatedConsumer(IProductRepository repository,IPublishEndpoint publishEndpoint)
         {
             _repository = repository;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
@@ -29,6 +31,13 @@ namespace ProductService.Consumers
                     // Optionally, reject the message or notify OrderService to rollback
                     continue;
                 }
+                var count = await _repository.lowStokProductAsync();
+                Console.WriteLine("count :" + count);
+
+                await _publishEndpoint.Publish<ILowStockProduct>(new
+                {
+                    lowStock = count
+                });
                 Console.WriteLine($"Successfully deducted {item.Quantity} from Product ID {item.ProductId}");
             }
         }

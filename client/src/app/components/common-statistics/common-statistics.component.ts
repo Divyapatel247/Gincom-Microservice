@@ -11,5 +11,6 @@ export class CommonStatisticsComponent {
   @Input() totalOrders: number = 0;
   @Input() totalUser :number = 0;
   @Input() lowStokCount : number = 0;
+  @Input() pendingOrders : number = 0;
 
 }

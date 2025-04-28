@@ -8,6 +8,7 @@ using ProductService.DTOs.Review;
 using ProductService.Interfaces;
 using ProductService.Mapper;
 using System.Text.Json;
+using ProductService.Service;
 
 namespace ProductService.Controllers;
 
@@ -20,6 +21,7 @@ public class ProductController : ControllerBase
     private readonly IReviewRepository _reviewRepo;
 
     private readonly IPublishEndpoint _publishEndpoint;
+
     public ProductController(IProductRepository repository, IReviewRepository reviewRepo, IPublishEndpoint publishEndpoint)
     {
         _repository = repository;
@@ -102,6 +104,17 @@ public class ProductController : ControllerBase
         int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
 
         Console.WriteLine("Updated Product: " + JsonSerializer.Serialize(updatedProduct));
+
+       var count =  await _repository.lowStokProductAsync();    
+       Console.WriteLine("count :"+count);
+
+       if(oldStock != updatedProduct.Stock){
+         await _publishEndpoint.Publish<ILowStockProduct>(new
+        {
+            lowStock = count
+        });
+       }
+
 
         if (oldStock == 0 && updatedProduct.Stock > 0)
         {
