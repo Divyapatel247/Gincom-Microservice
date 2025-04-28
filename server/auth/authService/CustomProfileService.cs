@@ -24,9 +24,9 @@ namespace authService
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim("role", user.Role)
+                        new Claim("role", user.Role),
+                        new Claim("email", user.Email)
                     };
-                        // new Claim("email", user.Email),
                         // new Claim("username", user.Username),
 
                     context.IssuedClaims.AddRange(claims);

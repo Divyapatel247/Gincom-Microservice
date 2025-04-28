@@ -14,13 +14,17 @@ builder.Services.AddLogging();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<NotificationServiceForOrderCreated>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserLoggedInConsumer>();
+    x.AddConsumer<UserRegisterConsumer>();
     x.AddConsumer<OrderCreatedConsumer>();
     x.AddConsumer<ProductStockUpdateConsumer>();
     x.AddConsumer<OrderStatusUpdatedConsumer>();
+    x.AddConsumer<LowStockProductConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("localhost", h =>
@@ -33,6 +37,13 @@ builder.Services.AddMassTransit(x =>
             e.Bind("xxxx");
             e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<UserLoggedInConsumer>(context);
+            // e.ConfigureConsumer<OrderCreatedConsumer>(context);
+        });
+        cfg.ReceiveEndpoint("publish-user-register-queue", e =>
+        {
+            e.Bind("PublishUserRegister");
+            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<UserRegisterConsumer>(context);
             // e.ConfigureConsumer<OrderCreatedConsumer>(context);
         });
         cfg.ReceiveEndpoint("order-created-notification-queue", e =>
@@ -52,6 +63,12 @@ builder.Services.AddMassTransit(x =>
             e.Bind("Common.Events:OrderStatusUpdatedEvent");
             e.ConfigureConsumeTopology = false;
             e.ConfigureConsumer<OrderStatusUpdatedConsumer>(context);
+        });
+         cfg.ReceiveEndpoint("publish-lowStock-product-queue", e =>
+        {
+            e.Bind("Common.Events:ILowStockProduct");
+            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumer<LowStockProductConsumer>(context);
         });
     });
 });

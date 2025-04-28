@@ -31,4 +31,9 @@ export class AuthService {
     const decoded = this.getDecodedToken();
     return decoded?.sub ?? null;
   }
+
+  getEmail(): string | null {
+    const decoded = this.getDecodedToken();
+    return decoded?.email ?? null;
+  }
 }

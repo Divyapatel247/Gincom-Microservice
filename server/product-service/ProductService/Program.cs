@@ -1,3 +1,4 @@
+using Common.Events;
 using Dapper;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

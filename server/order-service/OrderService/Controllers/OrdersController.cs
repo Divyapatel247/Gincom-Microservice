@@ -83,7 +83,7 @@ namespace OrderService.Controllers
         }
 
         [HttpPost("{userId}")]
-        public async Task<IActionResult> CreateOrder(string userId)
+        public async Task<IActionResult> CreateOrder(string userId,[FromBody] CreateOrderRequest request)
         {
             var basket = await _repository.GetBasketAsync(userId);
             if (basket == null || basket.Items == null || !basket.Items.Any())
@@ -150,6 +150,7 @@ namespace OrderService.Controllers
             {
                 OrderId = order.Id,
                 UserId = userId,
+                Email = request.UserEmail,
                 Items = orderItems.Select(item => new Common.Events.OrderItem
                 {
                     ProductId = item.ProductId,
@@ -301,4 +302,9 @@ namespace OrderService.Controllers
             }
         }
     }
+}
+
+public class CreateOrderRequest
+{
+    public string UserEmail { get; set; } = string.Empty;
 }

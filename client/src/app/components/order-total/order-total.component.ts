@@ -90,7 +90,7 @@ export class OrderTotalComponent implements OnChanges {
     }
   });
 
-  this.avgOrder = this.totalOrders ? totalAmount / this.totalOrders : 0;
+  this.avgOrder = this.totalOrders ? parseFloat((totalAmount / this.totalOrders).toFixed(2)) : 0;
 }
 
 getStatusStyle(status: string): string {

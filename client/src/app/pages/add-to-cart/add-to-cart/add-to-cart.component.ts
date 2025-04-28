@@ -168,7 +168,8 @@ export class AddToCartComponent implements OnInit, AfterViewInit {
 
   createOrderAfterPayment(paymentId: string) {
     if (this.userId) {
-      this.apiService.createOrder(this.userId).subscribe({
+      const userEmail : string = this.authService.getEmail() ?? " ";
+      this.apiService.createOrder(this.userId,userEmail).subscribe({
         next: (response) => {
           console.log('Order created after payment:', response);
           this.basket = null; // Clear cart after successful order
