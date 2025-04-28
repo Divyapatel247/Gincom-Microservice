@@ -3,9 +3,15 @@ using MassTransit.Transports.Fabric;
 using notificationService.Consumers;
 using notificationService.Hubs;
 using notificationService.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("./firebase-adminsdk.json") 
+});
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -14,8 +20,11 @@ builder.Services.AddLogging();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<NotificationServiceForOrderCreated>();
+builder.Services.AddSingleton<ITokenRepository, InMemoryTokenRepository>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddControllers();
+
 
 builder.Services.AddMassTransit(x =>
 {
@@ -58,11 +67,23 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 
 
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+app.MapControllers();
+app.UseCors("AllowAngular");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

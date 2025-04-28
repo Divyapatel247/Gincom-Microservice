@@ -15,11 +15,14 @@ namespace notificationService.Services
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly HttpClient _httpClient;
         private readonly EmailService _emailService;
-        public NotificationServiceForOrderCreated(IHubContext<NotificationHub> hubContext, IHttpClientFactory httpClientFactory, EmailService emailService)
+        private readonly ITokenRepository _tokenRepository;
+        public NotificationServiceForOrderCreated(IHubContext<NotificationHub> hubContext, IHttpClientFactory httpClientFactory, EmailService emailService, ITokenRepository tokenRepository)
         {
             _hubContext = hubContext;
             _httpClient = httpClientFactory.CreateClient();
             _emailService = emailService;
+            _tokenRepository = tokenRepository;
+            Console.WriteLine("NotificationServiceForOrderCreated initialized.");
 
         }
 
@@ -74,10 +77,49 @@ namespace notificationService.Services
             {
                 Console.WriteLine($"Failed to send email for OrderId: {order.OrderId}, Error: {ex.Message}");
             }
+            try
+            {
+                Console.WriteLine($"Retrieving tokens for UserId: {order.UserId}...");
+                var tokens = await _tokenRepository.GetTokensForUserAsync(order.UserId);
+                Console.WriteLine($"Retrieved tokens for UserId {order.UserId}: {string.Join(", ", tokens ?? new List<string>())}");
 
+                if (tokens != null && tokens.Any())
+                {
+                    Console.WriteLine($"Preparing push notification for {tokens.Count} tokens for OrderId: {order.OrderId}...");
+                    var message = new FirebaseAdmin.Messaging.MulticastMessage
+                    {
+                        Tokens = tokens.ToList(),
+                        Notification = new FirebaseAdmin.Messaging.Notification
+                        {
+                            Title = $"Order #{order.OrderId} Confirmed",
+                            Body = $"Your order worth ${order.TotalAmount} has been placed!"
+                        },
+                        Data = new Dictionary<string, string>
+                {
+                    { "orderId", order.OrderId.ToString() },
+                    { "click_action", "http://localhost:4200/customer/myOrders" }
+                }
+                    };
+                    Console.WriteLine($"Sending push notification with Title: {message.Notification.Title}, Body: {message.Notification.Body}, Click Action: {message.Data["click_action"]}...");
+                    var response = await FirebaseAdmin.Messaging.FirebaseMessaging.DefaultInstance.SendEachForMulticastAsync(message);
+                    Console.WriteLine($"Push notification response: SuccessCount={response.SuccessCount}, FailureCount={response.FailureCount} for OrderId: {order.OrderId}");
+                    if (response.FailureCount > 0)
+                    {
+                        Console.WriteLine($"Failed tokens details: {string.Join(", ", response.Responses.Where(r => !r.IsSuccess).Select(r => $"Error: {r.Exception?.Message}"))}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No valid tokens found for UserId: {order.UserId}. Push notification not sent.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send push notification for OrderId: {order.OrderId}, Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
         }
 
-        
+
 
         public async Task NotifyStockUpdated(Common.Events.ProductUpdatedStock update, List<int> userIds)
         {
@@ -93,7 +135,7 @@ namespace notificationService.Services
             await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
             Console.WriteLine($"Admin notification sent for OrderId: {update.Title}");
 
-            
+
             // Notification for User
             // UPDATED: Notify each interested user dynamically
             foreach (var userId in userIds)
@@ -105,7 +147,7 @@ namespace notificationService.Services
                     ProductId = update.ProductId,
                     Details = $"Product #{update.Title} is back in stock!"
                 };
-                
+
                 await _hubContext.Clients.Group($"User_{userId}").SendAsync("ReceiveNotification", userMessage);
                 Console.WriteLine($"User notification sent to User_{userId} for ProductId: {update.ProductId}");
 
@@ -115,7 +157,7 @@ namespace notificationService.Services
                 null);
 
                 if (response.IsSuccessStatusCode)
-                Console.WriteLine($"User {userId} marked as notified.");
+                    Console.WriteLine($"User {userId} marked as notified.");
                 else Console.WriteLine("database not updated");
             }
         }
