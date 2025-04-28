@@ -8,7 +8,9 @@ using ProductService.DTOs.Review;
 using ProductService.Interfaces;
 using ProductService.Mapper;
 using System.Text.Json;
+
 using ProductService.Service;
+
 
 namespace ProductService.Controllers;
 
@@ -128,9 +130,6 @@ public class ProductController : ControllerBase
             });
             Console.WriteLine($"event generated for updating stock of{updatedProduct.Title} to {updatedProduct.Stock}");
         }
-
-
-
         return Ok(productDto);
     }
 
@@ -240,7 +239,7 @@ public class ProductController : ControllerBase
     [HttpPut("{id}/stock")]
     public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockRequest request)
     {
-        Console.WriteLine($"🔍 Received productId: {id}, newStock: {request.NewStock}");
+        Console.WriteLine($"Received productId: {id}, newStock: {request.NewStock}");
         await _repository.UpdateProductStockAsync(id, request.NewStock);
         if (request.NewStock > 0)
         {
@@ -290,11 +289,22 @@ public class ProductController : ControllerBase
         return Ok();
     }
 
+
+    [HttpGet("search")]
+    public async Task<IActionResult> searchProduct([FromQuery] string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return BadRequest("Query cannot be empty.");
+
+        var results = await _repository.SearchProductAsync(query);
+        return Ok(results);
+
     [HttpGet("lowStok")]
      public async Task<IActionResult> lowStokProduct()
     {
      var  lowstock =  await _repository.lowStokProductAsync();
         return Ok(lowstock);
+
     }
 
 }

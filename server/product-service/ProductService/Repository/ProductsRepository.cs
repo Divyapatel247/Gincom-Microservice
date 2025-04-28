@@ -446,11 +446,23 @@ public class ProductsRepository : IProductRepository
         Console.WriteLine("deleting noti req deleted");
     }
 
+
+    public async Task<IEnumerable<Product>> SearchProductAsync(string query){
+        using var conn = new MySqlConnection(_connectionString);
+        var sql = "Select * from Products where Lower(title) Like @search" ;
+         return await conn.QueryAsync<Product>(sql, new {
+            search=$"%{query.ToLower()}%"
+         });
+
+    }
+
+    
     public async Task<int> lowStokProductAsync()
     {
         using var conn = new MySqlConnection(_connectionString);
         const string sql = "SELECT COUNT(*) FROM Products WHERE Stock <= @StockThreshold";
         return await conn.ExecuteScalarAsync<int>(sql, new { StockThreshold = 5 });
     }
+
 }
 
