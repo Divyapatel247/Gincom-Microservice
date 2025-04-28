@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { IProduct } from './productModel';
 import { CommonModule, CurrencyPipe, NgClass, NgFor } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgModel } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
 import { WebsocketService } from '../../service/websocket.service';
 
@@ -20,6 +20,8 @@ export class ProductComponent implements OnInit {
   selectedCategory: string = '';
   categories: string[] = [];
   clicked: boolean = false;
+  searchTerm : string= "";
+  searchResult: IProduct[] = [];
   constructor(private api : ApiService, private route : ActivatedRoute, private auth: AuthService, private websocketService: WebsocketService) {
 
   }
@@ -65,6 +67,7 @@ export class ProductComponent implements OnInit {
   displayProducts() {
     this.api.getProducts().subscribe((res:IProduct[]) => {
       this.products = res;
+      this.searchResult = res;
       console.log("response of getproducts",res);
 
     })
@@ -116,4 +119,26 @@ export class ProductComponent implements OnInit {
     });
   }
 
-}
+  onSearch(): void{
+    const trimmedQuery = this.searchTerm.trim();
+  if (trimmedQuery === '') {
+    this.searchResult = [...this.products];
+    return;
+  }
+  else {
+    this.searchResult = this.products.filter(product =>
+      product.title.toLowerCase().includes(trimmedQuery)
+    );
+  }
+    // this.api.searchProducts(this.searchTerm).subscribe({
+    //   next: (IProduct)=>{
+    //     this.searchResult = IProduct;
+    //   },
+    //   error: (err: IProduct) => {
+    //     console.error('Search error:', err);
+    //   }
+
+    // })
+  }
+
+  }
