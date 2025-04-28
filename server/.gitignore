@@ -15,7 +15,8 @@
 # Dependency directories
 /packages/
 /node_modules/
-/server/notification/notificationService/firebase-adminsdk.json
+# server/notification/notificationService/firebase-adminsdk.json
+**/firebase-adminsdk.json
 
 # Logs
 *.log
