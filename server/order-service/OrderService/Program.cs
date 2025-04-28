@@ -11,6 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient<ProductServiceClient>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPaymentService, RazorpayPaymentService>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderManagementService>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

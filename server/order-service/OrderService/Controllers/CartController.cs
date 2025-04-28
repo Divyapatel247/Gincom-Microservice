@@ -16,155 +16,89 @@ namespace OrderService.Controllers
     [ApiController]
     public class CartController : ControllerBase
     {
-        private readonly IOrderRepository _repository;
-        private readonly ProductServiceClient _productService;
+        private readonly CartService _cartService;
 
-        public CartController(IOrderRepository repository, ProductServiceClient productService)
+        public CartController(CartService cartService)
         {
-            _repository = repository;
-            _productService = productService;
+            _cartService = cartService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCart(string userId)
         {
-            var basket = await _repository.GetBasketAsync(userId);
+            var basket = await _cartService.GetCartAsync(userId);
             if (basket == null) return NotFound();
-            return Ok(BasketMapper.ToBasketResponse(basket));
+            return Ok(basket);
         }
 
         [HttpPost("items")]
         public async Task<IActionResult> AddToCart(string userId, [FromBody] AddToCartRequestDto request)
         {
-            var product = await _productService.GetProductAsync(request.ProductId, null);
-            if (product == null)
-                return BadRequest("Product not found");
-
-            // Check stock before adding to cart
-            if (product.Stock <= 0 || product.Stock < request.Quantity)
-                return BadRequest($"Insufficient stock for Product ID {request.ProductId}. Available: {product.Stock}, Requested: {request.Quantity}");
-
-            var basket = await _repository.GetBasketAsync(userId);
-            if (basket == null)
+            try
             {
-                basket = new Basket { UserId = userId };
-                basket = await _repository.CreateBasketAsync(basket);
+                var response = await _cartService.AddToCartAsync(userId, request);
+                return Ok(response);
             }
-
-            var existingItem = basket.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
-            int totalRequested = (existingItem?.Quantity ?? 0) + request.Quantity;
-
-            if (existingItem != null)
+            catch (Exception ex)
             {
-                await _repository.UpdateBasketItemAsync(existingItem.Id, totalRequested);
-                existingItem.Quantity = totalRequested;
+                return BadRequest(ex.Message);
             }
-            else
-            {
-                var item = BasketMapper.ToBasketItem(request);
-                await _repository.AddBasketItemAsync(item, basket.Id);
-                basket.Items.Add(item);
-            }
-
-            return Ok(BasketMapper.ToBasketResponse(basket));
         }
 
         [HttpPost("items/bulk")]
         public async Task<IActionResult> AddMultipleToCart(string userId, [FromBody] AddMultipleToCartRequestDto request)
         {
-            if (request.Items == null || !request.Items.Any())
-                return BadRequest("Items cannot be empty");
-
-            var basket = await _repository.GetBasketAsync(userId);
-            if (basket == null)
+            try
             {
-                basket = new Basket { UserId = userId };
-                basket = await _repository.CreateBasketAsync(basket);
+                var response = await _cartService.AddMultipleToCartAsync(userId, request);
+                return Ok(response);
             }
-
-            foreach (var itemDto in request.Items)
+            catch (Exception ex)
             {
-                var product = await _productService.GetProductAsync(itemDto.ProductId, null);
-                if (product == null)
-                    return BadRequest($"Product with ID {itemDto.ProductId} not found");
-
-                // Check stock before adding to cart
-                if (product.Stock <= 0 || product.Stock < itemDto.Quantity)
-                    return BadRequest($"Insufficient stock for Product ID {itemDto.ProductId}. Available: {product.Stock}, Requested: {itemDto.Quantity}");
-
-                var existingItem = basket.Items.FirstOrDefault(i => i.ProductId == itemDto.ProductId);
-                if (existingItem != null)
-                {
-                    int updatedQty = existingItem.Quantity + itemDto.Quantity;
-                    await _repository.UpdateBasketItemAsync(existingItem.Id, updatedQty);
-                    existingItem.Quantity = updatedQty;
-                }
-                else
-                {
-                    var item = new BasketItem
-                    {
-                        ProductId = itemDto.ProductId,
-                        Quantity = itemDto.Quantity
-                    };
-                    await _repository.AddBasketItemAsync(item, basket.Id);
-                    basket.Items.Add(item);
-                }
+                return BadRequest(ex.Message);
             }
-
-            return Ok(BasketMapper.ToBasketResponse(basket));
         }
+
         [HttpPut("items/{itemId}")]
         public async Task<IActionResult> UpdateCartItem(string userId, int itemId, [FromBody] UpdateBasketItemRequestDto request)
         {
-            var basket = await _repository.GetBasketAsync(userId);
-            if (basket == null) return NotFound("Basket not found");
-
-            var item = basket.Items.FirstOrDefault(i => i.Id == itemId);
-            if (item == null) return NotFound("Item not found in basket");
-
-            await _repository.UpdateBasketItemAsync(itemId, request.Quantity);
-            item.Quantity = request.Quantity;
-
-            return Ok(BasketMapper.ToBasketResponse(basket));
+            try
+            {
+                var response = await _cartService.UpdateCartItemAsync(userId, itemId, request);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("items/{itemId}")]
         public async Task<IActionResult> RemoveCartItem(string userId, int itemId)
         {
-            var basket = await _repository.GetBasketAsync(userId);
-            if (basket == null) return NotFound("Basket not found");
-
-            var item = basket.Items.FirstOrDefault(i => i.Id == itemId);
-            if (item == null) return NotFound("Item not found in basket");
-
-            await _repository.RemoveBasketItemAsync(itemId);
-            basket.Items.Remove(item);
-
-            return Ok(BasketMapper.ToBasketResponse(basket));
+            try
+            {
+                var response = await _cartService.RemoveCartItemAsync(userId, itemId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete]
         public async Task<IActionResult> ClearCart(string userId)
         {
-            var basket = await _repository.GetBasketAsync(userId);
-            if (basket == null) return NotFound("Basket not found");
-
-            await _repository.ClearBasketAsync(userId);
-            return NoContent();
+            try
+            {
+                await _cartService.ClearCartAsync(userId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
-
-        // [HttpGet("debug/stock")]
-        // public IActionResult DebugStock()
-        // {
-        //     var stocks = _productService.GetMockProducts();
-        //     return Ok(stocks);
-        // }
-
-        // [HttpGet("reset/stock")]
-        // public IActionResult ResetStock()
-        // {
-        //     _productService.ResetStock();
-        //     return Ok("Stock reset successfully");
-        // }
     }
 }
