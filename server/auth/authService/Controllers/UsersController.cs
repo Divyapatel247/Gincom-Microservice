@@ -1,5 +1,6 @@
 using authService.Models;
 using authService.Repositories;
+using authService.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 
@@ -8,10 +9,12 @@ using System.Security.Cryptography;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
+    private readonly RabbitMQPublisher _publisher;
 
-    public UsersController(IUserRepository userRepository)
+    public UsersController(IUserRepository userRepository, RabbitMQPublisher publisher)
     {
         _userRepository = userRepository;
+        _publisher = publisher;
     }
 
     [HttpPost("register")]
@@ -34,8 +37,27 @@ public class UsersController : ControllerBase
             return BadRequest("Invalid role. Must be 'User' or 'Admin'.");
 
         await _userRepository.AddAsync(user);
-       return Ok(new { message = "User registered successfully" });
 
+
+        var count = await _userRepository.GetUserCountAsync();
+        await _publisher.PublishUserRegister(count);
+        
+        return Ok(new { message = "User registered successfully" });
+
+    }
+
+    [HttpGet("count-users")]
+    public async Task<IActionResult> GetUserCount()
+    {
+        try
+        {
+            var count = await _userRepository.GetUserCountAsync();
+            return Ok(count);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
     }
 
     private string HashPassword(string password)
@@ -44,6 +66,7 @@ public class UsersController : ControllerBase
         var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         return Convert.ToBase64String(hashedBytes);
     }
+
 }
 
 public class RegisterRequest

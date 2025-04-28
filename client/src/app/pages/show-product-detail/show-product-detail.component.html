@@ -6,7 +6,6 @@
       <button
         id="save-button"
         (click)="onSave()"
-        routerLink="/admin/products"
         class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium"
       >
         Save Changes
@@ -14,7 +13,6 @@
       <button
         id="delete-button"
         (click)="onDelete()"
-        routerLink="/admin/products"
         class="px-4 py-2 border border-gray-200 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium"
       >
         Delete
@@ -67,12 +65,12 @@
           [(ngModel)]="product.description"
           name="description"
     required
-          
+
           type="text"
           rows="3"
-          class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm" 
+          class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
         ></textarea>
-        
+
       </div>
 
       <div id="category-field">

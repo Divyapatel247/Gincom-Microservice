@@ -34,6 +34,7 @@ namespace notificationService.Services
                 TotalAmount = order.TotalAmount,
                 Status = order.Status ?? "Pending",
                 CreatedAt = order.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                notificationType = "totalOrder",
                 Details = $"New order placed by User {order.UserId} for ${order.TotalAmount}. Items: {string.Join(", ", order.Items.Select(i => $"{i.Quantity} x Product {i.ProductId}"))}"
             };
             await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
@@ -152,6 +153,31 @@ namespace notificationService.Services
 
         }
 
+         public async Task NotifyUserCreated(IUserRegisterEvent message)
+        {
+            // Notification for Admin
+            var adminMessage = new
+            {
+                MessageType = "AdminNotification",
+                notificationType = "regisrterCustomer",
+                count = message.count
+            };
+            await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
+            Console.WriteLine($"Admin notification sent for count: {message.count}");
+        }
+
+         public async Task LowStock(ILowStockProduct message)
+        {
+            // Notification for Admin
+            var adminMessage = new
+            {
+                MessageType = "AdminNotification",
+                notificationType = "lowStockProduct",
+                lowStock = message.lowStock
+            };
+            await _hubContext.Clients.Group("Admin").SendAsync("ReceiveNotification", adminMessage);
+            Console.WriteLine($"Admin notification sent for count: {message.lowStock}");
+        }
 
     }
 }

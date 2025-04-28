@@ -30,6 +30,18 @@ namespace authService.Services
             });
             _logger.LogInformation("Published IUserLoggedInEvent for user {Username}", username);
         }
+
+        public async Task PublishUserRegister(int count)
+        {
+             var endpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"exchange:PublishUserRegister"));
+            await endpoint.Send<IUserRegisterEvent>(new
+            {
+                count
+            });
+            _logger.LogInformation("Published IUserRegisterEvent for user {Username}", count);
+        }
+
+        
     }
 
     // public interface IUserLoggedInEvent
