@@ -4,14 +4,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../shared/api.service';
 import { Order } from '../../models/order.interface';
 import { CommonModule } from '@angular/common';
+import { LoaderComponent } from "../../components/loader/loader.component";
 
 @Component({
   selector: 'app-admin-order-detail',
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './admin-order-detail.component.html',
   styleUrl: './admin-order-detail.component.css',
 })
 export class AdminOrderDetailComponent implements OnInit {
+  loading = true
   orderId!: string;
   order: Order = {
     id: 0,
@@ -33,11 +35,10 @@ export class AdminOrderDetailComponent implements OnInit {
     this.api.getOrderByOrderId(parseInt(this.orderId)).subscribe((order) => {
       this.order = order;
       this.calOrderTotle();
+      this.loading = false;
     });
     console.log('product :', this.orderId);
     console.log('order:', this.order);
-
-
   }
   calOrderTotle(){
     this.order.items.forEach((item) => {

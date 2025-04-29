@@ -5,14 +5,16 @@ import { ApiService } from '../../shared/api.service';
 import { CurrencyPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { UpdateProductComponent } from '../update-product/update-product.component';
+import { LoaderComponent } from "../loader/loader.component";
 
 @Component({
   selector: 'app-product-table',
-  imports: [NgFor, CurrencyPipe,NgClass,RouterLink],
+  imports: [NgFor, CurrencyPipe, NgClass, RouterLink, LoaderComponent],
   templateUrl: './product-table.component.html',
   styleUrl: './product-table.component.css'
 })
 export class ProductTableComponent implements OnInit {
+  loading = true;
   products : IProduct[] = [];
   selectedProduct: any | null = null;
   errorMessage: string = '';
@@ -28,6 +30,7 @@ export class ProductTableComponent implements OnInit {
       next: (res: IProduct[]) => {
         this.products = res;
         console.log('Products loaded:', this.products);
+        this.loading = false;
       },
       error: (err) => {
         this.errorMessage = 'Failed to load products. Please try again later.';
