@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule, NgModel } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
 import { WebsocketService } from '../../service/websocket.service';
+import { debounce, debounceTime, distinctUntilChanged, Subject, subscribeOn } from 'rxjs';
 
 
 @Component({
@@ -21,11 +22,32 @@ export class ProductComponent implements OnInit {
   categories: string[] = [];
   clicked: boolean = false;
   searchTerm : string= "";
+  private searchTermChanged: Subject<string>= new Subject<string>();
   searchResult: IProduct[] = [];
   constructor(private api : ApiService, private route : ActivatedRoute, private auth: AuthService, private websocketService: WebsocketService) {
 
   }
   ngOnInit(): void {
+    const trimmedQuery = this.searchTerm.trim();
+    this.searchTermChanged.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(trimmedQuery => {
+      if(trimmedQuery ===''){
+        this.displayProducts();
+      }else{
+        this.api.searchProducts(trimmedQuery).subscribe({
+          next: (result)=> {
+            this.products = result;
+          },
+          error:(err)=>{
+            console.error('Search failed', err)
+          }
+        })
+      }
+    })
+
+
     this.route.params.subscribe(params => {
       const category = params['category'] || '';
       this.selectedCategory = category;
@@ -34,15 +56,13 @@ export class ProductComponent implements OnInit {
       } else {
         this.displayProducts();
       }
-
-
     });
-
 
     this.getCategoryList();
 
     const userId = parseInt(this.auth.getUserId() || '');
     console.log("userId", userId, typeof userId);
+
     this.api.getNotifiedProductIds(userId).subscribe((notifiedIds: number[])=>{
           this.products.forEach(p => {
             p.IsNotifyDisabled = notifiedIds.includes(p.id);
@@ -51,6 +71,7 @@ export class ProductComponent implements OnInit {
 
     this.websocketService.stockUpdate.subscribe(({ productId }) => {
       console.log('SignalR update received for productId:', productId);
+      
       this.api.getProductById(productId).subscribe(updated => {
         console.log('Fetched updated product:', updated);
         const index = this.products.findIndex(p => p.id === parseInt(productId));
@@ -121,15 +142,8 @@ export class ProductComponent implements OnInit {
 
   onSearch(): void{
     const trimmedQuery = this.searchTerm.trim();
-  if (trimmedQuery === '') {
-    this.searchResult = [...this.products];
-    return;
-  }
-  else {
-    this.searchResult = this.products.filter(product =>
-      product.title.toLowerCase().includes(trimmedQuery)
-    );
-  }
+    this.searchTermChanged.next(trimmedQuery);
+  
     // this.api.searchProducts(this.searchTerm).subscribe({
     //   next: (IProduct)=>{
     //     this.searchResult = IProduct;

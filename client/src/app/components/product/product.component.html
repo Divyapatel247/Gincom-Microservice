@@ -104,147 +104,177 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Product Grid -->
 
-   <!-- Product Grid -->
-<div id="product-grid" class="flex-1 p-4 md:p-6 bg-gray-50">
-  <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    
-    <!-- Show products if available -->
-    <ng-container *ngIf="searchResult.length > 0; else noResults">
-      <div *ngFor="let item of searchResult">
-        <div id="product-{{ item.id }}" class="relative">
-          
-          <!-- Notification Bell -->
-          <button
-            id="notify-button-{{ item.id }}"
-            *ngIf="item.stock === 0"
-            class="absolute top-3 right-3 z-30 cursor-pointer bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors"
-            (click)="notifyMe(item.id)"
-            [disabled]="item.IsNotifyDisabled"
-            title="Notify me when product is back in stock"
-          >
-            <i
-              id="notify-icon-{{ item.id }}"
-              class="fas fa-bell"
-              [ngClass]="{
-                'text-black': !item.IsNotifyDisabled,
-                'text-gray-400': item.IsNotifyDisabled
-              }"
-            ></i>
-          </button>
-
-          <!-- Product Card -->
-          <div
-            id="product-card-{{ item.id }}"
-            class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col overflow-hidden"
-            [ngClass]="{ 'opacity-60 grayscale': item.stock == 0 }"
-          >
-            <a
-              id="product-link-{{ item.id }}"
-              routerLink="/customer/product-detail/{{ item.id }}"
-              class="w-full flex flex-col h-full"
-            >
-              
-              <!-- Product Image & Category Tag -->
-              <div
-                id="product-image-container-{{ item.id }}"
-                class="relative p-6 flex justify-center items-center bg-gray-50 border-b border-gray-100"
+    <!-- Product Grid -->
+    <div id="product-grid" class="flex-1 p-4 md:p-6 bg-gray-50">
+      <div
+        id="products-container"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <!-- Show products if available -->
+        <ng-container *ngIf="products.length > 0; else noResults">
+          <div *ngFor="let item of products">
+            <div id="product-{{ item.id }}" class="relative">
+              <!-- Notification Bell -->
+              <button
+                id="notify-button-{{ item.id }}"
+                *ngIf="item.stock === 0"
+                class="absolute top-3 right-3 z-30 cursor-pointer bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors"
+                (click)="notifyMe(item.id)"
+                [disabled]="item.IsNotifyDisabled"
+                title="Notify me when product is back in stock"
               >
-                <img
-                  id="product-image-{{ item.id }}"
-                  [src]="item.thumbnail"
-                  class="w-32 lg:w-40 aspect-square object-contain transition-transform duration-300 group-hover:scale-110"
-                />
-                <span
-                  id="category-tag-{{ item.id }}"
-                  class="absolute top-3 left-3 bg-black text-white text-xs font-medium px-2 py-1 rounded-full"
+                <i
+                  id="notify-icon-{{ item.id }}"
+                  class="fas fa-bell"
+                  [ngClass]="{
+                    'text-black': !item.IsNotifyDisabled,
+                    'text-gray-400': item.IsNotifyDisabled
+                  }"
+                ></i>
+              </button>
+
+              <!-- Product Card -->
+              <div
+                id="product-card-{{ item.id }}"
+                class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col overflow-hidden"
+                [ngClass]="{ 'opacity-60 grayscale': item.stock == 0 }"
+              >
+                <a
+                  id="product-link-{{ item.id }}"
+                  routerLink="/customer/product-detail/{{ item.id }}"
+                  class="w-full flex flex-col h-full"
                 >
-                  {{ item.categoryName }}
-                </span>
-              </div>
-
-              <!-- Product Details -->
-              <div id="product-details-{{ item.id }}" class="p-4 flex flex-col flex-grow">
-                <div id="product-title-stock-{{ item.id }}" class="flex justify-between items-start mb-2">
-                  <p id="product-title-{{ item.id }}" class="font-medium text-black text-base md:text-lg line-clamp-2">
-                    {{ item.title }}
-                  </p>
-                  <span
-                    id="stock-status-{{ item.id }}"
-                    class="bg-gray-50 text-black text-xs font-semibold px-2 py-0.5 rounded ml-2 whitespace-nowrap"
+                  <!-- Product Image & Category Tag -->
+                  <div
+                    id="product-image-container-{{ item.id }}"
+                    class="relative p-6 flex justify-center items-center bg-gray-50 border-b border-gray-100"
                   >
-                    {{ item.stock > 0 ? "In Stock" : "Out of Stock" }}
-                  </span>
-                </div>
-
-                <!-- Ratings -->
-                <div id="product-ratings-{{ item.id }}" class="flex items-center mt-1 mb-3">
-                  <div id="stars-container-{{ item.id }}" class="flex items-center space-x-0.5">
-                    <ng-container *ngFor="let star of getStars(item?.rating ?? 0); let i = index">
-                      <svg
-                        id="star-{{ item.id }}-{{ i }}"
-                        class="w-4 h-4"
-                        [ngClass]="star <= (item?.rating ?? 0) ? 'text-black' : 'text-gray-200'"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M10 15l-5.878 3.09 1.123-6.545L.49 7.545l6.564-.955L10 1l2.946 5.59 6.564.955-4.756 4.545 1.123 6.545z"
-                        />
-                      </svg>
-                    </ng-container>
-                  </div>
-                  <span id="rating-value-{{ item.id }}" class="text-sm text-gray-600 ml-2">
-                    {{ item.rating }}
-                  </span>
-                </div>
-
-                <!-- Price and Add Button -->
-                <div id="product-price-add-{{ item.id }}" class="mt-auto pt-3 flex justify-between items-center">
-                  <p id="product-price-{{ item.id }}" class="text-black font-bold text-base md:text-lg">
-                    {{ item.price | currency }}
-                  </p>
-                  <button
-                    id="add-to-cart-{{ item.id }}"
-                    class="bg-black text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-800"
-                  >
-                    <svg
-                      id="cart-icon-{{ item.id }}"
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    <img
+                      id="product-image-{{ item.id }}"
+                      [src]="item.thumbnail"
+                      class="w-32 lg:w-40 aspect-square object-contain transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <span
+                      id="category-tag-{{ item.id }}"
+                      class="absolute top-3 left-3 bg-black text-white text-xs font-medium px-2 py-1 rounded-full"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                      {{ item.categoryName }}
+                    </span>
+                  </div>
+
+                  <!-- Product Details -->
+                  <div
+                    id="product-details-{{ item.id }}"
+                    class="p-4 flex flex-col flex-grow"
+                  >
+                    <div
+                      id="product-title-stock-{{ item.id }}"
+                      class="flex justify-between items-start mb-2"
+                    >
+                      <p
+                        id="product-title-{{ item.id }}"
+                        class="font-medium text-black text-base md:text-lg line-clamp-2"
+                      >
+                        {{ item.title }}
+                      </p>
+                      <span
+                        id="stock-status-{{ item.id }}"
+                        class="bg-gray-50 text-black text-xs font-semibold px-2 py-0.5 rounded ml-2 whitespace-nowrap"
+                      >
+                        {{ item.stock > 0 ? "In Stock" : "Out of Stock" }}
+                      </span>
+                    </div>
+
+                    <!-- Ratings -->
+                    <div
+                      id="product-ratings-{{ item.id }}"
+                      class="flex items-center mt-1 mb-3"
+                    >
+                      <div
+                        id="stars-container-{{ item.id }}"
+                        class="flex items-center space-x-0.5"
+                      >
+                        <ng-container
+                          *ngFor="
+                            let star of getStars(item?.rating ?? 0);
+                            let i = index
+                          "
+                        >
+                          <svg
+                            id="star-{{ item.id }}-{{ i }}"
+                            class="w-4 h-4"
+                            [ngClass]="
+                              star <= (item?.rating ?? 0)
+                                ? 'text-black'
+                                : 'text-gray-200'
+                            "
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M10 15l-5.878 3.09 1.123-6.545L.49 7.545l6.564-.955L10 1l2.946 5.59 6.564.955-4.756 4.545 1.123 6.545z"
+                            />
+                          </svg>
+                        </ng-container>
+                      </div>
+                      <span
+                        id="rating-value-{{ item.id }}"
+                        class="text-sm text-gray-600 ml-2"
+                      >
+                        {{ item.rating }}
+                      </span>
+                    </div>
+
+                    <!-- Price and Add Button -->
+                    <div
+                      id="product-price-add-{{ item.id }}"
+                      class="mt-auto pt-3 flex justify-between items-center"
+                    >
+                      <p
+                        id="product-price-{{ item.id }}"
+                        class="text-black font-bold text-base md:text-lg"
+                      >
+                        {{ item.price | currency }}
+                      </p>
+                      <button
+                        id="add-to-cart-{{ item.id }}"
+                        class="bg-black text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-800"
+                      >
+                        <svg
+                          id="cart-icon-{{ item.id }}"
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </a>
               </div>
-            </a>
+            </div>
           </div>
-        </div>
+        </ng-container>
+
+        <!-- No results template -->
+        <ng-template #noResults>
+          <div class="col-span-4 text-center py-12">
+            <p class="text-gray-500 text-lg">No products found.</p>
+          </div>
+        </ng-template>
       </div>
-    </ng-container>
-
-    <!-- No results template -->
-    <ng-template #noResults>
-      <div class="col-span-4 text-center py-12">
-        <p class="text-gray-500 text-lg">No products found.</p>
-      </div>
-    </ng-template>
-
-  </div>
-</div>
-
-    
+    </div>
   </div>
 </div>

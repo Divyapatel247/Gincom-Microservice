@@ -299,6 +299,7 @@ public class ProductController : ControllerBase
 
         var results = await _repository.SearchProductAsync(query);
         return Ok(results);
+    }
 
 
     }
