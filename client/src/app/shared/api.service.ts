@@ -365,8 +365,8 @@ export class ApiService {
     return this.http.get<Order>(`${this.apiUrl}/api/orders/${orderId}`, {
       headers,
     });
- 
 
+  }
   getLowStockProducts(): Observable<number> {
     const token = localStorage.getItem('access_token');
     const headers = new HttpHeaders({

@@ -1,6 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { WebsocketService } from '../../service/websocket.service';
 import { Notification } from '../../models/notification.interface';
 import { AuthService } from '../../service/auth.service';
@@ -8,7 +8,7 @@ import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-customer-navbar',
-  imports: [NgIf,NgFor,CommonModule],
+  imports: [NgIf,NgFor,CommonModule,RouterLink],
   templateUrl: './customer-navbar.component.html',
   styleUrl: './customer-navbar.component.css',
 })

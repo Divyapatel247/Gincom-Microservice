@@ -2,7 +2,7 @@
 rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 />
-<nav class="bg-white border-gray-200 shadow-sm dark:bg-gray-900 relative" id="main-navigation">
+<nav class="bg-black border-gray-200 shadow-sm dark:bg-gray-900 relative" id="main-navigation">
   <div class="max-w-screen-xl flex items-center justify-between mx-auto p-4" id="nav-container">
     <!-- Logo -->
     <a class="flex items-center space-x-3 cursor-pointer" id="logo-link">
@@ -13,10 +13,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     <!-- Navigation Links -->
     <div class="flex-1 flex justify-center" id="nav-links-container">
       <ul class="flex space-x-8 font-medium" id="nav-links-list">
-        <li id="nav-home-item"><a routerLink="product" class="text-blue-700 hover:text-blue-900 px-3 py-2 rounded-md transition-colors" id="nav-home-link">Home</a></li>
-        <li id="nav-product-item"><a routerLink="product" class="text-gray-900 hover:text-blue-700 px-3 py-2 rounded-md transition-colors dark:text-white" id="nav-product-link">Product</a></li>
-        <li id="nav-inventory-item"><a routerLink="product-table" class="text-gray-900 hover:text-blue-700 px-3 py-2 rounded-md transition-colors dark:text-white" id="nav-inventory-link">Inventory</a></li>
-        <li id="nav-add-item-item"><a routerLink="add-product" class="text-gray-900 hover:text-blue-700 px-3 py-2 rounded-md transition-colors dark:text-white" id="nav-add-item-link">Add Item</a></li>
+        <li id="nav-home-item"><a routerLink="/customer/product" class="text-blue-700 hover:text-blue-900 px-3 py-2 rounded-md transition-colors" id="nav-home-link">Home</a></li>
+        <li id="nav-product-item"><a routerLink="/customer/product" class="text-gray-900 hover:text-blue-700 px-3 py-2 rounded-md transition-colors dark:text-white" id="nav-product-link">Products</a></li>
+        <li id="nav-inventory-item"><a routerLink="/customer/myOrders" class="text-gray-900 hover:text-blue-700 px-3 py-2 rounded-md transition-colors dark:text-white" id="nav-inventory-link">My Orders</a></li>
+        <li id="nav-add-item-item"><a routerLink="/customer/addToCart" class="text-gray-900 hover:text-blue-700 px-3 py-2 rounded-md transition-colors dark:text-white" id="nav-add-item-link">My Cart</a></li>
       </ul>
     </div>
 

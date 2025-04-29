@@ -107,15 +107,16 @@ public class ProductController : ControllerBase
 
         Console.WriteLine("Updated Product: " + JsonSerializer.Serialize(updatedProduct));
 
-       var count =  await _repository.lowStokProductAsync();    
-       Console.WriteLine("count :"+count);
+        var count = await _repository.lowStokProductAsync();
+        Console.WriteLine("count :" + count);
 
-       if(oldStock != updatedProduct.Stock){
-         await _publishEndpoint.Publish<ILowStockProduct>(new
+        if (oldStock != updatedProduct.Stock)
         {
-            lowStock = count
-        });
-       }
+            await _publishEndpoint.Publish<ILowStockProduct>(new
+            {
+                lowStock = count
+            });
+        }
 
 
         if (oldStock == 0 && updatedProduct.Stock > 0)
@@ -299,17 +300,17 @@ public class ProductController : ControllerBase
         var results = await _repository.SearchProductAsync(query);
         return Ok(results);
 
+
+    }
     [HttpGet("lowStok")]
-     public async Task<IActionResult> lowStokProduct()
+    public async Task<IActionResult> lowStokProduct()
     {
-     var  lowstock =  await _repository.lowStokProductAsync();
+        var lowstock = await _repository.lowStokProductAsync();
         return Ok(lowstock);
 
     }
 
 }
-
-
 
 public class notifyMeRequest
 {

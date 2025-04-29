@@ -105,12 +105,15 @@ export class WebsocketService implements OnDestroy {
         this.notification$.next(data);
         if(data.notificationType == 'regisrterCustomer'){
           this.registerCustomer$.next(data);
+          return
         }
         if(data.notificationType == 'totalOrder'){
           this.totalOrder$.next(data);
+          return
         }
         if(data.notificationType == 'lowStockProduct'){
           this.lowStock$.next(data);
+          return
         }
         const notification: Notification = {
           message: data.details || 'No details',
