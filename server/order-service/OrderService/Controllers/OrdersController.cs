@@ -45,8 +45,18 @@ namespace OrderService.Controllers
         [HttpPost("{userId}")]
         public async Task<IActionResult> CreateOrder(string userId, [FromBody] CreateOrderRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return BadRequest("User ID is required.");
+                }
+
                 (OrderResponseDto order, string razorpayOrderId) = await _orderService.CreateOrderAsync(userId, request);
                 return Ok(new { Order = order, RazorpayOrderId = razorpayOrderId });
             }

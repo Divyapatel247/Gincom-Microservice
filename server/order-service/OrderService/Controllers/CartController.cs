@@ -34,6 +34,10 @@ namespace OrderService.Controllers
         [HttpPost("items")]
         public async Task<IActionResult> AddToCart(string userId, [FromBody] AddToCartRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var response = await _cartService.AddToCartAsync(userId, request);
@@ -48,6 +52,10 @@ namespace OrderService.Controllers
         [HttpPost("items/bulk")]
         public async Task<IActionResult> AddMultipleToCart(string userId, [FromBody] AddMultipleToCartRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var response = await _cartService.AddMultipleToCartAsync(userId, request);
@@ -62,6 +70,10 @@ namespace OrderService.Controllers
         [HttpPut("items/{itemId}")]
         public async Task<IActionResult> UpdateCartItem(string userId, int itemId, [FromBody] UpdateBasketItemRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var response = await _cartService.UpdateCartItemAsync(userId, itemId, request);
