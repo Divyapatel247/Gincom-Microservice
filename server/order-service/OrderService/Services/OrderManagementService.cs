@@ -65,6 +65,8 @@ public class OrderManagementService
 
         public async Task<(OrderResponseDto Order, string RazorpayOrderId)> CreateOrderAsync(string userId, CreateOrderRequest request)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("User ID is required.");
             var basket = await _repository.GetBasketAsync(userId);
             if (basket == null || basket.Items == null || !basket.Items.Any())
                 throw new Exception("Cart is empty");
