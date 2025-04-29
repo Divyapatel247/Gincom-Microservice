@@ -6,16 +6,17 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { AddCrossProductsComponent } from "../add-cross-products/add-cross-products.component";
 import { Router, RouterLink } from '@angular/router';
 import { routes } from '../../app.routes';
+import { LoaderComponent } from "../loader/loader.component";
 
 @Component({
   selector: 'app-add-product',
-  imports: [ReactiveFormsModule, NgClass, NgIf, NgFor, AddCrossProductsComponent,FormsModule],
+  imports: [ReactiveFormsModule, NgClass, NgIf, NgFor, AddCrossProductsComponent, FormsModule, LoaderComponent],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.css'
 })
 export class AddProductComponent implements OnInit{
   @ViewChild(AddCrossProductsComponent) crossProductsComponent!: AddCrossProductsComponent;
-
+  loading = false;
   products : IProduct[] = [];
   categories: string[] = [];
 
@@ -75,6 +76,7 @@ export class AddProductComponent implements OnInit{
     if (this.productForm.invalid) {
       return;
     }
+    this.loading = true;
     this.addProduct();
   }
 
@@ -103,12 +105,14 @@ export class AddProductComponent implements OnInit{
 
     this.api.addProduct(productToAdd as IProduct).subscribe({
       next: (res: IProduct) => {
+        this.loading = false;
         this.products.push(res);
         this.productForm.reset();
         this.crossProductsComponent.reset();
         this.tagsArray = []
         this.errorMessage = 'Product added successfully!';
         setTimeout(() => (this.errorMessage = ''), 3000);
+
         // this.router.navigateByUrl('/admin/products')
       },
       error: (err) => {

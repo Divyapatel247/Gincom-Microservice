@@ -1,3 +1,10 @@
+@if(loading){
+ <app-loader></app-loader>
+}
+@if(!loading){
+
+
+
 <!-- Add Product Form Component -->
 <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100" id="add-product-container">
   <h2 class="text-2xl font-bold text-gray-900 mb-6" id="form-title">Add New Product</h2>
@@ -195,3 +202,4 @@
     </button>
   </form>
 </div>
+}

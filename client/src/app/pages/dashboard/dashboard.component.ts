@@ -5,6 +5,7 @@ import { OrderTotalComponent } from '../../components/order-total/order-total.co
 import { LatestOrdersComponent } from '../../components/latest-orders/latest-orders.component';
 import { ApiService } from '../../shared/api.service';
 import { WebsocketService } from '../../service/websocket.service';
+import { LoaderComponent } from "../../components/loader/loader.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -12,13 +13,14 @@ import { WebsocketService } from '../../service/websocket.service';
     CommonStatisticsComponent,
     OrderTotalComponent,
     LatestOrdersComponent,
-  ],
+    LoaderComponent
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements OnInit {
   constructor(private api: ApiService, private ws: WebsocketService) {}
-
+  loading = true;
   orders: Order[] = [];
   latestOrders: Order[] = [];
   pendingOrders:number = 0;
@@ -31,6 +33,9 @@ export class DashboardComponent implements OnInit {
       this.orders = res;
       this.latestOrders = this.getLatestFiveOrders(this.orders);
       this.getOrderWithPendingStatus(this.orders);
+      setTimeout(() => {
+        this.loading = false;
+      }, 3000);
     });
 
     this.api.getCustomerCount().subscribe((res)=>{

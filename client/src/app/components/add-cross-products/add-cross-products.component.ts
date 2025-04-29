@@ -3,15 +3,16 @@ import { Component, EventEmitter, NgModule, Output } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { FormsModule, NgModel } from '@angular/forms';
 import { IProduct } from '../product/productModel';
+import { LoaderComponent } from "../loader/loader.component";
 
 @Component({
   selector: 'app-add-cross-products',
-  imports: [NgFor,NgIf,FormsModule],
+  imports: [NgFor, NgIf, FormsModule, LoaderComponent],
   templateUrl: './add-cross-products.component.html',
   styleUrl: './add-cross-products.component.css'
 })
 export class AddCrossProductsComponent {
-
+  loading = false;
   constructor(private api: ApiService) {}
   categories: string[] = [];
   ngOnInit() {
@@ -35,6 +36,7 @@ export class AddCrossProductsComponent {
   onCategoryChange(): void {
     if (this.selectedCategory) {
       this.fetchProductsByCategory();
+      this.loading = true;
     } else {
       this.products = [];
       this.selectedProductIds = [];
@@ -45,12 +47,14 @@ export class AddCrossProductsComponent {
   fetchProductsByCategory(): void {
     this.api.getProductCategory(this.selectedCategory).subscribe({
       next: (products: IProduct[]) => {
+        this.loading = false;
         this.products = products;
         this.selectedProductIds = [];
         this.selectedProductsChange.emit(this.selectedProductIds);
       },
       error: (err:any) => {
         console.error('Error fetching products:', err);
+        this.loading = false;
         this.products = [];
         this.selectedProductIds = [];
         this.selectedProductsChange.emit(this.selectedProductIds);
