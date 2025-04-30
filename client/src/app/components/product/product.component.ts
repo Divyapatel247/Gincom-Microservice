@@ -6,16 +6,17 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule, NgModel } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
 import { WebsocketService } from '../../service/websocket.service';
+import { LoaderComponent } from "../loader/loader.component";
 
 
 @Component({
   selector: 'app-product',
-  imports: [NgFor, CurrencyPipe, NgClass, RouterLink, FormsModule, CommonModule],
+  imports: [NgFor, CurrencyPipe, NgClass, RouterLink, FormsModule, CommonModule, LoaderComponent],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
 export class ProductComponent implements OnInit {
-
+  loading = true;
   products: IProduct[] = [];
   selectedCategory: string = '';
   categories: string[] = [];
@@ -68,6 +69,7 @@ export class ProductComponent implements OnInit {
     this.api.getProducts().subscribe((res:IProduct[]) => {
       this.products = res;
       this.searchResult = res;
+      this.loading = false;
       console.log("response of getproducts",res);
 
     })
@@ -76,6 +78,7 @@ export class ProductComponent implements OnInit {
   getProductByCategory(category: string) {
     this.api.getProductCategory(category).subscribe((res:any) => {
       this.products = res;
+      this.loading = false;
     })
   }
 

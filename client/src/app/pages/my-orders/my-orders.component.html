@@ -1,3 +1,10 @@
+@if(loading){
+  <div class="h-[90vh]">
+    <app-loader></app-loader>
+  </div>
+}
+@if(!loading){
+
 <div id="orders-container" class="max-w-6xl mx-auto mt-8 mb-16">
   <!-- Page Header -->
   <div id="page-header" class="mb-8">
@@ -107,3 +114,4 @@
     </div>
   }
 </div>
+}
