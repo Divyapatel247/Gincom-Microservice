@@ -1,0 +1,145 @@
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+/>
+<nav id="main-navigation" class="bg-gray-900 border-gray-200 dark:bg-gray-900">
+  <div
+    id="nav-container"
+    class="max-w-screen-3xl flex flex-wrap items-center justify-between mx-auto p-4 px-9"
+  >
+    <a id="brand-logo" class="flex items-center space-x-3 rtl:space-x-reverse">
+      <img
+        id="logo-image"
+        src="assets/ecommerce-svgrepo-com.svg"
+        class="h-8"
+        alt="Flowbite Logo"
+      />
+      <span
+        id="brand-name"
+        class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
+        >EnCom</span
+      >
+    </a>
+    <!-- <div
+      *ngIf="currentUser"
+      class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
+    >
+      <button
+        type="button"
+        class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+        id="user-menu-button"
+        aria-expanded="false"
+        data-dropdown-toggle="user-dropdown"
+        data-dropdown-placement="bottom"
+        data-dropdown-trigger="click"
+      >
+        <span class="sr-only">Open user menu</span> -->
+        <!-- <img class="w-8 h-8 rounded-full cursor-pointer" [src]="currentUser.profilePictureUrl" alt="user photo"> -->
+      <!-- </button> -->
+      <!-- Dropdown menu -->
+      <!-- <div
+        class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600"
+        id="user-dropdown"
+      >
+        <div class="px-4 py-3"> -->
+          <!-- <span class="block text-sm text-gray-900 dark:text-white">{{currentUser.username}}</span>
+          <span class="block text-sm  text-gray-500 truncate dark:text-gray-400">{{currentUser.email}}</span> -->
+        <!-- </div>
+        <ul class="py-2" aria-labelledby="user-menu-button">
+          <li>
+            <a
+              routerLink="product"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+              >Dashboard</a
+            >
+          </li> -->
+          <!-- <li>
+            <a (click)="onLogoff()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+          </li> -->
+        <!-- </ul>
+      </div> -->
+      <!-- <button
+        data-collapse-toggle="navbar-user"
+        type="button"
+        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        aria-controls="navbar-user"
+        aria-expanded="false"
+      >
+        <span class="sr-only">Open main menu</span>
+        <svg
+          class="w-5 h-5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 17 14"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 1h15M1 7h15M1 13h15"
+          />
+        </svg>
+      </button>
+    </div> -->
+
+    <!-- Include Font Awesome -->
+
+    <!-- Notification Component -->
+    <div id="notification-container" class="relative">
+      <button id="notification-toggle-button" (click)="toggleNotifications()" class="relative p-2.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300">
+        <i id="notification-icon" class="fa-regular fa-bell text-xl text-blue-500"></i>
+        <span id="notification-badge" *ngIf="notifications.length > 0" class="absolute top-0 right-0 block w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+      </button>
+
+      <!-- Dropdown Panel -->
+      <div id="notification-panel" *ngIf="showNotifications" class="fixed right-4 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+        <div id="notification-header" class="bg-blue-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+          <h3 id="notification-title" class="font-medium text-blue-700">Notifications</h3>
+          <button id="clear-all-button" *ngIf="notifications.length > 0" (click)="clearAllNotifications()" class="text-xs text-blue-600 hover:text-blue-800">
+            Clear all
+          </button>
+        </div>
+
+        <div id="empty-notification-message" *ngIf="notifications.length === 0" class="px-4 py-8 text-gray-500 text-center">
+          <i id="empty-notification-icon" class="fa-regular fa-bell-slash text-gray-400 text-2xl mb-2"></i>
+          <p id="empty-notification-text">No notifications</p>
+        </div>
+
+        <div id="notifications-list-container" *ngIf="notifications.length > 0" class="max-h-80 overflow-y-auto">
+          <ul id="notifications-list" class="divide-y divide-gray-100">
+            <li id="notification-item-{{i}}" *ngFor="let notification of notifications; let i = index" class="px-4 py-3 hover:bg-gray-50 transition-colors">
+              <div id="notification-content-{{i}}" class="flex justify-between">
+                <div id="notification-text-container-{{i}}" class="flex-1">
+                  <p id="notification-message-{{i}}" class="text-sm text-gray-700">{{ notification.message }}</p>
+                  <p id="notification-time-{{i}}" class="text-xs text-gray-400 mt-1">{{ notification.timestamp | date:'short' }}</p>
+                </div>
+                <button id="delete-notification-button-{{i}}" (click)="deleteNotification(i)" class="text-gray-400 hover:text-red-500 focus:outline-none ml-2">
+                  <i id="delete-icon-{{i}}" class="fa-solid fa-times"></i>
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
+    <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+      <li>
+        <a routerLink="product" class="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500" aria-current="page">Home</a>
+      </li>
+      <li>
+        <a routerLink="product" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Product</a>
+      </li>
+      <li>
+        <a routerLink="product-table" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Inventory</a>
+      </li>
+      <li>
+        <a routerLink="add-product" class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Add Item</a>
+      </li>
+    </ul>
+  </div> -->
+  </div>
+</nav>

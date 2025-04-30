@@ -1,0 +1,50 @@
+<!-- cart-item.html - fully responsive -->
+<div id="cart-item-container" class="grid grid-cols-12 gap-2 sm:gap-4 items-center">
+  <!-- Product info - Full width on mobile, 6 cols on larger screens -->
+  <div id="product-info-container" class="col-span-12 sm:col-span-6 mb-3 sm:mb-0">
+    <div id="product-info-flex" class="flex items-center gap-3 sm:gap-4">
+      <img id="product-thumbnail" [src]="product?.thumbnail || 'https://via.placeholder.com/80'" alt="Product"
+          class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg bg-gray-50 border border-gray-100" />
+      <div id="product-details">
+        <h3 id="product-title" class="font-medium text-gray-900 text-sm sm:text-base">{{ product?.title || 'Loading...' }}</h3>
+        @if (item.createdAt) {
+          <p id="product-added-date" class="text-gray-400 text-xs mt-1">Added: {{ item.createdAt | date:'short' }}</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Price - Hidden on xs, visible from sm up -->
+  <div id="product-price" class="hidden sm:block sm:col-span-2 text-center text-gray-900">
+    ₹{{ product?.price || 0 | number:'1.2-2' }}
+  </div>
+
+  <!-- Quantity controls - 8 cols on mobile, 3 cols on larger screens -->
+  <div id="quantity-controls-container" class="col-span-8 sm:col-span-3">
+    <div id="quantity-controls-flex" class="flex items-center justify-start sm:justify-center">
+      <div id="quantity-input-group" class="flex items-center border border-gray-200 rounded-md">
+        <button id="decrease-quantity-btn" (click)="onUpdateQuantity(item.quantity - 1)"
+            class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">−</button>
+        <input id="quantity-input" type="number" [(ngModel)]="item.quantity" (change)="onUpdateQuantity(item.quantity)" min="1"
+            class="w-12 sm:w-16 text-center border-x border-gray-200 h-8 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        <button id="increase-quantity-btn" (click)="onUpdateQuantity(item.quantity + 1)"
+            class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">+</button>
+      </div>
+    </div>
+    @if (error) {
+      <p id="quantity-error" class="text-red-500 text-xs mt-1">{{ error }}</p>
+    }
+  </div>
+
+  <!-- Total price and remove button - 4 cols on mobile, 1 col on larger screens -->
+  <div id="total-price-container" class="col-span-4 sm:col-span-1 text-right">
+    <div id="total-price-actions" class="flex items-center justify-end gap-2 sm:gap-3">
+      <span id="total-price" class="font-medium text-sm sm:text-base">₹{{ (product?.price || 0) * item.quantity | number:'1.2-2' }}</span>
+      <button id="remove-item-btn" (click)="onRemove()" class="text-gray-400 hover:text-black transition">
+        <svg id="remove-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,522 @@
+@if(loading){
+<app-loader></app-loader>
+} @if(!loading){
+
+<div
+  id="product-details-container"
+  class="p-8 bg-white rounded-lg shadow-sm border border-gray-100"
+>
+  <!-- Header Section -->
+  <div id="header-section" class="flex justify-between items-center mb-8">
+    <h1 id="product-details-title" class="text-2xl font-bold text-gray-900">
+      Product Details
+    </h1>
+    <div id="header-buttons" class="flex gap-3">
+      <button
+        id="save-button"
+        (click)="onSave()"
+        class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-sm font-medium"
+      >
+        Save Changes
+      </button>
+      <button
+        id="delete-button"
+        (click)="onDelete()"
+        class="px-4 py-2 border border-gray-200 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <div id="product-content" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Left Column: Image and Basic Info -->
+    <div id="left-column">
+      <!-- Product Image -->
+      <div
+        id="product-image-container"
+        class="relative w-full h-72 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100"
+      >
+        <img
+          id="product-image"
+          *ngIf="product.thumbnail"
+          [src]="product.thumbnail"
+          class="h-full object-contain"
+        />
+        <!-- <span id="image-placeholder" class="text-gray-400">Product Image</span> -->
+        <button
+          id="edit-image-button"
+          class="absolute bottom-3 right-3 bg-white p-2 rounded-full shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+        >
+          <svg
+            id="edit-image-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div id="product-name-field" class="mt-4">
+        <label
+          id="product-name-label"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Product Name</label
+        >
+        <input
+          id="product-name-input"
+          [(ngModel)]="product.title"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-500"
+          disabled=""
+        />
+      </div>
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Description <span class="text-red-500">*</span>
+        </label>
+
+        <textarea
+          id="description-input"
+          name="description"
+          [(ngModel)]="product.description"
+          #descriptionInput="ngModel"
+          required
+          minlength="10"
+          rows="3"
+          class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+        ></textarea>
+
+        <div class="text-red-500 text-xs my-1">
+          <span *ngIf="descriptionInput.invalid && descriptionInput.touched">
+            <span *ngIf="descriptionInput.errors?.['required']"
+              >This is required</span
+            >
+            <span *ngIf="descriptionInput.errors?.['minlength']"
+              >Min 10 characters required.</span
+            >
+          </span>
+        </div>
+      </div>
+
+      <div id="category-field">
+        <label
+          id="category-label"
+          for="category"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Category <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="category"
+          [(ngModel)]="product.categoryName"
+          class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm appearance-none"
+        >
+          <option id="category-placeholder" value="" disabled>
+            Select a category
+          </option>
+          <option
+            id="category-option-{{ category }}"
+            *ngFor="let category of categories"
+            [value]="category"
+          >
+            {{ category }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Right Column: Product Information -->
+    <div id="right-column">
+      <h2
+        id="product-info-title"
+        class="text-lg font-semibold text-gray-900 mb-4"
+      >
+        Product Information
+      </h2>
+      <div id="product-info-grid" class="grid grid-cols-2 gap-4">
+        <div id="width-field">
+          <label
+            id="width-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Width
+          </label>
+          <input
+            id="width-input"
+            [ngModel]="product.dimensions?.width"
+            class="w-full px-3 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            disabled=""
+          />
+        </div>
+        <div id="height-field">
+          <label
+            id="height-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Height</label
+          >
+          <input
+            id="height-input"
+            [ngModel]="product.dimensions?.height"
+            class="w-full px-3 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            disabled=""
+          />
+        </div>
+        <div id="depth-field">
+          <div
+            id="depth-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Depth
+          </div>
+          <input
+            id="depth-input"
+            [ngModel]="product.dimensions?.depth"
+            class="w-full px-3 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            disabled=""
+          />
+        </div>
+        <div id="weight-field">
+          <label
+            id="weight-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Weight</label
+          >
+          <input
+            id="weight-input"
+            [(ngModel)]="product.weight"
+            class="w-full px-3 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            disabled=""
+          />
+        </div>
+        <div id="brand-field" class="col-span-2">
+          <label
+            id="brand-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Brand</label
+          >
+          <input
+            id="brand-input"
+            [(ngModel)]="product.brand"
+            class="w-full px-3 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            disabled=""
+          />
+        </div>
+        <div id="stock-field">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Stock <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="stock-input"
+            type="number"
+            name="stock"
+            [(ngModel)]="product.stock"
+            #stockInput="ngModel"
+            required
+            min="0"
+            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+          />
+
+          <div class="text-red-500 text-xs mt-1" id="stock-errors">
+            <span *ngIf="stockInput.invalid && stockInput.touched">
+              <span
+                *ngIf="stockInput.errors?.['required']"
+                id="stock-required-error"
+                >Stock is required.</span
+              >
+              <span *ngIf="stockInput.errors?.['min']" id="stock-min-error"
+                >Stock must be 0 or greater.</span
+              >
+            </span>
+          </div>
+        </div>
+
+        <div id="sku-field">
+          <label
+            id="sku-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >SKU</label
+          >
+          <input
+            id="sku-input"
+            [(ngModel)]="product.sku"
+            class="w-full px-3 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            disabled=""
+          />
+        </div>
+        <div id="price-field">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Price ($) <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="price-input"
+            type="number"
+            name="price"
+            [(ngModel)]="product.price"
+            #priceInput="ngModel"
+            required
+            min="1"
+            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+          />
+
+          <div class="text-red-500 text-xs mt-1" id="price-errors">
+            <span *ngIf="priceInput.invalid && priceInput.touched">
+              <span
+                *ngIf="priceInput.errors?.['required']"
+                id="price-required-error"
+                >Price is required.</span
+              >
+              <span *ngIf="priceInput.errors?.['min']" id="price-min-error"
+                >Price must be 1 or greater.</span
+              >
+            </span>
+          </div>
+        </div>
+
+        <div id="discount-field">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Discount (%) <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="discount-input"
+            name="discountPercentage"
+            type="number"
+            [(ngModel)]="product.discountPercentage"
+            #discountInput="ngModel"
+            required
+            min="0"
+            max="100"
+            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+          />
+
+          <div class="text-red-500 text-xs mt-1" id="discount-errors">
+            <span *ngIf="discountInput.invalid && discountInput.touched">
+              <span *ngIf="discountInput.errors?.['required']" id="discount-required-error">
+                Discount is required.
+              </span>
+              <span *ngIf="discountInput.errors?.['min']" id="discount-min-error">
+                Discount must be 0 or greater.
+              </span>
+              <span *ngIf="discountInput.errors?.['max']" id="discount-max-error">
+                Discount must be less than or equal to 100.
+              </span>
+            </span>
+          </div>
+        </div>
+
+
+        <!-- Tags Section -->
+        <div id="tags-section" class="col-span-2 mt-2">
+          <label
+            id="tags-label"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Tags <span class="text-red-500">*</span></label
+          >
+          <div id="tag-input-container" class="flex items-center gap-2">
+            <input
+              id="new-tag-input"
+              [(ngModel)]="newTag"
+              placeholder="Add tag..."
+              class="flex-grow px-3 py-2 bg-white border border-gray-200 rounded-md focus:ring-1 focus:ring-black focus:border-black text-sm"
+            />
+            <button
+              id="add-tag-button"
+              (click)="addTag()"
+              class="px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+            >
+              <svg
+                id="add-tag-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
+          </div>
+          <div id="tags-list" class="flex gap-2 mt-3 flex-wrap">
+            <span
+              id="tag-{{ tag }}"
+              *ngFor="let tag of product.tags"
+              class="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1"
+            >
+              {{ tag }}
+              <button
+                id="remove-tag-{{ tag }}"
+                (click)="removeTag(tag)"
+                class="ml-1 text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  id="remove-tag-icon-{{ tag }}"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3 w-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related & Cross Products Section -->
+  <div
+    id="related-cross-products"
+    class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10"
+  >
+    <div id="related-products-section">
+      <h3
+        id="related-products-title"
+        class="text-lg font-semibold text-gray-900 mb-3"
+      >
+        Related Products
+      </h3>
+      <div
+        id="related-products-container"
+        class="border border-gray-100 rounded-lg overflow-hidden"
+      >
+        <div id="related-products-list" class="max-h-64 overflow-y-auto">
+          <div
+            id="related-product-{{ item }}"
+            *ngFor="let item of relatedProducts"
+            class="flex items-center gap-4 p-3 border-b border-gray-100 hover:bg-gray-50"
+          >
+            <div
+              id="related-product-image-{{ item }}"
+              class="w-14 h-14 bg-gray-50 rounded-md flex items-center justify-center border border-gray-100"
+            ></div>
+            <div id="related-product-info-{{ item }}" class="flex-grow min-w-0">
+              <p
+                id="related-product-name-{{ item }}"
+                class="text-sm font-medium text-gray-900 truncate"
+              >
+                Product name
+              </p>
+              <p
+                id="related-product-price-{{ item }}"
+                class="text-sm text-gray-700"
+              >
+                $4.00
+              </p>
+              <div
+                id="related-product-rating-{{ item }}"
+                class="flex items-center mt-1 text-gray-400"
+              >
+                <span id="related-product-stars-{{ item }}" class="text-xs"
+                  >★★★★★</span
+                >
+                <span
+                  id="related-product-rating-value-{{ item }}"
+                  class="ml-1 text-xs text-gray-500"
+                  >4.0</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          id="related-products-footer"
+          class="p-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500"
+        >
+          Showing {{ relatedProducts?.length || 0 }} related products
+        </div>
+      </div>
+    </div>
+
+    <div id="cross-products-section">
+      <h3
+        id="cross-products-title"
+        class="text-lg font-semibold text-gray-900 mb-3"
+      >
+        Cross Products
+      </h3>
+      <div
+        id="cross-products-container"
+        class="border border-gray-100 rounded-lg overflow-hidden"
+      >
+        <div id="cross-products-list" class="max-h-64 overflow-y-auto">
+          <div
+            id="cross-product-{{ item.id }}"
+            *ngFor="let item of product.relatedProducts"
+            class="flex items-center gap-4 p-3 border-b border-gray-100 hover:bg-gray-50"
+          >
+            <div
+              id="cross-product-image-{{ item.id }}"
+              class="w-14 h-14 bg-gray-50 rounded-md flex items-center justify-center border border-gray-100"
+            >
+              <img
+                id="cross-product-img-{{ item.id }}"
+                [src]="item.thumbnail"
+                alt=""
+                srcset=""
+              />
+            </div>
+            <div
+              id="cross-product-info-{{ item.id }}"
+              class="flex-grow min-w-0"
+            >
+              <p
+                id="cross-product-name-{{ item.id }}"
+                class="text-sm font-medium text-gray-900 truncate"
+              >
+                {{ item.title }}
+              </p>
+              <p
+                id="cross-product-price-{{ item.id }}"
+                class="text-sm text-gray-700"
+              >
+                ${{ item.price }}
+              </p>
+              <div
+                id="cross-product-rating-{{ item.id }}"
+                class="flex items-center mt-1 text-gray-400"
+              >
+                <span id="cross-product-stars-{{ item.id }}" class="text-xs"
+                  >★★★★★</span
+                >
+                <span
+                  id="cross-product-rating-value-{{ item.id }}"
+                  class="ml-1 text-xs text-gray-500"
+                  >4.0</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          id="cross-products-footer"
+          class="p-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500"
+        >
+          Showing {{ product.relatedProducts?.length || 0 }} cross products
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
