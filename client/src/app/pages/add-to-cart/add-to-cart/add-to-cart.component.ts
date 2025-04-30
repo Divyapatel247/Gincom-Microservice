@@ -6,7 +6,6 @@ import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../service/auth.service';
 import { RouterLink } from '@angular/router';
-import { LoaderComponent } from "../../../components/loader/loader.component";
 
 import { LoaderComponent } from "../../../components/loader/loader.component";
 
