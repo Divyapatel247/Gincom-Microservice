@@ -302,7 +302,7 @@ public class ProductController : ControllerBase
     }
 
 
-    }
+    
     [HttpGet("lowStok")]
     public async Task<IActionResult> lowStokProduct()
     {

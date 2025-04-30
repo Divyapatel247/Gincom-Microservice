@@ -30,7 +30,7 @@ export class ProductComponent implements OnInit {
   ngOnInit(): void {
     const trimmedQuery = this.searchTerm.trim();
     this.searchTermChanged.pipe(
-      debounceTime(300),
+      debounceTime(500),
       distinctUntilChanged()
     ).subscribe(trimmedQuery => {
       if(trimmedQuery ===''){
