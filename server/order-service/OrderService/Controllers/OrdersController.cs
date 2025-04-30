@@ -45,14 +45,27 @@ namespace OrderService.Controllers
         [HttpPost("{userId}")]
         public async Task<IActionResult> CreateOrder(string userId, [FromBody] CreateOrderRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Return detailed validation errors
+            }
+
             try
             {
-                (OrderResponseDto order, string razorpayOrderId) = await _orderService.CreateOrderAsync(userId, request);
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    ModelState.AddModelError("userId", "User ID is required.");
+                    return BadRequest(ModelState);
+                }
+
+                var (order, razorpayOrderId) = await _orderService.CreateOrderAsync(userId, request);
                 return Ok(new { Order = order, RazorpayOrderId = razorpayOrderId });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                // Log the exception and return a specific message
+                Console.WriteLine($"Error in CreateOrder: {ex.Message}");
+                return BadRequest(new { error = ex.Message }); // Return the specific exception message
             }
         }
         [HttpPut("{orderId}/status")]
