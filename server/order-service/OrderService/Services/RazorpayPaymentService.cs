@@ -9,8 +9,8 @@ namespace OrderService.Services
 {
     public class RazorpayPaymentService : IPaymentService
     {
-        private readonly string _keyId;
-        private readonly string _keySecret;
+        private readonly string? _keyId;
+        private readonly string? _keySecret;
 
         public RazorpayPaymentService(IConfiguration configuration)
         {
@@ -20,16 +20,43 @@ namespace OrderService.Services
 
         public async Task<string> CreateRazorpayOrderAsync(int orderId, decimal amount)
         {
-            var client = new RazorpayClient(_keyId, _keySecret);
-            var orderData = new Dictionary<string, object>
+            return await Task.Run(() =>
             {
-                { "amount", (int)(amount * 100) }, 
-                { "currency", "INR" },
-                { "receipt", $"order_{orderId}" }
-            };
-            var razorpayOrder = client.Order.Create(orderData);
-            return razorpayOrder["id"].ToString();
-        
+                try
+                {
+                    Console.WriteLine($"[RazorpayPaymentService] Initializing Razorpay client with KeyId: {_keyId}");
+                    Console.WriteLine($"[RazorpayPaymentService] Creating order for OrderId: {orderId}, Amount: {(int)(amount * 100)} paise");
+
+                    var client = new RazorpayClient(_keyId, _keySecret);
+                    var orderData = new Dictionary<string, object>
+                    {
+                        { "amount", (int)(amount * 100) },
+                        { "currency", "INR" },
+                        { "receipt", $"order_{orderId}_{DateTime.UtcNow.Ticks}" }
+                    };
+
+                    Console.WriteLine($"[RazorpayPaymentService] Sending order creation request: Amount: {orderData["amount"]}, Currency: {orderData["currency"]}, Receipt: {orderData["receipt"]}");
+
+                    var razorpayOrder = client.Order.Create(orderData);
+                    Console.WriteLine($"[RazorpayPaymentService] Razorpay order created successfully for OrderId: {orderId}, RazorpayId: {razorpayOrder["id"]}");
+                    return razorpayOrder["id"].ToString();
+                }
+                catch (Exception ex)
+                {
+                    string errorDetails = ex.Message;
+                    if (ex.Data.Contains("error"))
+                    {
+                        var error = ex.Data["error"] as Dictionary<string, object>;
+                        if (error != null)
+                        {
+                            errorDetails = $"Code: {error.GetValueOrDefault("code", "N/A")}, Description: {error.GetValueOrDefault("description", "N/A")}";
+                        }
+                    }
+
+                    Console.WriteLine($"[RazorpayPaymentService] Error creating Razorpay order for OrderId: {orderId}, Message: {ex.Message}, Details: {errorDetails}, StackTrace: {ex.StackTrace}");
+                    throw new Exception($"Razorpay error for OrderId {orderId}: {errorDetails}", ex);
+                }
+            });
+        }
     }
-}
 }

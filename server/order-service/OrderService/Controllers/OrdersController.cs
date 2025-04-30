@@ -47,22 +47,25 @@ namespace OrderService.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(ModelState); // Return detailed validation errors
             }
 
             try
             {
                 if (string.IsNullOrWhiteSpace(userId))
                 {
-                    return BadRequest("User ID is required.");
+                    ModelState.AddModelError("userId", "User ID is required.");
+                    return BadRequest(ModelState);
                 }
 
-                (OrderResponseDto order, string razorpayOrderId) = await _orderService.CreateOrderAsync(userId, request);
+                var (order, razorpayOrderId) = await _orderService.CreateOrderAsync(userId, request);
                 return Ok(new { Order = order, RazorpayOrderId = razorpayOrderId });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                // Log the exception and return a specific message
+                Console.WriteLine($"Error in CreateOrder: {ex.Message}");
+                return BadRequest(new { error = ex.Message }); // Return the specific exception message
             }
         }
         [HttpPut("{orderId}/status")]
