@@ -12,7 +12,7 @@ using OrderService.Models;
 
 namespace OrderService.Services
 {
-public class OrderManagementService
+    public class OrderManagementService
     {
         private readonly IOrderRepository _repository;
         private readonly ProductServiceClient _productService;
@@ -65,11 +65,28 @@ public class OrderManagementService
 
         public async Task<(OrderResponseDto Order, string RazorpayOrderId)> CreateOrderAsync(string userId, CreateOrderRequest request)
         {
+            Console.WriteLine($"[Service] Starting CreateOrderAsync for userId: {userId}");
+
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("User ID is required.");
-            var basket = await _repository.GetBasketAsync(userId);
+
+            Basket basket;
+            try
+            {
+                basket = await _repository.GetBasketAsync(userId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Service] Error retrieving basket for userId {userId}: {ex.Message}");
+                throw new Exception($"Failed to retrieve cart for user {userId}: {ex.Message}");
+            }
+
+            Console.WriteLine($"[Service] Retrieved basket for userId: {userId}, Basket: {basket?.Id}, Items count: {basket?.Items?.Count ?? 0}");
             if (basket == null || basket.Items == null || !basket.Items.Any())
+            {
+                Console.WriteLine($"[Service] Error: Cart is empty for userId: {userId}");
                 throw new Exception("Cart is empty");
+            }
 
             Console.WriteLine("[Service] Basket Items:");
             foreach (var i in basket.Items)
@@ -92,11 +109,19 @@ public class OrderManagementService
             // Check stock for all items
             foreach (var item in orderItems)
             {
+                Console.WriteLine($"[Service] Checking stock for ProductId: {item.ProductId}, Quantity: {item.Quantity}");
                 var product = await _productService.GetProductAsync(item.ProductId, string.Empty);
                 if (product == null)
+                {
+                    Console.WriteLine($"[Service] Error: Product not found for ProductId: {item.ProductId}");
                     throw new Exception($"Product with ID {item.ProductId} not found");
+                }
                 if (product.Stock <= 0 || product.Stock < item.Quantity)
+                {
+                    Console.WriteLine($"[Service] Error: Insufficient stock for ProductId: {item.ProductId}, Available: {product.Stock}, Requested: {item.Quantity}");
                     throw new Exception($"Insufficient stock for Product ID {item.ProductId}. Available: {product.Stock}, Requested: {item.Quantity}");
+                }
+                Console.WriteLine($"[Service] Stock check passed for ProductId: {item.ProductId}, Available: {product.Stock}");
             }
 
             // Calculate total amount (for Razorpay)
@@ -105,7 +130,9 @@ public class OrderManagementService
             {
                 var product = await _productService.GetProductAsync(item.ProductId, string.Empty);
                 totalAmount += (product?.Price ?? 0) * item.Quantity;
+                Console.WriteLine($"[Service] Adding to total: ProductId: {item.ProductId}, Price: {product?.Price}, Quantity: {item.Quantity}, Subtotal: {(product?.Price ?? 0) * item.Quantity}");
             }
+            Console.WriteLine($"[Service] Total amount calculated: {totalAmount}");
 
             var order = new Order
             {
@@ -114,41 +141,86 @@ public class OrderManagementService
                 Items = orderItems
             };
 
-            order = await _repository.CreateOrderAsync(order);
+            try
+            {
+                order = await _repository.CreateOrderAsync(order);
+                Console.WriteLine($"[Service] Order created with Id: {order.Id}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Service] Error creating order for userId {userId}: {ex.Message}");
+                throw new Exception($"Failed to create order: {ex.Message}");
+            }
 
             // Initiate Razorpay order (simulating payment)
-            var razorpayOrderId = await _paymentService.CreateRazorpayOrderAsync(order.Id, totalAmount * 100);
-            var payment = new Payment
+            string razorpayOrderId;
+            try
             {
-                UserId = userId,
-                OrderId = order.Id,
-                Status = "Pending",
-                TransactionId = razorpayOrderId
-            };
-            await _repository.CreatePaymentAsync(payment);
+                razorpayOrderId = await _paymentService.CreateRazorpayOrderAsync(order.Id, totalAmount * 100);
+                Console.WriteLine($"[Service] Razorpay order created with Id: {razorpayOrderId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Service] Error creating Razorpay order for OrderId {order.Id}: {ex.Message}");
+                throw new Exception($"Failed to initiate payment with Razorpay: {ex.Message}");
+            }
+
+            try
+            {
+                var payment = new Payment
+                {
+                    UserId = userId,
+                    OrderId = order.Id,
+                    Status = "Pending",
+                    TransactionId = razorpayOrderId
+                };
+                await _repository.CreatePaymentAsync(payment);
+                Console.WriteLine($"[Service] Payment record created for OrderId: {order.Id}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Service] Error creating payment record for OrderId {order.Id}: {ex.Message}");
+                throw new Exception($"Failed to create payment record: {ex.Message}");
+            }
 
             // Publish OrderCreatedEvent
-            var orderCreatedEvent = new OrderCreatedEvent
+            try
             {
-                OrderId = order.Id,
-                UserId = userId,
-                Email = request.UserEmail,
-                Items = orderItems.Select(item => new Common.Events.OrderItem
+                var orderCreatedEvent = new OrderCreatedEvent
                 {
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity
-                }).ToList(),
-                TotalAmount = totalAmount
-            };
-            await _publishEndpoint.Publish(orderCreatedEvent);
-            Console.WriteLine($"Published OrderCreatedEvent for OrderId: {order.Id} with TotalAmount: {totalAmount}");
+                    OrderId = order.Id,
+                    UserId = userId,
+                    Email = request.UserEmail,
+                    Items = orderItems.Select(item => new Common.Events.OrderItem
+                    {
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity
+                    }).ToList(),
+                    TotalAmount = totalAmount
+                };
+                await _publishEndpoint.Publish(orderCreatedEvent);
+                Console.WriteLine($"[Service] Published OrderCreatedEvent for OrderId: {order.Id} with TotalAmount: {totalAmount}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Service] Error publishing OrderCreatedEvent for OrderId {order.Id}: {ex.Message}");
+                throw new Exception($"Failed to publish order event: {ex.Message}");
+            }
 
             // Clear cart after payment initiation
-            await _repository.ClearBasketAsync(userId);
+            try
+            {
+                await _repository.ClearBasketAsync(userId);
+                Console.WriteLine($"[Service] Cleared cart for userId: {userId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Service] Error clearing cart for userId {userId}: {ex.Message}");
+                throw new Exception($"Failed to clear cart: {ex.Message}");
+            }
 
             return (OrderMapper.ToOrderResponse(order), razorpayOrderId);
         }
-
         public async Task<OrderResponseDto> UpdateOrderStatusAsync(int orderId, UpdateOrderStatusRequestDto request)
         {
             var order = await _repository.GetOrderByIdAsync(orderId);

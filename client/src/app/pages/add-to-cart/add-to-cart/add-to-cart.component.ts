@@ -8,6 +8,11 @@ import { AuthService } from '../../../service/auth.service';
 import { RouterLink } from '@angular/router';
 import { LoaderComponent } from "../../../components/loader/loader.component";
 
+import { LoaderComponent } from "../../../components/loader/loader.component";
+
+import { HttpErrorResponse } from '@angular/common/http';
+
+
 @Component({
   selector: 'app-add-to-cart',
   imports: [CartItemComponent, NgIf, NgForOf, CommonModule, FormsModule, RouterLink, LoaderComponent],
@@ -21,6 +26,7 @@ export class AddToCartComponent implements OnInit, AfterViewInit {
   totalAmount: number = 0;
   userId: string | null = null;
   private razorpayScriptLoaded: boolean = false;
+  errorMessage: string | null = null;
 
   constructor(private apiService: ApiService, private authService: AuthService) {}
 
@@ -136,7 +142,7 @@ export class AddToCartComponent implements OnInit, AfterViewInit {
         }
 
         const options = {
-          key: 'rzp_test_xH3hHR8WECV8q3',
+          key: 'rzp_test_BeDrEzRi7xKQpG',
           amount: calculatedTotal * 100,
           currency: 'INR',
           name: 'Encom',
@@ -171,18 +177,26 @@ export class AddToCartComponent implements OnInit, AfterViewInit {
 
   createOrderAfterPayment(paymentId: string) {
     if (this.userId) {
-      const userEmail : string = this.authService.getEmail() ?? " ";
-      this.apiService.createOrder(this.userId,userEmail).subscribe({
-        next: (response) => {
-          console.log('Order created after payment:', response);
-          this.basket = null; // Clear cart after successful order
-          this.totalQuantity = 0;
-          this.totalAmount = 0;
-        },
-        error: (err) => console.error('Error creating order:', err),
-      });
+        const userEmail: string = this.authService.getEmail() ?? " ";
+        this.apiService.createOrder(this.userId, userEmail).subscribe({
+            next: (response) => {
+                console.log('Order created after payment:', response);
+                this.basket = null;
+                this.totalQuantity = 0;
+                this.totalAmount = 0;
+                this.errorMessage = null;
+            },
+            error: (err: HttpErrorResponse) => {
+                console.error('Error creating order:', err);
+                if (err.error && typeof err.error === 'object' && 'error' in err.error) {
+                    this.errorMessage = err.error.error || 'An unexpected error occurred.';
+                } else {
+                    this.errorMessage = err.message || 'Failed to connect to the server.';
+                }
+            }
+        });
     }
-  }
+}
 
   private loadRazorpayScript(): Promise<void> {
     return new Promise((resolve, reject) => {
