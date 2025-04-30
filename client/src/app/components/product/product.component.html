@@ -1,3 +1,9 @@
+@if(loading){
+  <div class="h-[90vh]">
+    <app-loader></app-loader>
+  </div>
+}
+@if(!loading){
 <div
   id="main-container"
   class="min-h-screen bg-gray-50 flex flex-col md:flex-row w-full font-sans"
@@ -29,6 +35,7 @@
         Categories
       </h2>
     </div>
+
     <div id="categories-list" class="px-4 py-4">
       <ul id="category-items" class="space-y-2 list-none p-0">
         <li
@@ -107,6 +114,7 @@
 
     <!-- Product Grid -->
 
+
     <!-- Product Grid -->
     <div id="product-grid" class="flex-1 p-4 md:p-6 bg-gray-50">
       <div
@@ -137,6 +145,7 @@
               </button>
 
               <!-- Product Card -->
+
               <div
                 id="product-card-{{ item.id }}"
                 class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col overflow-hidden"
@@ -275,6 +284,8 @@
           </div>
         </ng-template>
       </div>
+
     </div>
   </div>
 </div>
+}

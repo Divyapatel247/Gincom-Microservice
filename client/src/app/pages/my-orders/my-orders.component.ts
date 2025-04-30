@@ -7,14 +7,16 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { IProduct } from '../../components/product/productModel';
 import { WebsocketService } from '../../service/websocket.service';
 import { Notification as AppNotification } from '../../models/notification.interface';
+import { LoaderComponent } from "../../components/loader/loader.component";
 
 @Component({
   selector: 'app-my-orders',
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './my-orders.component.html',
   styleUrl: './my-orders.component.css'
 })
 export class MyOrdersComponent implements OnInit, OnDestroy {
+  loading = true;
   orders: Order[] = [];
   userId: string | null = null;
   notifications: AppNotification[] = [];
@@ -47,10 +49,12 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
           createdAt: order.createdAt || new Date(),
           razorpayOrderId: order.razorpayOrderId || ''
         }));
+        this.loading = false;
       },
       error: (err) => {
         console.error('Error fetching orders:', err);
         this.error = 'Failed to load orders';
+        this.loading = false;
       }
     });
   }

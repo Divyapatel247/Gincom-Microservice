@@ -14,18 +14,20 @@ import { Subscription } from 'rxjs';
 import { WebsocketService } from '../../service/websocket.service';
 import { Notification } from '../../models/notification.interface';
 import { BasketItem, BasketResponse } from '../../models/cart.interface';
+import { LoaderComponent } from "../loader/loader.component";
 
 
 
 
 @Component({
   selector: 'app-product-detail',
-  imports: [ NgIf, NgFor, CommonModule, FormsModule],
+  imports: [NgIf, NgFor, CommonModule, FormsModule, LoaderComponent],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',
 
 })
 export class ProductDetailComponent implements OnInit {
+  loader = true;
   isToggle: any;
   productDetail: IProduct = {
     id: 0,
@@ -83,10 +85,11 @@ export class ProductDetailComponent implements OnInit {
       this.api.getProductById(productid).subscribe((res: IProduct) => {
         console.log(res);
         this.productDetail = res;
-        
+
         this.productDetail = res;
         this.remainingStock = res.stock;
         console.log(res);
+        this.loader = false;
         this.adjustRemainingStock(this.currentUserId!.toString(), this.productDetail.id);
       });
     if (productid) {
@@ -163,8 +166,8 @@ export class ProductDetailComponent implements OnInit {
     })
   }
 
-  
-  
+
+
 
   clampQuantity(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
