@@ -4,14 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
+import { LoaderComponent } from "../../components/loader/loader.component";
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule,RouterLink],
+  imports: [FormsModule, RouterLink, LoaderComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  loading = false;
   loginObj: any = {
     client_id: 'client',
     client_secret: 'secret',
@@ -23,6 +25,7 @@ export class LoginComponent {
   constructor(private api: ApiService, private router: Router,private authService: AuthService) {}
 
   onLogin() {
+    this.loading = true;
     const body = this.toUrlEncoded(this.loginObj);
     this.api.login(body).subscribe({
       next: (res) => {
@@ -31,7 +34,7 @@ export class LoginComponent {
         localStorage.setItem('scope', res.scope);
         const role = this.authService.getRole();
         console.log('Logged in user role:', role);
-
+        this.loading = false;
         alert(`Welcome,You have successfully logged in.`);
 
         if (role === 'Admin') {
@@ -44,6 +47,7 @@ export class LoginComponent {
       },
       error: (err) => {
         console.error('Login error:', err);
+        this.loading = false;
         alert(err.error || 'Login failed. Please try again.');
       },
     });

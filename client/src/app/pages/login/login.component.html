@@ -1,3 +1,11 @@
+@if(loading){
+  <div class="h-screen">
+
+    <app-loader></app-loader>
+  </div>
+}
+@if(!loading){
+
 <section id="login-section" class="bg-gray-50 dark:bg-gray-900">
   <div id="login-container" class="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen lg:py-0">
     <a href="#" id="brand-logo" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -56,3 +64,4 @@
     </div>
   </div>
 </section>
+}

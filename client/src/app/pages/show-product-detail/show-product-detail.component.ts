@@ -4,14 +4,16 @@ import { IProduct, IProductWithRelatedProducts } from '../../components/product/
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../shared/api.service';
 import { NgFor, NgIf } from '@angular/common';
+import { LoaderComponent } from "../../components/loader/loader.component";
 
 @Component({
   selector: 'app-show-product-detail',
-  imports: [FormsModule,NgFor,RouterLink,NgIf],
+  imports: [FormsModule, NgFor, RouterLink, NgIf, LoaderComponent],
   templateUrl: './show-product-detail.component.html',
   styleUrl: './show-product-detail.component.css'
 })
 export class ShowProductDetailComponent implements OnInit {
+  loading = true;
   product : IProductWithRelatedProducts = {
     title: '',
     price: 0,
@@ -45,11 +47,15 @@ export class ShowProductDetailComponent implements OnInit {
     // console.log("productId :", this.productId)
     this.api.getProductById(this.productId).subscribe(p =>{
       this.product = p
+      setTimeout(() => {
+        this.loading = false;
+      }, 3000);
     });
     console.log("product :", this.product)
     this.api.getCategoryList().subscribe((res: string[]) => {
       this.categories = res;
     });
+
   }
 
 
@@ -73,13 +79,14 @@ export class ShowProductDetailComponent implements OnInit {
   }
 
   onDelete(){
+    this.loading = true;
   this.api.deleteProduct(this.productId).subscribe(()=>{
-
     this.router.navigateByUrl("/admin/products");
   })
   }
 
   onSave(){
+    this.loading = true;
     this.api.updateProduct(Number(this.productId),this.product).subscribe(()=>{
       this.router.navigateByUrl("/admin/products");
     })

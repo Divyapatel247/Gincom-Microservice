@@ -22,9 +22,14 @@
     Please select a category to view products
   </div>
 
-  <div *ngIf="selectedCategory && products.length === 0" class="py-8 text-center text-gray-500 text-sm" id="empty-state-no-products">
+  <div *ngIf="selectedCategory && products.length === 0 && !loading" class="py-8 text-center text-gray-500 text-sm" id="empty-state-no-products">
     No products found for this category
   </div>
+
+  @if(loading){
+ <app-loader></app-loader>
+  }
+ @if(!loading){
 
   <!-- Products list -->
   <div class="max-h-96 overflow-y-auto mt-2 border border-gray-100 rounded-md" id="products-list-container">
@@ -50,7 +55,7 @@
       </div>
     </div>
   </div>
-
+ }
   <!-- Counter -->
   <div class="text-xs text-gray-600 mt-3 flex justify-between items-center" id="selection-counter-container">
     <div id="selection-count-text">{{ selectedProductIds.length }} of 4 products selected</div>
