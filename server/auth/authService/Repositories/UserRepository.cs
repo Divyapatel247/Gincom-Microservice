@@ -14,7 +14,7 @@ public class UserRepository(string connectionString) : IUserRepository
     public async Task<User> GetByUsernameAsync(string username)
     {
         using var connection = new MySqlConnection(_connectionString);
-        var query = "SELECT * FROM Users WHERE Username = @Username";
+        var query = "SELECT * FROM Users WHERE BINARY  Username = @Username";
         return await connection.QueryFirstOrDefaultAsync<User>(
            query, new { Username = username });
     }
