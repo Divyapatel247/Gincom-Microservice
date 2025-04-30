@@ -6,14 +6,16 @@ import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../service/auth.service';
 import { RouterLink } from '@angular/router';
+import { LoaderComponent } from "../../../components/loader/loader.component";
 
 @Component({
   selector: 'app-add-to-cart',
-  imports: [CartItemComponent,NgIf,NgForOf,CommonModule,FormsModule,RouterLink],
+  imports: [CartItemComponent, NgIf, NgForOf, CommonModule, FormsModule, RouterLink, LoaderComponent],
   templateUrl: './add-to-cart.component.html',
   styleUrl: './add-to-cart.component.css'
 })
 export class AddToCartComponent implements OnInit, AfterViewInit {
+  loading = true;
   basket: BasketResponse | null = null;
   totalQuantity: number = 0;
   totalAmount: number = 0;
@@ -30,6 +32,7 @@ export class AddToCartComponent implements OnInit, AfterViewInit {
           console.log('Cart data:', data);
           this.basket = data;
           this.calculateTotals();
+          this.loading = false;
         },
         error: (err) => console.error('Error fetching cart:', err),
       });
