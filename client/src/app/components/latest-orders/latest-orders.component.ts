@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Order } from '../../models/order.interface';
 import { CommonModule } from '@angular/common';
 
@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class LatestOrdersComponent {
   @Input() orders: Order[] = [];
+  constructor(private route:Router){}
 
   getStatusStyle(status: string): string {
     switch (status) {
@@ -24,4 +25,8 @@ export class LatestOrdersComponent {
         return 'bg-gray-100 text-gray-800';
     }
   }
+
+  onView(orderId:number){
+    this.route.navigateByUrl(`/admin/orders/${orderId}`)
+   }
 }
