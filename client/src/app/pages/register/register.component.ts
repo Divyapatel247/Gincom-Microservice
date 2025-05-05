@@ -34,7 +34,7 @@ export class RegisterComponent {
          error: (err) => {
            console.error("Register error:", err);
            this.loading = false;
-           alert(err.error || 'Register failed. Please try again.');
+           alert('Register failed. Please try again.');
          }
        });
      }

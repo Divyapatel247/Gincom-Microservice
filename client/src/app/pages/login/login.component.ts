@@ -48,7 +48,7 @@ export class LoginComponent {
       error: (err) => {
         console.error('Login error:', err);
         this.loading = false;
-        alert(err.error || 'Login failed. Please try again.');
+        alert('Login failed. Please try again.');
       },
     });
   }
