@@ -1,0 +1,1 @@
+ALTER TABLE Products ADD SoldCount INT DEFAULT 0;

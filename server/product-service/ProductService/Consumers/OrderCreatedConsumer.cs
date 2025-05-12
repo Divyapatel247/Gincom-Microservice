@@ -31,6 +31,12 @@ namespace ProductService.Consumers
                     // Optionally, reject the message or notify OrderService to rollback
                     continue;
                 }
+
+                //increment soldProduct
+                var updateSuccess = await _repository.IncrementSoldCountAsync(item.ProductId, item.Quantity);
+                if(!updateSuccess){
+                    Console.WriteLine("stock deducted but failed to increment sold count");
+                }
                 var count = await _repository.lowStokProductAsync();
                 Console.WriteLine("count :" + count);
 
