@@ -29,5 +29,7 @@ public class ProductDTO
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
 
+        public int SoldCount { get; set; }
+
         public List<ProductDTO> RelatedProducts { get; set; } = new List<ProductDTO>();
 }

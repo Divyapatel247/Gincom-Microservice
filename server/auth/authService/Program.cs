@@ -80,7 +80,7 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.UseRouting();
-app.UseIdentityServer();
+    app.UseIdentityServer();
 app.UseAuthorization();
 app.MapControllers();
 

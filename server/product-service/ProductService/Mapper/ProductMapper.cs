@@ -33,6 +33,7 @@ public static class ProductMapper
             Thumbnail = productModel.Thumbnail,
             CategoryId = productModel.CategoryId,
             CategoryName = productModel.Category?.Name,
+            SoldCount = productModel.SoldCount,
 
             RelatedProducts = productModel.RelatedProducts?
         .Where(p => p != null)
