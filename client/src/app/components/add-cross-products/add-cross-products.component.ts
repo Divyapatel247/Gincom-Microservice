@@ -49,7 +49,7 @@ export class AddCrossProductsComponent {
       next: (products: IProduct[]) => {
         this.loading = false;
         this.products = products;
-        this.selectedProductIds = [];
+        // this.selectedProductIds = [];
         this.selectedProductsChange.emit(this.selectedProductIds);
       },
       error: (err:any) => {

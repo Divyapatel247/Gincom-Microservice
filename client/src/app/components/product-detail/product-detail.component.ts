@@ -10,7 +10,7 @@ import {
 } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { WebsocketService } from '../../service/websocket.service';
 import { Notification } from '../../models/notification.interface';
 import { BasketItem, BasketResponse } from '../../models/cart.interface';
@@ -59,7 +59,7 @@ export class ProductDetailComponent implements OnInit {
   loading: boolean = false;
   errorMessage: string = '';
 
-
+  productid : string | null = null;
 
 
 
@@ -84,11 +84,11 @@ export class ProductDetailComponent implements OnInit {
     }
 
     this.activadedRoute.paramMap.subscribe(params => {
-      const productid = params.get('productid');
-      if (productid) {
+       this.productid = params.get('productid');
+      if (this.productid) {
         this.loader = true;
 
-        this.api.getProductById(productid).subscribe((res: IProductWithRelatedProducts) => {
+        this.api.getProductById(this.productid).subscribe((res: IProductWithRelatedProducts) => {
           console.log('Product Detail:', res);
           this.productDetail = res;
           this.remainingStock = res.stock;
@@ -100,7 +100,7 @@ export class ProductDetailComponent implements OnInit {
           }
         });
 
-        this.api.getReviewsofProduct(productid).subscribe((reviews: IReview[]) => {
+        this.api.getReviewsofProduct(this.productid).subscribe((reviews: IReview[]) => {
           this.productDetail.reviews = reviews;
           reviews.forEach(r => console.log('review.userId:', r.userId, 'type:', typeof r.userId));
           console.log('Reviews:', reviews);
@@ -138,7 +138,10 @@ export class ProductDetailComponent implements OnInit {
 
   getProductByCategory(category: string) {
     this.api.getProductCategory(category).subscribe((res:any) => {
-      this.relatedProduct = res;
+      if (this.productid != null) {
+        this.relatedProduct = res.filter((e: any) => e.id != (this.productid != null ? +this.productid : 0)).slice(0,4);
+
+      }
       this.loading = false;
     })
   }
