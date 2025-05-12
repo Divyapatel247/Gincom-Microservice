@@ -109,7 +109,6 @@ export class WebsocketService implements OnDestroy {
         }
         if(data.notificationType == 'totalOrder'){
           this.totalOrder$.next(data);
-          return
         }
         if(data.notificationType == 'lowStockProduct'){
           this.lowStock$.next(data);

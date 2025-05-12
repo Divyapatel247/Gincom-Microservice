@@ -464,5 +464,12 @@ public class ProductsRepository : IProductRepository
         return await conn.ExecuteScalarAsync<int>(sql, new { StockThreshold = 5 });
     }
 
+    public async Task<bool> IncrementSoldCountAsync(int productId, int quantity)
+    {
+        using var conn = new MySqlConnection(_connectionString);
+        var sql = "update products Set SoldCount = Soldcount + @Quantity where Id =@ProductId";
+        var result = await conn.ExecuteAsync(sql,new { ProductId = productId, Quantity = quantity });
+        return result > 0;
+    }
 }
 

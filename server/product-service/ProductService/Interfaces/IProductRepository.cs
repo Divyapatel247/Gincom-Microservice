@@ -27,5 +27,6 @@ Task<List<Product>> GetAllProductsAsync();
         Task<IEnumerable<Product>> SearchProductAsync(string query);
 
         Task<int> lowStokProductAsync();
+        Task<bool> IncrementSoldCountAsync(int productId, int quantity);
 
 }

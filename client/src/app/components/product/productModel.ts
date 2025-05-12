@@ -23,12 +23,12 @@ export interface IProduct {
   categoryId: number;
   categoryName?: string | null;
   IsNotifyDisabled?: boolean;
-
+  soldCount : number;
   relatedProductIds : Number[]
 }
 
 export interface IProductWithRelatedProducts extends IProduct {
-  relatedProducts : [{id:number,title:string,price:number,thumbnail:string}]
+  relatedProducts : [{id:number,title:string,price:number,thumbnail:string,stock: number, categoryName?: string | null,rating?: number;}]
 }
 
 export interface IReview {
