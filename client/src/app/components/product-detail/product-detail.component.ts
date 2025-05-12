@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { IProduct, IReview } from '../product/productModel';
+import { IProduct, IProductWithRelatedProducts, IReview } from '../product/productModel';
 import { ApiService } from '../../shared/api.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   NgFor,
   NgIf,
@@ -21,7 +21,7 @@ import { LoaderComponent } from "../loader/loader.component";
 
 @Component({
   selector: 'app-product-detail',
-  imports: [NgIf, NgFor, CommonModule, FormsModule, LoaderComponent],
+  imports: [NgIf, NgFor, CommonModule, FormsModule, LoaderComponent,RouterLink],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',
 
@@ -29,7 +29,8 @@ import { LoaderComponent } from "../loader/loader.component";
 export class ProductDetailComponent implements OnInit {
   loader = true;
   isToggle: any;
-  productDetail: IProduct = {
+  relatedProduct : IProduct[] | undefined;
+  productDetail: IProductWithRelatedProducts = {
     id: 0,
     description: '',
     stock: 0,
@@ -49,7 +50,9 @@ export class ProductDetailComponent implements OnInit {
     warrantyInformation: '',
     returnPolicy: '',
     reviews: [],
-    relatedProductIds: []
+    relatedProductIds: [],
+    relatedProducts: [{ id: 0, title: '', price: 0, thumbnail: '', stock: 0, categoryName: '', rating: 0 }],
+    soldCount: 0
   };
   quantity: number = 1;
   remainingStock: number = 0;
@@ -79,28 +82,31 @@ export class ProductDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    const productid = this.activadedRoute.snapshot.paramMap.get('productid');
-    // console.log(productid);
-    productid &&
-      this.api.getProductById(productid).subscribe((res: IProduct) => {
-        console.log(res);
-        this.productDetail = res;
 
-        this.productDetail = res;
-        this.remainingStock = res.stock;
-        console.log(res);
-        this.loader = false;
-        this.adjustRemainingStock(this.currentUserId!.toString(), this.productDetail.id);
-      });
-    if (productid) {
-      this.api
-        .getReviewsofProduct(productid)
-        .subscribe((reviews: IReview[]) => {
+    this.activadedRoute.paramMap.subscribe(params => {
+      const productid = params.get('productid');
+      if (productid) {
+        this.loader = true;
+
+        this.api.getProductById(productid).subscribe((res: IProductWithRelatedProducts) => {
+          console.log('Product Detail:', res);
+          this.productDetail = res;
+          this.remainingStock = res.stock;
+          this.loader = false;
+
+          this.adjustRemainingStock(this.currentUserId!.toString(), this.productDetail.id);
+          if(this.productDetail.categoryName){
+            this.getProductByCategory(this.productDetail.categoryName);
+          }
+        });
+
+        this.api.getReviewsofProduct(productid).subscribe((reviews: IReview[]) => {
           this.productDetail.reviews = reviews;
           reviews.forEach(r => console.log('review.userId:', r.userId, 'type:', typeof r.userId));
           console.log('Reviews:', reviews);
         });
-    }
+      }
+    });
 
 
 
@@ -129,6 +135,13 @@ export class ProductDetailComponent implements OnInit {
   };
 
   ratingWarning: boolean = false;
+
+  getProductByCategory(category: string) {
+    this.api.getProductCategory(category).subscribe((res:any) => {
+      this.relatedProduct = res;
+      this.loading = false;
+    })
+  }
 
   checkRating() {
     this.ratingWarning = this.newReview.rating < 1 || this.newReview.rating > 5;
@@ -234,6 +247,13 @@ export class ProductDetailComponent implements OnInit {
       }
     });
   }
+
+  getStars(rating: number | undefined): number[] {
+    const validRating = rating ?? 0;
+    return Array.from({ length: 5 }, (_, i) => i + 1);
+  }
+
+
 }
 
 

@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
       this.getOrderWithPendingStatus(this.orders);
       setTimeout(() => {
         this.loading = false;
-      }, 3000);
+      }, 1000);
     });
 
     this.api.getCustomerCount().subscribe((res)=>{

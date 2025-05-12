@@ -30,8 +30,9 @@ export class ShowProductDetailComponent implements OnInit {
     categoryId: 0,
     stock: 0,
     relatedProductIds: [],
-    relatedProducts: [{id:0,title:'',price:0,thumbnail:''}],
-    thumbnail : ''
+    relatedProducts: [{ id: 0, title: '', price: 0, thumbnail: '', stock: 0, categoryName: '', rating: 0 }],
+    thumbnail: '',
+    soldCount: 0
   };
   // relatedProducts: object[] = []
 
