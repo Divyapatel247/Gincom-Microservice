@@ -139,15 +139,15 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Product Information</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-sm">
               <div>
-                <p class="text-gray-600">Width:</p>
+                <p class="text-gray-600">Width(cm):</p>
                 <p class="font-medium">{{ productDetail?.dimensions?.width }}</p>
               </div>
               <div>
-                <p class="text-gray-600">Height:</p>
+                <p class="text-gray-600">Height(cm):</p>
                 <p class="font-medium">{{ productDetail?.dimensions?.height }}</p>
               </div>
               <div>
-                <p class="text-gray-600">Depth:</p>
+                <p class="text-gray-600">Depth(cm):</p>
                 <p class="font-medium">{{ productDetail?.dimensions?.depth }}</p>
               </div>
               <div>
@@ -276,7 +276,7 @@
 
   <!-- Cross Products -->
   <div class="mt-16">
-    <h3 class="text-2xl font-bold text-gray-900 mb-6">Cross Products</h3>
+    <h3 class="text-2xl font-bold text-gray-900 mb-6">Cross Sell Products</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Show products if available -->
       <ng-container *ngIf="productDetail.relatedProducts; else noResults">
@@ -358,7 +358,7 @@
 
   <!-- Related Products -->
   <div class="mt-16 mb-8">
-    <h3 class="text-2xl font-bold text-gray-900 mb-6">Related Products</h3>
+    <h3 class="text-2xl font-bold text-gray-900 mb-6">you might me interested in ...</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Show products if available -->
       <ng-container *ngIf="relatedProduct; else noRelatedResults">
